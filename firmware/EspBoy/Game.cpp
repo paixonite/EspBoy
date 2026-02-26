@@ -40,6 +40,10 @@ void Game::loop() {
     }
 }
 
+bool Game::shouldExit() const {
+    return _exit_request;
+}
+
 void Game::changeState(GameState newState) {
     currentState = newState;
     stateTimer = millis();
