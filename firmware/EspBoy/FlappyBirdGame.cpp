@@ -2,7 +2,7 @@
 #include "audio_assets.h"
 #include "pins.h"
 
-// --- CONSTANTES DO JOGO ---
+// Constantes do jogo
 const float GRAVITY = 0.3;
 const float FLAP_STRENGTH = -5.0;
 const float PIPE_SPEED = 2.0;
@@ -16,26 +16,15 @@ const int HUD_HEIGHT = 20;
 const int predefinedPipeGaps[] = {55, 75, 95, 115, 135};
 const int numPipeTypes = 5;
 
-// Construtor da classe
 FlappyBirdGame::FlappyBirdGame(TFT_eSPI* tft_display, SoundManager* sound_manager)
-    : tft(tft_display), sound(sound_manager) {
-    _exit_request = false;
+    : Game(tft_display, sound_manager, "Flappy Bird") {
 }
 
-// Chamado para (re)iniciar o jogo
-void FlappyBirdGame::setup() {
-    resetGame();
-    currentState = STATE_TITLE;
-    drawTitleScreen();
-}
-
-// Reseta o jogo para o estado inicial
 void FlappyBirdGame::resetGame() {
     player_y = tft->height() / 2;
     player_y_prev = player_y;
     player_vel_y = 0;
     score = 0;
-    _exit_request = false;
     fullRedrawRequired = true;
 
     for (int i = 0; i < 3; i++) {
@@ -47,70 +36,25 @@ void FlappyBirdGame::resetGame() {
     }
 }
 
-// Loop principal do jogo, chamado repetidamente
-void FlappyBirdGame::loop() {
-    switch (currentState) {
-        case STATE_TITLE:
-            handleInput();
-            break;
-
-        case STATE_PLAYING: {
-            handleInput();
-            updateGame();
-            checkCollisions();
-
-            if (currentState == STATE_GAME_OVER) {
-                break;
-            }
-
-            draw();
-
-            player_y_prev = player_y;
-            for (int i = 0; i < 3; i++) {
-                pipes[i].x_prev = pipes[i].x;
-            }
-
-            delay(16); // ~60 FPS
-            break;
-        }
-
-        case STATE_GAME_OVER:
-            if (millis() - gameOverTime > 2000) {
-                setup();
-            }
-            break;
-    }
-}
-
-// Lida com a entrada do jogador
-void FlappyBirdGame::handleInput() {
+void FlappyBirdGame::handleInputPlaying() {
     static bool lastButtonState = LOW;
     bool currentButtonState = digitalRead(BTN_A);
 
     if (lastButtonState == LOW && currentButtonState == HIGH) {
-        if (currentState == STATE_TITLE) {
-            currentState = STATE_PLAYING;
-        }
-        if (currentState == STATE_PLAYING) {
-            player_vel_y = FLAP_STRENGTH;
-            sound->play(MELODY_FLAP, MELODY_FLAP_LENGTH);
-        }
+        player_vel_y = FLAP_STRENGTH;
+        sound->play(MELODY_FLAP, MELODY_FLAP_LENGTH);
     }
     lastButtonState = currentButtonState;
-
-    if (digitalRead(BTN_START) == HIGH && digitalRead(BTN_SELECT) == HIGH) {
-        _exit_request = true;
-    }
 }
 
-// Atualiza a física e a lógica do jogo
-void FlappyBirdGame::updateGame() {
+void FlappyBirdGame::updatePlaying() {
     player_vel_y += GRAVITY;
     player_y += player_vel_y;
 
     for (int i = 0; i < 3; i++) {
         pipes[i].x -= PIPE_SPEED;
 
+        // Recicla o cano que saiu da tela
         if (pipes[i].x < -PIPE_WIDTH) {
             pipes[i].x = pipes[(i + 2) % 3].x + PIPE_SPACING;
             int randomIndex = random(numPipeTypes);
@@ -118,39 +62,38 @@ void FlappyBirdGame::updateGame() {
             pipes[i].scored = false;
         }
 
+        // Pontuação
         if (!pipes[i].scored && pipes[i].x + PIPE_WIDTH < PLAYER_X) {
             score++;
             pipes[i].scored = true;
             sound->play(MELODY_SCORE, MELODY_SCORE_LENGTH);
         }
     }
+
+    checkCollisions();
 }
 
-// Verifica todas as colisões
 void FlappyBirdGame::checkCollisions() {
+    // Colisão com teto e chão
     if (player_y + PLAYER_SIZE > tft->height() || player_y < HUD_HEIGHT) {
-        currentState = STATE_GAME_OVER;
-        gameOverTime = millis();
         sound->play(MELODY_HIT, MELODY_HIT_LENGTH);
-        drawGameOverScreen();
+        changeState(STATE_GAME_OVER);
         return;
     }
 
+    // Colisão com canos
     for (int i = 0; i < 3; i++) {
         if (PLAYER_X + PLAYER_SIZE > pipes[i].x && PLAYER_X < pipes[i].x + PIPE_WIDTH) {
             if (player_y < pipes[i].gap_y - PIPE_GAP / 2 || player_y + PLAYER_SIZE > pipes[i].gap_y + PIPE_GAP / 2) {
-                currentState = STATE_GAME_OVER;
-                gameOverTime = millis();
                 sound->play(MELODY_HIT, MELODY_HIT_LENGTH);
-                drawGameOverScreen();
+                changeState(STATE_GAME_OVER);
                 return;
             }
         }
     }
 }
 
-// Desenha todos os elementos na tela de forma otimizada
-void FlappyBirdGame::draw() {
+void FlappyBirdGame::drawPlaying() {
     if (fullRedrawRequired) {
         tft->fillScreen(TFT_BLACK);
         drawHUD();
@@ -163,12 +106,12 @@ void FlappyBirdGame::draw() {
             }
         }
     } else {
+        // Apaga rastro do player
         if (player_y != player_y_prev) {
             int top_prev = round(player_y_prev);
             int top_curr = round(player_y);
             int dy = top_curr - top_prev;
 
-            // Apaga rastro do player
             if (dy > 0) {
                 tft->fillRect(PLAYER_X, top_prev, PLAYER_SIZE, dy, TFT_BLACK);
             } else if (dy < 0) {
@@ -198,9 +141,14 @@ void FlappyBirdGame::draw() {
     tft->fillRect(PLAYER_X, round(player_y), PLAYER_SIZE, PLAYER_SIZE, TFT_YELLOW);
     drawHUD();
     tft->drawFastHLine(0, tft->height() - 1, tft->width(), TFT_WHITE);
+
+    // Atualiza estados anteriores
+    player_y_prev = player_y;
+    for (int i = 0; i < 3; i++) {
+        pipes[i].x_prev = pipes[i].x;
+    }
 }
 
-// Desenha a interface (pontuação) na área segura
 void FlappyBirdGame::drawHUD() {
     tft->fillRect(0, 0, tft->width(), HUD_HEIGHT, TFT_BLACK);
     tft->drawFastHLine(0, HUD_HEIGHT - 1, tft->width(), TFT_WHITE);
@@ -209,35 +157,4 @@ void FlappyBirdGame::drawHUD() {
     tft->setTextColor(TFT_WHITE);
     tft->setTextSize(2);
     tft->drawString(String(score), tft->width() / 2, 3);
-}
-
-// Desenha a tela inicial
-void FlappyBirdGame::drawTitleScreen() {
-    tft->fillScreen(TFT_BLACK);
-    tft->setTextColor(TFT_YELLOW);
-    tft->setTextSize(3);
-    tft->setTextDatum(MC_DATUM);
-    tft->drawString("Flappy Bird", tft->width() / 2, tft->height() / 2 - 20);
-    tft->setTextSize(2);
-    tft->setTextColor(TFT_WHITE);
-    tft->drawString("Press 'A'", tft->width() / 2, tft->height() / 2 + 20);
-}
-
-// Desenha a tela de Game Over
-void FlappyBirdGame::drawGameOverScreen() {
-    tft->fillRect(tft->width() / 2 - 90, tft->height() / 2 - 40, 175, 80, TFT_BLACK);
-    tft->drawRect(tft->width() / 2 - 90, tft->height() / 2 - 40, 175, 80, TFT_WHITE);
-    tft->setTextColor(TFT_RED);
-    tft->setTextSize(3);
-    tft->setTextDatum(MC_DATUM);
-    tft->drawString("GAME OVER", tft->width() / 2, tft->height() / 2 - 10);
-    
-    tft->setTextColor(TFT_WHITE);
-    tft->setTextSize(2);
-    String s = "Score: " + String(score);
-    tft->drawString(s, tft->width() / 2, tft->height() / 2 + 20);
-}
-
-bool FlappyBirdGame::shouldExit() const {
-    return _exit_request;
 }
