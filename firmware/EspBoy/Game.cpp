@@ -97,6 +97,12 @@ void Game::handleInputTitle() {
     bool currentButtonA = digitalRead(BTN_A);
     bool currentStart = digitalRead(BTN_START);
 
+    // Evita o bounce do menu
+    if (millis() - stateTimer < 250) {
+        lastButtonA = currentButtonA; // Mantém o estado sincronizado
+        return;
+    }
+
     // Começa se apertar A ou Start
     if ((lastButtonA == LOW && currentButtonA == HIGH) || currentStart == HIGH) {
         changeState(STATE_PLAYING);
