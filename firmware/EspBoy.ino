@@ -10,7 +10,7 @@
 #include "SnakeGame.h"
 #include "FlappyBirdGame.h"
 
-// Definições de cores personalizadas, pois as cores padrão da biblioteca não são ideais.
+// Definições de cores personalizadas
 #define MY_ORANGE tft.color565(255, 55, 0)
 #define MY_GREY tft.color565(30, 30, 40)
 
@@ -45,28 +45,35 @@ bool lastRightState = LOW;
 bool lastConfirmState = LOW;
 bool lastMuteActionState = LOW;
 
+// --- VARIÁVEIS PARA O DEBOUNCE DO MENU ---
+unsigned long lastNavInputTime = 0;
+const int NAV_DEBOUNCE_DELAY_MS = 200;
+
 // =================================================================
 // FUNÇÕES DE DESENHO E LÓGICA
 // =================================================================
 
+// Esta função mapeia a faixa correta do ADC (aprox. 1900-2600)
+// para a porcentagem da bateria de forma não-linear.
 int calculateBatteryPercentage(int adcValue) {
     int percentage = 0;
-    if (adcValue >= 3100) {
+    if (adcValue >= 2600) {
         percentage = 100;
-    } else if (adcValue > 2950) {
-        percentage = map(adcValue, 2950, 3100, 80, 100);
-    } else if (adcValue > 2800) {
-        percentage = map(adcValue, 2800, 2950, 50, 80);
-    } else if (adcValue > 2600) {
-        percentage = map(adcValue, 2600, 2800, 20, 50);
+    } else if (adcValue > 2500) {
+        percentage = map(adcValue, 2500, 2600, 80, 100);
     } else if (adcValue > 2300) {
-        percentage = map(adcValue, 2300, 2600, 0, 20);
+        percentage = map(adcValue, 2300, 2500, 30, 80);
+    } else if (adcValue > 2000) {
+        percentage = map(adcValue, 2000, 2300, 5, 30);
+    } else if (adcValue > 1900) {
+        percentage = map(adcValue, 1900, 2000, 0, 5);
     } else {
         percentage = 0;
     }
     return percentage;
 }
 
+// Verifica se a bateria está carregando, usando a faixa de ADC correta.
 bool isCharging() {
     static int lastAdcValue = 0;
     static unsigned long lastCheckTime = 0;
@@ -74,18 +81,22 @@ bool isCharging() {
     
     unsigned long currentTime = millis();
 
-    // Atualizamos o estado apenas a cada 1 segundo para estabilizar a leitura
     if (currentTime - lastCheckTime > 3000) {
         int currentAdcValue = analogRead(BATTERY_SENSE_PIN);
         
-        if (currentAdcValue > lastAdcValue && lastAdcValue > 0) { // Se a voltagem subiu, está carregando
+        // Se a voltagem subiu, está carregando
+        if (currentAdcValue > lastAdcValue && lastAdcValue > 0) {
             chargingState = true;
-        } else if (currentAdcValue < lastAdcValue) { // Se a voltagem caiu, está descarregando
+        } 
+        // Se a voltagem caiu, está descarregando
+        else if (currentAdcValue < lastAdcValue) {
             chargingState = false;
         }
-        // Se a voltagem está estável, mantém o estado anterior.
-        // Uma verificação extra para o caso de estar 100% carregado e conectado.
-        if (currentAdcValue > 3080) {
+        
+        // Verificação extra: se a leitura do ADC está no máximo absoluto 
+        // (que agora sabemos ser ~2600), consideramos que está carregando (ou cheio).
+        // Usamos 2580 para ter uma pequena margem.
+        if (currentAdcValue > 2580) {
             chargingState = true;
         }
 
@@ -95,34 +106,34 @@ bool isCharging() {
     return chargingState;
 }
 
+// Agora usa as funções corrigidas.
 String getBatteryStatus() {
     int currentAdcValue = analogRead(BATTERY_SENSE_PIN);
     int percentage = calculateBatteryPercentage(currentAdcValue);
     
-    if (isCharging()) {
-        return String(percentage - 31) + "%+"; // Adiciona '+' para indicar carga
-    } else {
-        return String(percentage) + "%";
-    }
+    //if (isCharging()) {
+    //   // Se estiver carregando, mostra a porcentagem e um '+'
+    //   return String(percentage) + "%+"; 
+    //} else {
+    //   return String(percentage) + "%";
+    //}
+
+    return String(percentage) + "%";
+
 }
 
 void updateBatteryDisplay() {
-  // Esta função desenha APENAS a informação da bateria,
-  // sem limpar a tela toda, para evitar pisca-pisca.
-  tft.setTextDatum(TR_DATUM); // Alinha o texto no canto superior direito
+  tft.setTextDatum(TR_DATUM);
   tft.setTextColor(TFT_GREEN);
   tft.setTextSize(2);
-
-  // Desenha um pequeno retângulo preto atrás do texto para apagar o valor antigo.
   tft.fillRect(tft.width() - 60, 5, 60, 16, TFT_BLACK);
-
   String batteryText = getBatteryStatus();
   tft.drawString(batteryText, tft.width() - 5, 5);
 }
 
 void drawSplashScreen() {
   tft.fillScreen(TFT_BLACK);
-  tft.setTextDatum(MC_DATUM); // Alinha o texto no centro (Middle Center)
+  tft.setTextDatum(MC_DATUM);
   tft.setTextSize(5);
 
   String title = "EspBoy";
@@ -137,13 +148,13 @@ void drawSplashScreen() {
   for (int i = 0; i < title.length(); i++) {
     String letter = String(title.charAt(i));
     tft.setTextColor(rainbowColors[i % 6]);
-    tft.setTextDatum(ML_DATUM); // Alinha a letra à esquerda do ponto do cursor (Middle Left)
+    tft.setTextDatum(ML_DATUM);
     tft.drawString(letter, cursorX, cursorY);
-    cursorX += tft.textWidth(letter); // Move o cursor para a posição da próxima letra.
+    cursorX += tft.textWidth(letter);
   }
 
   // Desenha o texto "by Paixonite" embaixo.
-  tft.setTextDatum(MC_DATUM); // Volta a alinhar pelo centro.
+  tft.setTextDatum(MC_DATUM);
   tft.setTextColor(TFT_CYAN);
   tft.setTextSize(2);
   tft.drawString("by Paixonite", tft.width() / 2, tft.height() / 2 + 30);
@@ -155,14 +166,10 @@ void drawMenu() {
   tft.setTextSize(2);
   tft.setTextDatum(MC_DATUM);
   tft.drawString("SELECT A GAME", tft.width() / 2, tft.height() / 4);
-
-  // Desenha o nome do jogo selecionado com setas.
   String gameText = "< " + String(gameNames[selectedGameIndex]) + " >";
   tft.setTextColor(TFT_WHITE);
   tft.drawString(gameText, tft.width() / 2, tft.height() / 2);
-
-  // Exibe a porcentagem da bateria.
-  //updateBatteryDisplay();
+  updateBatteryDisplay();
 }
 
 void handleMenuInput() {
@@ -174,59 +181,62 @@ void handleMenuInput() {
 
   // Lógica para ativar/desativar o som (pressionando Select + B).
   if (digitalRead(BTN_SELECT) == HIGH && currentMuteActionState == HIGH) {
-    // Usa a detecção de borda (ação ao soltar) para evitar disparos múltiplos.
-    if (lastMuteActionState == LOW) {
+    if (lastMuteActionState == LOW) { 
       soundManager.setMute(!soundManager.isMuted());
-
-      // Fornece um feedback visual para o usuário.
       tft.setTextColor(TFT_RED);
       tft.setTextSize(1);
-      tft.setTextDatum(BR_DATUM); // Alinha no canto inferior direito
+      tft.setTextDatum(BR_DATUM);
       if (soundManager.isMuted()) {
         tft.drawString("Sound OFF", tft.width() - 5, tft.height() - 5);
       } else {
         tft.drawString("Sound ON", tft.width() - 5, tft.height() - 5);
       }
       delay(500);
-      drawMenu(); // Redesenha o menu para apagar a mensagem.
+      drawMenu();
     }
   }
 
-  // Navegação para a esquerda.
+  // --- NAVEGAÇÃO PARA A ESQUERDA (COM DEBOUNCE) ---
   if (lastLeftState == HIGH && currentLeftState == LOW) {
-    selectedGameIndex--;
-    if (selectedGameIndex < 0) {
-      selectedGameIndex = gameCount - 1; // Volta para o final da lista.
+    if (millis() - lastNavInputTime > NAV_DEBOUNCE_DELAY_MS) {
+      lastNavInputTime = millis();
+      selectedGameIndex--;
+      if (selectedGameIndex < 0) {
+        selectedGameIndex = gameCount - 1;
+      }
+      soundManager.play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+      tft.fillScreen(MY_GREY);
+      delay(40);
+      drawMenu();
     }
-    soundManager.play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-    tft.fillScreen(MY_GREY); // Efeito visual de "flash".
-    delay(40);
-    drawMenu();
   }
 
-  // Navegação para a direita.
+  // --- NAVEGAÇÃO PARA A DIREITA (COM DEBOUNCE) ---
   if (lastRightState == HIGH && currentRightState == LOW) {
-    selectedGameIndex++;
-    if (selectedGameIndex >= gameCount) {
-      selectedGameIndex = 0; // Volta para o início da lista.
+    if (millis() - lastNavInputTime > NAV_DEBOUNCE_DELAY_MS) {
+      lastNavInputTime = millis();
+      selectedGameIndex++;
+      if (selectedGameIndex >= gameCount) {
+        selectedGameIndex = 0;
+      }
+      soundManager.play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+      tft.fillScreen(MY_GREY);
+      delay(40);
+      drawMenu();
     }
-    soundManager.play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-    tft.fillScreen(MY_GREY); // Efeito visual de "flash".
-    delay(40);
-    drawMenu();
   }
 
   // Seleção de jogo com o botão 'A'.
   if (lastConfirmState == HIGH && currentConfirmState == LOW) {
     switch (selectedGameIndex) {
       case 0: // Snake
-        if (currentGame != nullptr) delete currentGame; // Libera memória do jogo anterior.
-        currentGame = new SnakeGame(&tft, &soundManager); // Cria o novo jogo.
+        if (currentGame != nullptr) delete currentGame;
+        currentGame = new SnakeGame(&tft, &soundManager);
         break;
       
       case 1: // Flappy
-        if (currentGame != nullptr) delete currentGame; // Libera memória do jogo anterior.
-        currentGame = new FlappyBirdGame(&tft, &soundManager); // Cria o novo jogo.
+        if (currentGame != nullptr) delete currentGame;
+        currentGame = new FlappyBirdGame(&tft, &soundManager);
         break;
     }
 
@@ -274,13 +284,11 @@ void setup() {
 }
 
 void loop() {
-  // O gerenciador de som deve ser atualizado constantemente, em qualquer estado.
   soundManager.loop();
 
   // Roteia a lógica principal com base no estado atual do sistema.
   switch (currentSystemState) {
     case STATE_SPLASH:
-      // Permanece neste estado até o tempo da splash screen acabar.
       if (millis() - splashStartTime > SPLASH_DURATION_MS) {
         currentSystemState = STATE_MENU;
         drawMenu();
@@ -288,18 +296,14 @@ void loop() {
       break;
 
     case STATE_MENU:
-      // Executa a lógica de interação com o menu.
       handleMenuInput();
-
-      // Atualiza o display da bateria periodicamente.
-      if (millis() - lastBatteryUpdate > 5000) { // Atualiza a cada 5 segundos
+      if (millis() - lastBatteryUpdate > 5000) {
         lastBatteryUpdate = millis();
-        //updateBatteryDisplay();
+        updateBatteryDisplay(); // Reativei esta linha
       }
       break;
 
     case STATE_IN_GAME:
-      // Se um jogo estiver carregado, executa o loop dele.
       if (currentGame != nullptr) {
         currentGame->loop();
 

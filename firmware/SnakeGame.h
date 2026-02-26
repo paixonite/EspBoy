@@ -34,7 +34,7 @@ private:
     static const int DISPLAY_WIDTH = 320;
     static const int DISPLAY_HEIGHT = 170;
     static const int SPEED = 200;
-    static const int CELL_SIZE = 8;
+    static const int CELL_SIZE = 10;
     static const int Y_OFFSET = CELL_SIZE;
     static const int GRID_WIDTH = DISPLAY_WIDTH / CELL_SIZE;
     static const int GRID_HEIGHT = (DISPLAY_HEIGHT - Y_OFFSET) / CELL_SIZE;
