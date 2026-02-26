@@ -6,7 +6,7 @@ Um console de jogos portátil, estilo "Game Boy", construído do zero utilizando
 
 ## 🕹️ Sobre o Projeto
 
-O objetivo do EspBoy é construir uma plataforma de hardware e software robusta e modular, aprendendo na prática conceitos de:
+O objetivo do EspBoy é construir uma plataforma de hardware e software robusta e modular, desenvolvendo na prática habilidades em:
 
 - **Desenvolvimento de Hardware:** Montagem de circuitos, soldagem e integração de componentes.
 - **Programação de Baixo Nível:** Interação direta com GPIOs, timers e periféricos do microcontrolador.
@@ -32,28 +32,28 @@ O software do EspBoy foi projetado para ser escalável e eficiente.
 
 ## 📂 Estrutura do Código
 
-O projeto segue uma organização limpa que separa as responsabilidades do firmware. 
+O projeto segue uma organização que separa as responsabilidades do firmware. 
 
-> **Nota:** Embora a estrutura abaixo mostre pastas separadas para organização lógica, para compilar na **Arduino IDE**, todos os arquivos `.h` e `.cpp` devem estar na **raiz** junto com o `.ino`, a menos que sejam instalados como bibliotecas externas.
-
-```text
+```
 EspBoy/
-|-- EspBoy.ino           # Firmware principal: inicializa hardware, gerencia o jogo atual.
-|-- pins.h               # Centraliza a definição de todos os pinos de hardware.
-|-- audio_assets.h       # Define as notas musicais e as melodias do jogo.
-|-- Game.h               # Classe genérica dos jogos
 |
-|-- SoundManager/        # Classe que gerencia todo o áudio não-bloqueante.
-|   |-- SoundManager.h
-|   |-- SoundManager.cpp
+|-- [ Core & Hardware ]
+|-- EspBoy.ino           # Firmware principal: máquina de estados, menu e inicialização.
+|-- pins.h               # Centraliza a definição de todos os pinos físicos do ESP32.
 |
-|-- SnakeGame/           # Classe que contém toda a lógica do Snake.
-|   |-- SnakeGame.h
-|   |-- SnakeGame.cpp
+|-- [ Motor de Jogos ]
+|-- Game.h               # Classe base genérica (interface padrão).
 |
-|-- FlappyBirdGame/      # Classe que contém toda a lógica do Flappy Bird.
-|   |-- FlappyBirdGame.h
-|   |-- FlappyBirdGame.cpp
+|-- [ Sistema de Áudio ]
+|-- SoundManager.h       # Classe para gerenciamento de áudio não-bloqueante via buzzer.
+|-- SoundManager.cpp     # Implementação do controle de som.
+|-- audio_assets.h       # Biblioteca de notas musicais e arrays de melodias.
+|
+|-- [ Jogos Implementados ]
+|-- SnakeGame.h          # Cabeçalho do Snake.
+|-- SnakeGame.cpp        # Implementação.
+|-- FlappyBirdGame.h     # Cabeçalho do Flappy Bird.
+|-- FlappyBirdGame.cpp   # Implementação.
 ```
 
 ## 🚀 Como Compilar e Usar
@@ -68,8 +68,6 @@ EspBoy/
     - Abra o arquivo `EspBoy.ino` na Arduino IDE
     - Selecione a placa correta (LILYGO T-Display S3)
     - Faça o upload.
-      
->⚠️ Atenção: Para compilar corretamente na Arduino IDE padrão, certifique-se de que todos os arquivos auxiliares (.h e .cpp das classes SoundManager, Game, etc.) estejam localizados na mesma pasta do arquivo EspBoy.ino, e não em subpastas separadas.
 
 ## 👤 Autor
 
