@@ -13,5 +13,6 @@
 #define BUZZER_PIN 16
 #define POWER_ENABLE_PIN  15 // Pino para ligar a energia da bateria
 #define BATTERY_SENSE_PIN 4  // Pino para ler a voltagem da bateria
+#define TFT_BL_PIN 38 // Pino de controle do Backlight do LILYGO T-Display S3
 
 #endif // PINS_H

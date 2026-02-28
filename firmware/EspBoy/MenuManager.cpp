@@ -190,6 +190,11 @@ void MenuManager::handleSettingsInput() {
             else if (selectedSettingIndex == 1) {
                 currentBrightness -= 10;
                 if (currentBrightness < 10) currentBrightness = 10;
+
+                // Mapeamento Exponencial (Gamma) com piso de 40 e teto de 254
+                float normalized = currentBrightness / 100.0;
+                int pwm = 40 + (int)(214.0 * normalized * normalized);
+                analogWrite(TFT_BL_PIN, pwm);
             }
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             drawSettings();
@@ -200,6 +205,10 @@ void MenuManager::handleSettingsInput() {
             else if (selectedSettingIndex == 1) {
                 currentBrightness += 10;
                 if (currentBrightness > 100) currentBrightness = 100;
+
+                float normalized = currentBrightness / 100.0;
+                int pwm = 54.9 + (int)(200 * normalized * normalized);
+                analogWrite(TFT_BL_PIN, pwm);
             }
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             drawSettings();
@@ -314,14 +323,15 @@ void MenuManager::drawMenu() {
     tft->setTextColor(TFT_YELLOW);
     tft->setTextSize(2);
     tft->setTextDatum(MC_DATUM);
-    tft->drawString("SELECT A GAME", tft->width() / 2, tft->height() / 4);
+    tft->drawString("-- SELECT A GAME --", tft->width() / 2, tft->height() / 4);
     
     String gameText = "< " + String(gameNames[selectedGameIndex]) + " >";
     tft->setTextColor(TFT_WHITE);
     tft->drawString(gameText, tft->width() / 2, tft->height() / 2);
     
+    tft->drawFastHLine(0, tft->height() - 25, tft->width(), TFT_WHITE);
     tft->setTextSize(1);
-    tft->drawString("[A] Play    [SELECT] Settings", tft->width() / 2, tft->height() - 15);
+    tft->drawString("[A] Play    [SELECT] Settings", tft->width() / 2, tft->height() - 12);
     
     updateBatteryDisplay();
 }

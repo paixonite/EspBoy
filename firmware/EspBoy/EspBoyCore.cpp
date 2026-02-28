@@ -60,6 +60,9 @@ void EspBoyCore::loadHardware() {
     
     pinMode(POWER_ENABLE_PIN, OUTPUT);
     digitalWrite(POWER_ENABLE_PIN, HIGH);
+
+    pinMode(TFT_BL_PIN, OUTPUT);
+    analogWrite(TFT_BL_PIN, 255); // Liga a tela com 100% de brilho (0-255)
 }
 
 void EspBoyCore::loadGame(int gameIndex) {

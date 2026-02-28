@@ -73,7 +73,11 @@ void Game::drawTitleScreen() {
     
     tft->setTextSize(2);
     tft->setTextColor(TFT_WHITE);
-    tft->drawString("Press 'A' or 'Start'", tft->width() / 2, tft->height() / 2 + 20);
+    tft->drawString("Press [A] or [START]", tft->width() / 2, tft->height() / 2 + 20);
+
+    tft->setTextSize(1);
+    tft->setTextColor(TFT_LIGHTGREY);
+    tft->drawString("Press [START] + [SELECT] to quit", tft->width() / 2, tft->height() / 2 + 40);
 }
 
 void Game::drawGameOverScreen() {
