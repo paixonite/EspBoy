@@ -82,7 +82,7 @@ void SnakeGame::updatePlaying() {
     // Checa colisões críticas
     if (collided == SNAKE || collided == WALL) {
         sound->play(MELODY_GAME_OVER, MELODY_GAME_OVER_LENGTH);
-        changeState(STATE_GAME_OVER);
+        endGame();
         return;
     }
 

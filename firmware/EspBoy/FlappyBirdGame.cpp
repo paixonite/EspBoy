@@ -77,7 +77,7 @@ void FlappyBirdGame::checkCollisions() {
     // Colisão com teto e chão
     if (player_y + PLAYER_SIZE > tft->height() || player_y < HUD_HEIGHT) {
         sound->play(MELODY_HIT, MELODY_HIT_LENGTH);
-        changeState(STATE_GAME_OVER);
+        endGame();
         return;
     }
 
@@ -86,7 +86,7 @@ void FlappyBirdGame::checkCollisions() {
         if (PLAYER_X + PLAYER_SIZE > pipes[i].x && PLAYER_X < pipes[i].x + PIPE_WIDTH) {
             if (player_y < pipes[i].gap_y - PIPE_GAP / 2 || player_y + PLAYER_SIZE > pipes[i].gap_y + PIPE_GAP / 2) {
                 sound->play(MELODY_HIT, MELODY_HIT_LENGTH);
-                changeState(STATE_GAME_OVER);
+                endGame();
                 return;
             }
         }

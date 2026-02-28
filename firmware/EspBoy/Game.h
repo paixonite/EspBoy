@@ -2,49 +2,73 @@
 #define GAME_H
 
 #include <TFT_eSPI.h>
+#include <Preferences.h>
 #include "SoundManager.h"
 #include "pins.h"
 
-// Movemos o enum para cá para ser compartilhado por todos os jogos
-enum GameState { STATE_TITLE, STATE_PLAYING, STATE_GAME_OVER };
+enum GameState { 
+    STATE_TITLE, 
+    STATE_PLAYING, 
+    STATE_GAME_OVER, 
+    STATE_HIGHSCORE_VIEW, 
+    STATE_HIGHSCORE_ENTRY 
+};
 
 class Game {
 public:
-    // Construtor base exigindo o nome do jogo para as telas padrão
     Game(TFT_eSPI* tft_display, SoundManager* sound_manager, const String& game_name);
     virtual ~Game() {}
 
-    // Métodos públicos chamados pelo EspBoy.ino. 
-    // NÃO são mais virtuais puros, pois a classe Game os implementa!
     void setup();
     void loop();
     bool shouldExit() const;
 
 protected:
-    // --- Atributos Compartilhados (Nenhum jogo filho precisa declarar isso de novo) ---
     TFT_eSPI* tft;
     SoundManager* sound;
     String gameName;
     GameState currentState;
     bool _exit_request;
     int score;
-    unsigned long stateTimer; // Generaliza o gameOverTime/gameOverStartTime
+    unsigned long stateTimer; 
 
-    // --- Template Methods: O que cada jogo DEVE implementar ---
-    virtual void resetGame() = 0;          // Zera variáveis, posições, cobra, canos, etc.
-    virtual void updatePlaying() = 0;      // Lógica e física (roda durante STATE_PLAYING)
-    virtual void drawPlaying() = 0;        // Renderização (roda durante STATE_PLAYING)
-    virtual void handleInputPlaying() = 0; // Controles (roda durante STATE_PLAYING)
+    virtual void resetGame() = 0;          
+    virtual void updatePlaying() = 0;      
+    virtual void drawPlaying() = 0;        
+    virtual void handleInputPlaying() = 0; 
 
-    // --- Métodos de Tela e Comportamento Padrão (Podem ser sobrescritos se necessário) ---
     virtual void drawTitleScreen();
     virtual void drawGameOverScreen();
     virtual void handleInputTitle();
     virtual void handleGameOverState();
 
-    // --- Utilitários ---
     void changeState(GameState newState);
-    void checkGlobalExit(); // Verifica Start + Select
+    void checkGlobalExit(); 
+    
+    // --- Lógica de Highscores ---
+    void endGame(); // Função chamada pelos jogos ao morrer
+    void loadHighscores();
+    void saveHighscores();
+    
+    void drawHighscoreViewScreen();
+    void drawHighscoreEntryScreen();
+    void drawInitials(); // Nova função sub-renderizadora anti-flicker
+    
+    void handleHighscoreViewInput();
+    void handleHighscoreEntryInput();
+
+private:
+    Preferences preferences;
+    int topScores[3];
+    String topNames[3];
+    int newHighscoreRank; 
+    
+    // Variáveis da tela de iniciais
+    char currentInitials[3];
+    int currentInitialIndex;
+    
+    // Variável estática global para lembrar o último nome inserido em qualquer jogo
+    static char lastInitials[3]; 
 };
 
 #endif // GAME_H
