@@ -2,19 +2,20 @@
 #include "audio_assets.h"
 #include "pins.h"
 
-// Constantes do jogo
-const float GRAVITY = 0.3;
-const float FLAP_STRENGTH = -5.0;
+// Constantes do jogo (Ajustadas)
+const float GRAVITY = 0.28;
+const float FLAP_STRENGTH = -4.2;
 const float PIPE_SPEED = 2.0;
 const int PLAYER_X = 40;
 const int PLAYER_SIZE = 12;
 const int PIPE_WIDTH = 30;
-const int PIPE_GAP = 70;
+const int PIPE_GAP = 55;
 const int PIPE_SPACING = 120;
 const int HUD_HEIGHT = 20;
 
-const int predefinedPipeGaps[] = {55, 75, 95, 115, 135};
-const int numPipeTypes = 5;
+// Limites seguros para a geração aleatória do centro da fresta (gap_y)
+const int MIN_GAP_Y = 55;
+const int MAX_GAP_Y = 135;
 
 FlappyBirdGame::FlappyBirdGame(TFT_eSPI* tft_display, SoundManager* sound_manager)
     : Game(tft_display, sound_manager, "Flappy Bird") {
@@ -30,8 +31,8 @@ void FlappyBirdGame::resetGame() {
     for (int i = 0; i < 3; i++) {
         pipes[i].x = tft->width() + (i * PIPE_SPACING);
         pipes[i].x_prev = pipes[i].x;
-        int randomIndex = random(numPipeTypes);
-        pipes[i].gap_y = predefinedPipeGaps[randomIndex];
+        // Geração 100% aleatória dentro dos limites visíveis da tela
+        pipes[i].gap_y = random(MIN_GAP_Y, MAX_GAP_Y + 1);
         pipes[i].scored = false;
     }
 }
@@ -57,8 +58,8 @@ void FlappyBirdGame::updatePlaying() {
         // Recicla o cano que saiu da tela
         if (pipes[i].x < -PIPE_WIDTH) {
             pipes[i].x = pipes[(i + 2) % 3].x + PIPE_SPACING;
-            int randomIndex = random(numPipeTypes);
-            pipes[i].gap_y = predefinedPipeGaps[randomIndex];
+            // Geração 100% aleatória para o novo cano
+            pipes[i].gap_y = random(MIN_GAP_Y, MAX_GAP_Y + 1);
             pipes[i].scored = false;
         }
 
