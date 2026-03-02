@@ -24,12 +24,6 @@ O objetivo do EspBoy é construir uma plataforma de hardware e software robusta 
 
 O software do EspBoy foi projetado para ser modular, escalável e responsivo.
 
-- **👾 Jogos:** Atualmente, conta com os clássicos Snake e Flappy Bird. Planos futuros incluirão jogos como Tetris e Frogger.
-- **🔋 Suporte a Bateria Recarregável:** O firmware inclui rotinas para habilitar e monitorar o nível da bateria, permitindo que o console seja jogado em qualquer lugar.
-- **🧩 Arquitetura de Software Modular (POO):** O código é organizado com um arquivo `.ino` principal que atua como um "mini-sistema operacional", e cada jogo é sua própria classe (biblioteca). Isso facilita a adição de novos jogos sem alterar o código principal.
-- **🎵 Gerenciador de Áudio Não-Bloqueante:** Um sistema de som que toca melodias e efeitos sonoros em segundo plano, sem usar `delay()` e sem travar a lógica do jogo.
-- **🕹️ Controles Responsivos:** A leitura dos botões é feita de forma não-bloqueante, com técnicas de *debounce* e detecção de borda (ação ao soltar o botão).
-
 - 👾 Jogos Inclusos: Atualmente, conta com os clássicos Snake e Flappy Bird, rodando de forma fluida a ~60 FPS. Planos futuros incluirão jogos como Tetris e Frogger.
 - 🏆 Sistema de Highscores Persistente: O console possui uma memória Flash integrada que salva o Top 3 de cada jogo, incluindo uma tela de entrada de 3 iniciais no clássico estilo arcade.
 - ⚙️ Menu de Configurações Dinâmico: Uma UI de sistema dedicada permite ajustar o volume, alterar o brilho da tela e resetar os recordes.
