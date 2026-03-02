@@ -32,6 +32,10 @@ protected:
     int score;
     unsigned long stateTimer; 
 
+    // Arrays para placeholders customizáveis por cada jogo
+    int defaultScores[3];
+    String defaultNames[3];
+
     virtual void resetGame() = 0;          
     virtual void updatePlaying() = 0;      
     virtual void drawPlaying() = 0;        
@@ -46,13 +50,13 @@ protected:
     void checkGlobalExit(); 
     
     // --- Lógica de Highscores ---
-    void endGame(); // Função chamada pelos jogos ao morrer
+    void endGame(); 
     void loadHighscores();
     void saveHighscores();
     
     void drawHighscoreViewScreen();
     void drawHighscoreEntryScreen();
-    void drawInitials(); // Nova função sub-renderizadora anti-flicker
+    void drawInitials(); 
     
     void handleHighscoreViewInput();
     void handleHighscoreEntryInput();
@@ -63,11 +67,9 @@ private:
     String topNames[3];
     int newHighscoreRank; 
     
-    // Variáveis da tela de iniciais
     char currentInitials[3];
     int currentInitialIndex;
     
-    // Variável estática global para lembrar o último nome inserido em qualquer jogo
     static char lastInitials[3]; 
 };
 

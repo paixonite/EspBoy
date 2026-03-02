@@ -10,10 +10,16 @@ Game::Game(TFT_eSPI* tft_display, SoundManager* sound_manager, const String& gam
     score = 0;
     currentState = STATE_TITLE;
     
-    loadHighscores();
+    // Configura os placeholders universais do sistema.
+    // Qualquer jogo filho pode sobrescrever isso no seu próprio construtor.
+    defaultScores[0] = 30; defaultNames[0] = "CPU";
+    defaultScores[1] = 20; defaultNames[1] = "ESP";
+    defaultScores[2] = 10; defaultNames[2] = "BOY";
 }
 
 void Game::setup() {
+    // Carrega os recordes (ou os placeholders se a flash estiver limpa) ANTES de iniciar o jogo
+    loadHighscores();
     resetGame();
     changeState(STATE_TITLE);
 }
@@ -68,9 +74,7 @@ void Game::checkGlobalExit() {
     static bool lastSelectState = LOW;
     bool currentSelectState = digitalRead(BTN_SELECT);
     
-    // Gatilho apenas na borda de subida para evitar que o clique vaze pro Menu
     if (lastSelectState == LOW && currentSelectState == HIGH) {
-        // Permite sair de quase qualquer lugar, exceto enquanto digita o recorde
         if (currentState == STATE_TITLE || currentState == STATE_PLAYING || currentState == STATE_GAME_OVER) {
             _exit_request = true;
         }
@@ -136,9 +140,7 @@ void Game::drawGameOverScreen() {
 
 void Game::handleGameOverState() {
     if (millis() - stateTimer > 2500) {
-        // Após a tela de Game Over acabar, checamos se houve recorde
         if (newHighscoreRank != -1) {
-            // Puxa as últimas iniciais usadas na sessão
             currentInitials[0] = lastInitials[0];
             currentInitials[1] = lastInitials[1];
             currentInitials[2] = lastInitials[2];
@@ -162,7 +164,6 @@ void Game::endGame() {
             break;
         }
     }
-    // Sempre vai pro Game Over primeiro
     changeState(STATE_GAME_OVER);
 }
 
@@ -172,8 +173,9 @@ void Game::loadHighscores() {
     
     preferences.begin(ns.c_str(), true); 
     for (int i = 0; i < 3; i++) {
-        topScores[i] = preferences.getInt(("score" + String(i)).c_str(), 0);
-        topNames[i] = preferences.getString(("name" + String(i)).c_str(), "---");
+        // Agora tenta carregar da memória; se não encontrar, usa os defaults definidos
+        topScores[i] = preferences.getInt(("score" + String(i)).c_str(), defaultScores[i]);
+        topNames[i] = preferences.getString(("name" + String(i)).c_str(), defaultNames[i]);
     }
     preferences.end();
 }
@@ -242,7 +244,6 @@ void Game::handleHighscoreViewInput() {
 // =================================================================
 
 void Game::drawHighscoreEntryScreen() {
-    // Desenha as partes estáticas apenas uma vez para não piscar
     tft->fillScreen(TFT_BLACK);
     tft->setTextColor(TFT_GREEN);
     tft->setTextSize(2);
@@ -256,7 +257,7 @@ void Game::drawHighscoreEntryScreen() {
     tft->setTextColor(TFT_LIGHTGREY);
     tft->drawString("[A] Confirm", tft->width() / 2, tft->height() - 15);
 
-    drawInitials(); // Desenha as letras
+    drawInitials();
 }
 
 void Game::drawInitials() {
@@ -270,13 +271,11 @@ void Game::drawInitials() {
     for (int i = 0; i < 3; i++) {
         int centerX = startX + (i * charSpacing);
         
-        // Limpa apenas a área da letra exata (anti-flicker)
         tft->fillRect(centerX - 15, yPos - 20, 30, 45, TFT_BLACK);
 
         tft->setTextColor(i == currentInitialIndex ? TFT_YELLOW : TFT_WHITE);
         tft->drawString(String(currentInitials[i]), centerX, yPos);
         
-        // Linha centralizada em baixo da letra
         if (i == currentInitialIndex) {
             tft->drawFastHLine(centerX - 14, yPos + 20, 24, TFT_YELLOW);
         }
@@ -285,7 +284,7 @@ void Game::drawInitials() {
 
 void Game::handleHighscoreEntryInput() {
     static unsigned long lastNavTime = 0;
-    const int NAV_DELAY = 150; // Debounce contínuo
+    const int NAV_DELAY = 150; 
     
     bool curUp = digitalRead(BTN_UP);
     bool curDown = digitalRead(BTN_DOWN);
@@ -301,7 +300,6 @@ void Game::handleHighscoreEntryInput() {
 
     bool redraw = false;
 
-    // Navegação com repetição automática baseada no delay
     if (millis() - lastNavTime > NAV_DELAY) {
         if (curUp == HIGH) {
             currentInitials[currentInitialIndex]++;
@@ -329,12 +327,9 @@ void Game::handleHighscoreEntryInput() {
         }
     }
 
-    // Confirmação
     if (lastA == LOW && curA == HIGH) {
-        // Atualiza a memória global
         for (int i = 0; i < 3; i++) lastInitials[i] = currentInitials[i];
 
-        // Desloca as pontuações e salva
         for (int i = 2; i > newHighscoreRank; i--) {
             topScores[i] = topScores[i - 1];
             topNames[i] = topNames[i - 1];

@@ -1,5 +1,6 @@
 #include "MenuManager.h"
 #include "audio_assets.h"
+#include <Preferences.h>
 
 #define MY_ORANGE tft->color565(255, 55, 0)
 #define MY_GREY tft->color565(30, 30, 40)
@@ -241,8 +242,23 @@ void MenuManager::handleConfirmResetInput() {
     }
 
     if (lastConfirmState == LOW && currentConfirmState == HIGH) {
-        // TODO: Limpar EEPROM/Preferences
-        sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+        
+        // Instancia o gerenciador de memória
+        Preferences prefs;
+        
+        // Itera por todos os jogos cadastrados no menu e limpa seus recordes
+        for (int i = 0; i < GAME_COUNT; i++) {
+            String ns = String(gameNames[i]);
+            ns.replace(" ", ""); // Garante que o nome bata com o namespace usado no Game.cpp
+            
+            prefs.begin(ns.c_str(), false); // Abre em modo Leitura/Escrita
+            prefs.clear();                  // Deleta todas as chaves deste namespace
+            prefs.end();                    // Fecha e salva
+        }
+
+        // Toca um som de pontuação para indicar sucesso na ação
+        sound->play(MELODY_SCORE, MELODY_SCORE_LENGTH); 
+        
         currentState = MENU_STATE_SETTINGS;
         menuStateTimer = millis(); 
         drawSettings(); 
