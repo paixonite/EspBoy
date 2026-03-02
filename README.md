@@ -2,15 +2,15 @@
 
 ![EspBoy logo](EspBoy_logo.png)
 
-Um console de jogos portátil, estilo "Game Boy", construído do zero utilizando um ESP32-S3 da LILYGO, componentes eletrônicos básicos e muita programação! Este é um projeto pessoal com fins educacionais, desenvolvido utilizando materiais e o espaço maker do **Colégio Técnico da UFMG (Coltec)**.
+Um console de jogos portátil, estilo "Game Boy", construído do zero utilizando um ESP32-S3 da LILYGO, componentes eletrônicos básicos e muita programação! Este é um projeto pessoal com fins educacionais, desenvolvido originalmente com os materiais e o espaço maker do Colégio Técnico da UFMG (Coltec) e em constante evolução durante a graduação em Ciência da Computação (DCC/UFMG).
 
 ## 🕹️ Sobre o Projeto
 
 O objetivo do EspBoy é construir uma plataforma de hardware e software robusta e modular, desenvolvendo na prática habilidades em:
 
 - **Desenvolvimento de Hardware:** Montagem de circuitos, soldagem e integração de componentes.
-- **Programação de Baixo Nível:** Interação direta com GPIOs, timers e periféricos do microcontrolador.
-- **Arquitetura de Software:** Criação de um sistema organizado, com um "firmware principal" que gerencia "bibliotecas" de jogos independentes.
+- **Programação de Baixo Nível:** Interação direta com GPIOs, timers (PWM) e periféricos do microcontrolador.
+- **Arquitetura de Software:** Criação de um sistema operacional organizado por responsabilidades, com classes abstratas ditando o ciclo de vida dos jogos através do padrão Template Method.
 - **Gerenciamento de Energia:** Implementação de um sistema de bateria recarregável para portabilidade real.
 
 ## ⚙️ Hardware Utilizado
@@ -22,13 +22,14 @@ O objetivo do EspBoy é construir uma plataforma de hardware e software robusta 
 
 ## ✨ Features do Firmware
 
-O software do EspBoy foi projetado para ser escalável e eficiente.
+O software do EspBoy foi projetado para ser modular, escalável e responsivo.
 
-- **👾 Jogos:** Atualmente, conta com os clássicos Snake e Flappy Bird. Planos futuros incluirão jogos como Tetris e Frogger.
-- **🔋 Suporte a Bateria Recarregável:** O firmware inclui rotinas para habilitar e monitorar o nível da bateria, permitindo que o console seja jogado em qualquer lugar.
-- **🧩 Arquitetura de Software Modular (POO):** O código é organizado com um arquivo `.ino` principal que atua como um "mini-sistema operacional", e cada jogo é sua própria classe (biblioteca). Isso facilita a adição de novos jogos sem alterar o código principal.
-- **🎵 Gerenciador de Áudio Não-Bloqueante:** Um sistema de som que toca melodias e efeitos sonoros em segundo plano, sem usar `delay()` e sem travar a lógica do jogo.
-- **🕹️ Controles Responsivos:** A leitura dos botões é feita de forma não-bloqueante, com técnicas de *debounce* e detecção de borda (ação ao soltar o botão) para uma experiência de jogo precisa.
+- 👾 Jogos Inclusos: Atualmente, conta com os clássicos Snake e Flappy Bird, rodando de forma fluida a ~60 FPS. Planos futuros incluirão jogos como Tetris e Frogger.
+- 🏆 Sistema de Highscores Persistente: O console possui uma memória Flash integrada que salva o Top 3 de cada jogo, incluindo uma tela de entrada de 3 iniciais no clássico estilo arcade.
+- ⚙️ Menu de Configurações Dinâmico: Uma UI de sistema dedicada permite ajustar o volume, alterar o brilho da tela e resetar os recordes.
+- 🧩 Arquitetura Orientada a Objetos (POO): O sistema é orquestrado por um Core (EspBoyCore) que delega tarefas para gerenciadores específicos (MenuManager, BatteryManager). Novos jogos herdam de uma superclasse Game que fornece a máquina de estados padrão e os métodos template.
+- 🎵 Áudio Não-Bloqueante: Um sistema de som que toca melodias e efeitos sonoros em segundo plano através de uma máquina de estados, sem travar a física ou a lógica dos jogos.
+- 🕹️ Controles Responsívos: A leitura dos botões utiliza técnicas de detecção de borda, debounce e prevenção de vazamento de inputs.
 
 ## 📂 Estrutura do Código
 
@@ -37,23 +38,25 @@ O projeto segue uma organização que separa as responsabilidades do firmware.
 ```
 EspBoy/
 |
-|-- [ Core & Hardware ]
-|-- EspBoy.ino           # Firmware principal: máquina de estados, menu e inicialização.
-|-- pins.h               # Centraliza a definição de todos os pinos físicos do ESP32.
+|-- [ Ponto de Entrada ]
+|-- EspBoy.ino            # Apenas inicializa o sistema operacional do console.
+|-- pins.h                # Centraliza o mapeamento de hardware do ESP32.
 |
-|-- [ Motor de Jogos ]
-|-- Game.h               # Classe base genérica (interface padrão).
+|-- [ Sistema Operacional (Managers) ]
+|-- EspBoyCore.h/.cpp     # Orquestrador de estado global.
+|-- MenuManager.h/.cpp    # Gerencia Splash Screen, Carrossel de Jogos e Settings.
+|-- BatteryManager.h/.cpp # Lógica matemática e ADC de leitura da bateria.
+|
+|-- [ Motor de Jogos (Engine) ]
+|-- Game.h/.cpp           # Classe abstrata base com Template Methods.
 |
 |-- [ Sistema de Áudio ]
-|-- SoundManager.h       # Classe para gerenciamento de áudio não-bloqueante via buzzer.
-|-- SoundManager.cpp     # Implementação do controle de som.
-|-- audio_assets.h       # Biblioteca de notas musicais e arrays de melodias.
+|-- SoundManager.h/.cpp   # Gerenciador de fila de áudio não-bloqueante.
+|-- audio_assets.h        # Biblioteca de frequências e arrays de melodias.
 |
 |-- [ Jogos Implementados ]
-|-- SnakeGame.h          # Cabeçalho do Snake.
-|-- SnakeGame.cpp        # Implementação.
-|-- FlappyBirdGame.h     # Cabeçalho do Flappy Bird.
-|-- FlappyBirdGame.cpp   # Implementação.
+|-- SnakeGame.h/.cpp      # Lógica isolada do Snake.
+|-- FlappyBirdGame.h/.cpp # Lógica isolada do Flappy Bird.
 ```
 
 ## 🚀 Como Compilar e Usar
