@@ -62,6 +62,13 @@ const Note MELODY_MENU_NAVIGATE[] = {
 };
 const int MELODY_MENU_NAVIGATE_LENGTH = sizeof(MELODY_MENU_NAVIGATE) / sizeof(Note);
 
+// Fanfarra tocada quando o jogador bate um recorde (Arpejo ascendente)
+const Note MELODY_NEW_HIGHSCORE[] = {
+    {NOTE_C5, 100},
+    {NOTE_G5, 100},
+    {NOTE_C6, 400}  
+};
+const int MELODY_NEW_HIGHSCORE_LENGTH = sizeof(MELODY_NEW_HIGHSCORE) / sizeof(Note);
 
 // -----------------------------------------------------------------
 // 3.2 Sons do Jogo Snake

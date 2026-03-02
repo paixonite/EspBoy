@@ -145,6 +145,8 @@ void Game::handleGameOverState() {
             currentInitials[1] = lastInitials[1];
             currentInitials[2] = lastInitials[2];
             currentInitialIndex = 0;
+            sound->play(MELODY_NEW_HIGHSCORE, MELODY_NEW_HIGHSCORE_LENGTH);
+
             changeState(STATE_HIGHSCORE_ENTRY);
         } else {
             setup(); 
