@@ -189,6 +189,12 @@ void MenuManager::handleSettingsInput() {
             lastNavInputTime = millis();
             if (selectedSettingIndex == 0) sound->setMute(!sound->isMuted());
             else if (selectedSettingIndex == 1) {
+            if (selectedSettingIndex == 0) { // Sound
+                sound->setMute(!sound->isMuted());
+                // Toca o som apenas se a ação foi de LIGAR o som.
+                if (!sound->isMuted()) sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            } else if (selectedSettingIndex == 1) { // Brightness
+                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
                 currentBrightness -= 10;
                 if (currentBrightness < 10) currentBrightness = 10;
 
@@ -204,6 +210,11 @@ void MenuManager::handleSettingsInput() {
             lastNavInputTime = millis();
             if (selectedSettingIndex == 0) sound->setMute(!sound->isMuted());
             else if (selectedSettingIndex == 1) {
+            if (selectedSettingIndex == 0) { // Sound
+                sound->setMute(!sound->isMuted());
+                if (!sound->isMuted()) sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            } else if (selectedSettingIndex == 1) { // Brightness
+                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
                 currentBrightness += 10;
                 if (currentBrightness > 100) currentBrightness = 100;
 
