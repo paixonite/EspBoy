@@ -74,4 +74,4 @@ EspBoy/
 
 ## 👤 Autor
 
-- **Vítor Paixão** - https://github.com/Paixonite
+- **Vítor Paixão** - https://github.com/paixonite
