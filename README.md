@@ -24,12 +24,12 @@ O objetivo do EspBoy é construir uma plataforma de hardware e software robusta 
 
 O software do EspBoy foi projetado para ser modular, escalável e responsivo.
 
-- 👾 Jogos Inclusos: Atualmente, conta com os clássicos Snake e Flappy Bird, rodando de forma fluida a ~60 FPS. Planos futuros incluirão jogos como Tetris e Frogger.
-- 🏆 Sistema de Highscores Persistente: O console possui uma memória Flash integrada que salva o Top 3 de cada jogo, incluindo uma tela de entrada de 3 iniciais no clássico estilo arcade.
-- ⚙️ Menu de Configurações Dinâmico: Uma UI de sistema dedicada permite ajustar o volume, alterar o brilho da tela e resetar os recordes.
-- 🧩 Arquitetura Orientada a Objetos (POO): O sistema é orquestrado por um Core (EspBoyCore) que delega tarefas para gerenciadores específicos (MenuManager, BatteryManager). Novos jogos herdam de uma superclasse Game que fornece a máquina de estados padrão e os métodos template.
-- 🎵 Áudio Não-Bloqueante: Um sistema de som que toca melodias e efeitos sonoros em segundo plano através de uma máquina de estados, sem travar a física ou a lógica dos jogos.
-- 🕹️ Controles Responsívos: A leitura dos botões utiliza técnicas de detecção de borda, debounce e prevenção de vazamento de inputs.
+- **Jogos Inclusos:** Atualmente, conta com os clássicos Snake e Flappy Bird, rodando de forma fluida a ~60 FPS. Planos futuros incluirão jogos como Tetris e Frogger.
+- **Sistema de Highscores Persistente:** O console possui uma memória Flash integrada que salva o Top 3 de cada jogo, incluindo uma tela de entrada de 3 iniciais no clássico estilo arcade.
+- **Menu de Configurações Dinâmico:** Uma UI de sistema dedicada permite ajustar o volume, alterar o brilho da tela e resetar os recordes.
+- **Arquitetura Orientada a Objetos (POO):** O sistema é orquestrado por um Core (EspBoyCore) que delega tarefas para gerenciadores específicos (MenuManager, BatteryManager). Novos jogos herdam de uma superclasse Game que fornece a máquina de estados padrão e os métodos template.
+- **Áudio Não-Bloqueante:** Um sistema de som que toca melodias e efeitos sonoros em segundo plano através de uma máquina de estados, sem travar a física ou a lógica dos jogos.
+- **Controles Responsívos:** A leitura dos botões utiliza técnicas de detecção de borda, debounce e prevenção de vazamento de inputs.
 
 ## 📂 Estrutura do Código
 
