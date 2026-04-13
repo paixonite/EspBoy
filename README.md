@@ -2,7 +2,7 @@
 
 ![EspBoy logo](EspBoy_logo.png)
 
-Um console de jogos portátil, estilo "Game Boy", construído do zero utilizando um ESP32-S3 da LILYGO, componentes eletrônicos básicos e muita programação! Este é um projeto pessoal com fins educacionais, desenvolvido originalmente com os materiais e o espaço maker do Colégio Técnico da UFMG (Coltec) e em constante evolução durante a graduação em Ciência da Computação (DCC/UFMG).
+Um console de jogos portátil, inspirado pelo icônico "Game Boy", construído do zero utilizando um ESP32-S3 da LILYGO, componentes eletrônicos básicos e muita programação! Este é um projeto pessoal com fins educacionais, desenvolvido originalmente com os materiais e o espaço maker do Colégio Técnico da UFMG (Coltec) e em constante evolução durante a graduação em Ciência da Computação (DCC/UFMG).
 
 ## 🕹️ Sobre o Projeto
 
