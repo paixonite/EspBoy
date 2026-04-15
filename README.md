@@ -1,77 +1,77 @@
-# 🎮 EspBoy ![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow) ![Plataforma](https://img.shields.io/badge/plataforma-ESP32--S3-blue) ![Framework](https://img.shields.io/badge/framework-Arduino-cyan)
+# 🎮 EspBoy ![Status](https://img.shields.io/badge/status-in%20development-yellow) ![Platform](https://img.shields.io/badge/platform-ESP32--S3-blue) ![Framework](https://img.shields.io/badge/framework-Arduino-cyan)
 
 ![EspBoy logo](EspBoy_logo.png)
 
-Um console de jogos portátil, inspirado pelo icônico "Game Boy", construído do zero utilizando um ESP32-S3 da LILYGO, componentes eletrônicos básicos e muita programação! Este é um projeto pessoal com fins educacionais, desenvolvido originalmente com os materiais e o espaço maker do Colégio Técnico da UFMG (Coltec) e em constante evolução durante a graduação em Ciência da Computação (DCC/UFMG).
+A portable game console, inspired by the iconic "Game Boy", built from scratch using a LILYGO ESP32-S3, basic electronic components, and lots of programming! This is a personal educational project, originally developed using the materials and maker space at Colégio Técnico da UFMG (Coltec) and constantly evolving during my Computer Science undergraduate studies (DCC/UFMG).
 
-## 🕹️ Sobre o Projeto
+## 🕹️ About the Project
 
-O objetivo do EspBoy é construir uma plataforma de hardware e software robusta e modular, desenvolvendo na prática habilidades em:
+The goal of EspBoy is to build a robust and modular hardware and software platform, developing practical skills in:
 
-- **Desenvolvimento de Hardware:** Montagem de circuitos, soldagem e integração de componentes.
-- **Programação de Baixo Nível:** Interação direta com GPIOs, timers (PWM) e periféricos do microcontrolador.
-- **Arquitetura de Software:** Criação de um sistema operacional organizado por responsabilidades, com classes abstratas ditando o ciclo de vida dos jogos através do padrão Template Method.
-- **Gerenciamento de Energia:** Implementação de um sistema de bateria recarregável para portabilidade real.
+- **Hardware Development:** Circuit assembly, soldering, and component integration.
+- **Low-Level Programming:** Direct interaction with GPIOs, timers (PWM), and microcontroller peripherals.
+- **Software Architecture:** Creating an operating system organized by responsibilities, with abstract classes dictating the game lifecycle via the Template Method pattern.
+- **Power Management:** Implementing a rechargeable battery system for true portability.
 
-## ⚙️ Hardware Utilizado
+## ⚙️ Hardware Used
 
-- **Placa de Desenvolvimento:** LILYGO T-Display ESP32-S3 (com display TFT de 1.9" 170x320 integrado).
-- **Entradas:** 8 botões *push button* (Direcionais, Start, Select, A, B).
-- **Áudio:** 1 Buzzer passivo para reprodução de melodias e efeitos sonoros.
-- **Alimentação:** Bateria de LiPo 3.7V recarregável, gerenciada pelo módulo de carregamento USB-C TP4056 e um slide switch.
+- **Development Board:** LILYGO T-Display ESP32-S3 (with integrated 1.9" 170x320 TFT display).
+- **Inputs:** 8 push buttons (D-Pad, Start, Select, A, B).
+- **Audio:** 1 Passive buzzer for playing melodies and sound effects.
+- **Power:** 3.7V rechargeable LiPo battery, managed by a TP4056 USB-C charging module and a slide switch.
 
-## ✨ Features do Firmware
+## ✨ Firmware Features
 
-O software do EspBoy foi projetado para ser modular, escalável e responsivo.
+The EspBoy software was designed to be modular, scalable, and responsive.
 
-- **Jogos Inclusos:** Atualmente, conta com os clássicos Snake e Flappy Bird, rodando de forma fluida a ~60 FPS. Planos futuros incluirão jogos como Tetris e Frogger.
-- **Sistema de Highscores Persistente:** O console possui uma memória Flash integrada que salva o Top 3 de cada jogo, incluindo uma tela de entrada de 3 iniciais no clássico estilo arcade.
-- **Menu de Configurações Dinâmico:** Uma UI de sistema dedicada permite ajustar o volume, alterar o brilho da tela e resetar os recordes.
-- **Arquitetura Orientada a Objetos (POO):** O sistema é orquestrado por um Core (EspBoyCore) que delega tarefas para gerenciadores específicos (MenuManager, BatteryManager). Novos jogos herdam de uma superclasse Game que fornece a máquina de estados padrão e os métodos template.
-- **Áudio Não-Bloqueante:** Um sistema de som que toca melodias e efeitos sonoros em segundo plano através de uma máquina de estados, sem travar a física ou a lógica dos jogos.
-- **Controles Responsívos:** A leitura dos botões utiliza técnicas de detecção de borda, debounce e prevenção de vazamento de inputs.
+- **Included Games:** Currently features the classics Snake and Flappy Bird, running smoothly at ~60 FPS. Future plans include games like Tetris and Frogger.
+- **Persistent Highscore System:** The console has built-in Flash memory that saves the Top 3 for each game, including a classic arcade-style 3-initial input screen.
+- **Dynamic Settings Menu:** A dedicated system UI allows adjusting volume, changing screen brightness, and resetting records.
+- **Object-Oriented Architecture (OOP):** The system is orchestrated by a Core (`EspBoyCore`) that delegates tasks to specific managers (`MenuManager`, `BatteryManager`). New games inherit from a `Game` superclass that provides the standard state machine and template methods.
+- **Non-Blocking Audio:** A sound system that plays background melodies and sound effects via a state machine, without freezing the game's physics or logic.
+- **Responsive Controls:** Button reading utilizes edge detection, debounce techniques, and input leak prevention.
 
-## 📂 Estrutura do Código
+## 📂 Code Structure
 
-O projeto segue uma organização que separa as responsabilidades do firmware. 
+The project follows an organization that separates firmware responsibilities. 
 
 ```
 EspBoy/
 |
-|-- [ Ponto de Entrada ]
-|-- EspBoy.ino            # Apenas inicializa o sistema operacional do console.
-|-- pins.h                # Centraliza o mapeamento de hardware do ESP32.
+|-- [ Entry Point ]
+|-- EspBoy.ino            # Only initializes the console's operating system.
+|-- pins.h                # Centralizes the ESP32 hardware mapping.
 |
-|-- [ Sistema Operacional (Managers) ]
-|-- EspBoyCore.h/.cpp     # Orquestrador de estado global.
-|-- MenuManager.h/.cpp    # Gerencia Splash Screen, Carrossel de Jogos e Settings.
-|-- BatteryManager.h/.cpp # Lógica matemática e ADC de leitura da bateria.
+|-- [ Operating System (Managers) ]
+|-- EspBoyCore.h/.cpp     # Global state orchestrator.
+|-- MenuManager.h/.cpp    # Manages Splash Screen, Game Carousel, and Settings.
+|-- BatteryManager.h/.cpp # Math logic and ADC for battery reading.
 |
-|-- [ Motor de Jogos (Engine) ]
-|-- Game.h/.cpp           # Classe abstrata base com Template Methods.
+|-- [ Game Engine ]
+|-- Game.h/.cpp           # Base abstract class with Template Methods.
 |
-|-- [ Sistema de Áudio ]
-|-- SoundManager.h/.cpp   # Gerenciador de fila de áudio não-bloqueante.
-|-- audio_assets.h        # Biblioteca de frequências e arrays de melodias.
+|-- [ Audio System ]
+|-- SoundManager.h/.cpp   # Non-blocking audio queue manager.
+|-- audio_assets.h        # Frequency library and melody arrays.
 |
-|-- [ Jogos Implementados ]
-|-- SnakeGame.h/.cpp      # Lógica isolada do Snake.
-|-- FlappyBirdGame.h/.cpp # Lógica isolada do Flappy Bird.
+|-- [ Implemented Games ]
+|-- SnakeGame.h/.cpp      # Isolated Snake logic.
+|-- FlappyBirdGame.h/.cpp # Isolated Flappy Bird logic.
 ```
 
-## 🚀 Como Compilar e Usar
+## 🚀 How to Compile and Use
 
-1.  **Ambiente:** O projeto foi desenvolvido usando a **Arduino IDE**.
-2.  **Hardware:** Monte o circuito conforme as definições da pcb.
-3.  **Bibliotecas:**
-    - Instale o suporte para placas **ESP32** na Arduino IDE.
-    - Instale a biblioteca **TFT_eSPI** de Bodmer. (Pode ser necessário configurar o `User_Setup.h` da biblioteca para a placa LILYGO T-Display S3, embora muitas versões recentes a detectem automaticamente).
-4.  **Compilação:**
-    - Clone este repositório
-    - Abra o arquivo `EspBoy.ino` na Arduino IDE
-    - Selecione a placa correta (LILYGO T-Display S3)
-    - Faça o upload.
+1.  **Environment:** The project was developed using the **Arduino IDE**.
+2.  **Hardware:** Assemble the circuit according to the PCB definitions.
+3.  **Libraries:**
+    - Install **ESP32** board support in the Arduino IDE.
+    - Install the **TFT_eSPI** library by Bodmer. (You may need to configure the library's `User_Setup.h` for the LILYGO T-Display S3 board, although many recent versions detect it automatically).
+4.  **Compilation:**
+    - Clone this repository.
+    - Open the `EspBoy.ino` file in the Arduino IDE.
+    - Select the correct board (LILYGO T-Display S3).
+    - Upload.
 
-## 👤 Autor
+## 👤 Author
 
-- **Vítor Paixão** - https://github.com/paixonite
+- **Vítor Paixão** - [https://github.com/paixonite](https://github.com/paixonite)
