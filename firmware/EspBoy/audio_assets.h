@@ -119,4 +119,24 @@ const Note MELODY_HIT[] = {
 const int MELODY_HIT_LENGTH = sizeof(MELODY_HIT) / sizeof(Note);
 
 
+// -----------------------------------------------------------------
+// 3.4 Frogger Game Sounds
+// -----------------------------------------------------------------
+
+// Crisp two-note upward chirp when the frog hops.
+const Note MELODY_FROGGER_HOP[] = {
+    {NOTE_E4, 25},
+    {NOTE_A4, 35}
+};
+const int MELODY_FROGGER_HOP_LENGTH = sizeof(MELODY_FROGGER_HOP) / sizeof(Note);
+
+// Bright ascending arpeggio when reaching a lilypad goal bay.
+const Note MELODY_FROGGER_GOAL[] = {
+    {NOTE_E4, 55},
+    {NOTE_G4, 55},
+    {NOTE_C5, 55},
+    {NOTE_G5, 130}
+};
+const int MELODY_FROGGER_GOAL_LENGTH = sizeof(MELODY_FROGGER_GOAL) / sizeof(Note);
+
 #endif // AUDIO_ASSETS_H
