@@ -93,12 +93,21 @@ void ConfigManager::setBrightness(int val) {
     prefs.end();
 }
 
-void ConfigManager::applyBrightness() const {
+int ConfigManager::calculateBrightnessPwm(int percent) {
+    if (percent < 0) percent = 0;
+    if (percent > 100) percent = 100;
     // Squared curve compensates for the eye's non-linear brightness perception.
     // Range: ~42 (10%) up to 254 (100%), so the screen never goes fully dark while awake.
-    float normalized = _brightness / 100.0f;
-    int pwm = 40 + (int)(214.0f * normalized * normalized);
-    analogWrite(TFT_BL_PIN, pwm);
+    float normalized = percent / 100.0f;
+    return 40 + (int)(214.0f * normalized * normalized);
+}
+
+void ConfigManager::applyBrightness() const {
+    analogWrite(TFT_BL_PIN, calculateBrightnessPwm(_brightness));
+}
+
+void ConfigManager::applyDimmedBrightness() const {
+    analogWrite(TFT_BL_PIN, calculateBrightnessPwm(10)); // Exactly 10% brightness
 }
 
 void ConfigManager::setBacklightRaw(uint8_t pwm) const {

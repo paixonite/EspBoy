@@ -22,7 +22,9 @@ public:
     int getBrightness() const;
     void setBrightness(int val);
     void applyBrightness() const;
+    void applyDimmedBrightness() const;
     void setBacklightRaw(uint8_t pwm) const;
+    static int calculateBrightnessPwm(int percent);
 
     // --- Auto-Sleep Timeout ---
     int getSleepTimeoutIndex() const;

@@ -124,7 +124,7 @@ void EspBoyCore::handlePowerManagement() {
         isDimmed = false;
     } else if (timeoutMs > DIM_WARNING_MS && idleMs >= (timeoutMs - DIM_WARNING_MS)) {
         if (!isDimmed) {
-            configManager.setBacklightRaw(30);
+            configManager.applyDimmedBrightness();
             isDimmed = true;
         }
     }
