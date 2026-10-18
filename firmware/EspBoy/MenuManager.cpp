@@ -187,8 +187,6 @@ void MenuManager::handleSettingsInput() {
         }
         else if (lastLeftState == LOW && currentLeftState == HIGH) {
             lastNavInputTime = millis();
-            if (selectedSettingIndex == 0) sound->setMute(!sound->isMuted());
-            else if (selectedSettingIndex == 1) {
             if (selectedSettingIndex == 0) { // Sound
                 sound->setMute(!sound->isMuted());
                 // Toca o som apenas se a ação foi de LIGAR o som.
@@ -203,13 +201,10 @@ void MenuManager::handleSettingsInput() {
                 int pwm = 40 + (int)(214.0 * normalized * normalized);
                 analogWrite(TFT_BL_PIN, pwm);
             }
-            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             drawSettings();
         }
         else if (lastRightState == LOW && currentRightState == HIGH) {
             lastNavInputTime = millis();
-            if (selectedSettingIndex == 0) sound->setMute(!sound->isMuted());
-            else if (selectedSettingIndex == 1) {
             if (selectedSettingIndex == 0) { // Sound
                 sound->setMute(!sound->isMuted());
                 if (!sound->isMuted()) sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
@@ -222,7 +217,6 @@ void MenuManager::handleSettingsInput() {
                 int pwm = 54.9 + (int)(200 * normalized * normalized);
                 analogWrite(TFT_BL_PIN, pwm);
             }
-            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             drawSettings();
         }
     }
