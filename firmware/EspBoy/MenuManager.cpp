@@ -211,10 +211,7 @@ void MenuManager::handleSettingsInput() {
                 sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
                 currentBrightness -= 10;
                 if (currentBrightness < 10) currentBrightness = 10;
-
-                float normalized = currentBrightness / 100.0;
-                int pwm = 40 + (int)(214.0 * normalized * normalized);
-                analogWrite(TFT_BL_PIN, pwm);
+                applyBrightness();
             } else if (selectedSettingIndex == 3) { // Config 1
                 sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
                 placeholderVal1 = !placeholderVal1;
@@ -238,10 +235,7 @@ void MenuManager::handleSettingsInput() {
                 sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
                 currentBrightness += 10;
                 if (currentBrightness > 100) currentBrightness = 100;
-
-                float normalized = currentBrightness / 100.0;
-                int pwm = 54.9 + (int)(200 * normalized * normalized);
-                analogWrite(TFT_BL_PIN, pwm);
+                applyBrightness();
             } else if (selectedSettingIndex == 3) { // Config 1
                 sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
                 placeholderVal1 = !placeholderVal1;
@@ -279,6 +273,14 @@ void MenuManager::handleSettingsInput() {
     lastUpState = currentUpState; lastDownState = currentDownState;
     lastLeftState = currentLeftState; lastRightState = currentRightState;
     lastConfirmState = currentConfirmState; lastCancelState = currentCancelState;
+}
+
+void MenuManager::applyBrightness() {
+    // Squared curve compensates for the eye's non-linear brightness perception.
+    // Range: ~42 (10%) up to 254 (100%), so the screen never goes fully dark.
+    float normalized = currentBrightness / 100.0;
+    int pwm = 40 + (int)(214.0 * normalized * normalized);
+    analogWrite(TFT_BL_PIN, pwm);
 }
 
 void MenuManager::handleConfirmResetInput() {

@@ -65,6 +65,9 @@ private:
     int handleSelectInput();
     void handleSettingsInput();
     void handleConfirmResetInput();
+
+    // Converts currentBrightness (10-100%) to a gamma-corrected backlight PWM value
+    void applyBrightness();
 };
 
 #endif // MENUMANAGER_H
