@@ -12,9 +12,9 @@ Game::Game(TFT_eSPI* tft_display, SoundManager* sound_manager, const String& gam
     
     // Configure universal system placeholders.
     // Any child game can override this in its own constructor.
-    defaultScores[0] = 30; defaultNames[0] = "CPU";
-    defaultScores[1] = 20; defaultNames[1] = "ESP";
-    defaultScores[2] = 10; defaultNames[2] = "BOY";
+    defaultScores[0] = 30; defaultNames[0] = "ESP";
+    defaultScores[1] = 20; defaultNames[1] = "BOY";
+    defaultScores[2] = 10; defaultNames[2] = "CPU";
 }
 
 void Game::setup() {

@@ -20,9 +20,9 @@ static const uint16_t PAD_LIT_COLOR[4] = {
 
 GeniusGame::GeniusGame(TFT_eSPI* tft_display, SoundManager* sound_manager)
     : Game(tft_display, sound_manager, "Genius") {
-    defaultScores[0] = 15; defaultNames[0] = "GEN";
-    defaultScores[1] = 10; defaultNames[1] = "MEM";
-    defaultScores[2] = 5;  defaultNames[2] = "SYN";
+    defaultScores[0] = 15;
+    defaultScores[1] = 10;
+    defaultScores[2] = 5;
 }
 
 void GeniusGame::resetGame() {

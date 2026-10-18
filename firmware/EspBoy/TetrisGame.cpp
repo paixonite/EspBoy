@@ -98,10 +98,6 @@ static const int8_t WALL_KICKS[8][2] = {
 
 TetrisGame::TetrisGame(TFT_eSPI* tft_display, SoundManager* sound_manager)
     : Game(tft_display, sound_manager, "Tetris") {
-    // Default high scores in lines cleared (homage to Alexey Pajitnov)
-    defaultScores[0] = 30; defaultNames[0] = "PAZ";
-    defaultScores[1] = 20; defaultNames[1] = "TET";
-    defaultScores[2] = 10; defaultNames[2] = "BLK";
 }
 
 void TetrisGame::refillBag() {
