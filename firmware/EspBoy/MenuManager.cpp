@@ -17,7 +17,11 @@ MenuManager::MenuManager(TFT_eSPI* tft_display, SoundManager* sound_manager, Bat
     selectedGameIndex = 0;
     
     selectedSettingIndex = 0;
-    currentBrightness = 100; 
+    settingsScrollOffset = 0;
+    currentBrightness = 100;
+    placeholderVal1 = 1;
+    placeholderVal2 = 50;
+    placeholderVal3 = 0;
 
     lastBatteryUpdate = 0;
     lastNavInputTime = 0;
@@ -103,6 +107,7 @@ int MenuManager::handleSelectInput() {
         currentState = MENU_STATE_SETTINGS;
         menuStateTimer = millis(); 
         selectedSettingIndex = 0; 
+        settingsScrollOffset = 0;
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
         drawSettings();
         
@@ -177,33 +182,50 @@ void MenuManager::handleSettingsInput() {
     if (millis() - lastNavInputTime > NAV_DEBOUNCE_DELAY_MS) {
         if (lastUpState == LOW && currentUpState == HIGH) {
             lastNavInputTime = millis();
-            selectedSettingIndex--;
-            if (selectedSettingIndex < 0) selectedSettingIndex = SETTING_COUNT - 1;
-            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-            drawSettings();
+            if (selectedSettingIndex > 0) {
+                selectedSettingIndex--;
+                if (selectedSettingIndex < settingsScrollOffset) {
+                    settingsScrollOffset = selectedSettingIndex;
+                }
+                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+                drawSettings();
+            }
         }
         else if (lastDownState == LOW && currentDownState == HIGH) {
             lastNavInputTime = millis();
-            selectedSettingIndex++;
-            if (selectedSettingIndex >= SETTING_COUNT) selectedSettingIndex = 0;
-            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-            drawSettings();
+            if (selectedSettingIndex < SETTING_COUNT - 1) {
+                selectedSettingIndex++;
+                if (selectedSettingIndex >= settingsScrollOffset + 3) {
+                    settingsScrollOffset = selectedSettingIndex - 2;
+                }
+                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+                drawSettings();
+            }
         }
         else if (lastLeftState == LOW && currentLeftState == HIGH) {
             lastNavInputTime = millis();
             if (selectedSettingIndex == 0) { // Sound
                 sound->setMute(!sound->isMuted());
-                // Play sound only if action was to turn sound ON.
                 if (!sound->isMuted()) sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             } else if (selectedSettingIndex == 1) { // Brightness
                 sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
                 currentBrightness -= 10;
                 if (currentBrightness < 10) currentBrightness = 10;
 
-                // Exponential mapping (Gamma) with floor of 40 and ceiling of 254
                 float normalized = currentBrightness / 100.0;
                 int pwm = 40 + (int)(214.0 * normalized * normalized);
                 analogWrite(TFT_BL_PIN, pwm);
+            } else if (selectedSettingIndex == 3) { // Config 1
+                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+                placeholderVal1 = !placeholderVal1;
+            } else if (selectedSettingIndex == 4) { // Config 2
+                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+                placeholderVal2 -= 10;
+                if (placeholderVal2 < 0) placeholderVal2 = 0;
+            } else if (selectedSettingIndex == 5) { // Config 3
+                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+                placeholderVal3--;
+                if (placeholderVal3 < 0) placeholderVal3 = 2;
             }
             drawSettings();
         }
@@ -220,18 +242,37 @@ void MenuManager::handleSettingsInput() {
                 float normalized = currentBrightness / 100.0;
                 int pwm = 54.9 + (int)(200 * normalized * normalized);
                 analogWrite(TFT_BL_PIN, pwm);
+            } else if (selectedSettingIndex == 3) { // Config 1
+                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+                placeholderVal1 = !placeholderVal1;
+            } else if (selectedSettingIndex == 4) { // Config 2
+                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+                placeholderVal2 += 10;
+                if (placeholderVal2 > 100) placeholderVal2 = 100;
+            } else if (selectedSettingIndex == 5) { // Config 3
+                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+                placeholderVal3++;
+                if (placeholderVal3 > 2) placeholderVal3 = 0;
             }
             drawSettings();
         }
     }
 
-    // Interaction with button A (Reset Highscores)
+    // Interaction with button A
     if (lastConfirmState == LOW && currentConfirmState == HIGH) {
         if (selectedSettingIndex == 2) {
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             currentState = MENU_STATE_CONFIRM_RESET;
             menuStateTimer = millis(); 
             drawConfirmReset();
+        } else if (selectedSettingIndex == 3) {
+            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            placeholderVal1 = !placeholderVal1;
+            drawSettings();
+        } else if (selectedSettingIndex == 5) {
+            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            placeholderVal3 = (placeholderVal3 + 1) % 3;
+            drawSettings();
         }
     }
 
@@ -291,32 +332,76 @@ void MenuManager::drawSettings() {
     tft->fillScreen(TFT_BLACK);
     drawTopBar("SETTINGS", TFT_YELLOW);
 
-    tft->setTextSize(2);
     int startY = 55;
     int spacingY = 30;
 
-    // 0: Sound
-    tft->setTextDatum(ML_DATUM);
-    tft->setTextColor(selectedSettingIndex == 0 ? TFT_YELLOW : TFT_WHITE);
-    tft->drawString(selectedSettingIndex == 0 ? "> Sound:" : "  Sound:", 20, startY);
-    String soundStatus = sound->isMuted() ? "[ OFF ]" : "[ ON ]";
-    tft->setTextDatum(MR_DATUM);
-    tft->drawString(soundStatus, tft->width() - 20, startY);
+    // Up arrow indicating lines above (centered horizontally in left margin at x = 13)
+    if (settingsScrollOffset > 0) {
+        tft->fillTriangle(13, 43, 9, 51, 17, 51, TFT_WHITE);
+    }
 
-    // 1: Brightness
-    tft->setTextDatum(ML_DATUM);
-    tft->setTextColor(selectedSettingIndex == 1 ? TFT_YELLOW : TFT_WHITE);
-    tft->drawString(selectedSettingIndex == 1 ? "> Brightness:" : "  Brightness:", 20, startY + spacingY);
-    String brightStatus = "< " + String(currentBrightness) + "% >";
-    tft->setTextDatum(MR_DATUM);
-    tft->drawString(brightStatus, tft->width() - 20, startY + spacingY);
+    // Down arrow indicating lines below (centered horizontally in left margin at x = 13)
+    if (settingsScrollOffset + 3 < SETTING_COUNT) {
+        tft->fillTriangle(13, 127, 9, 119, 17, 119, TFT_WHITE);
+    }
 
-    // 2: Reset Highscores
-    tft->setTextDatum(ML_DATUM);
-    tft->setTextColor(selectedSettingIndex == 2 ? TFT_YELLOW : TFT_WHITE);
-    tft->drawString(selectedSettingIndex == 2 ? "> Highscores:" : "  Highscores:", 20, startY + spacingY * 2);
-    tft->setTextDatum(MR_DATUM);
-    tft->drawString("[ RESET ]", tft->width() - 20, startY + spacingY * 2);
+    const int boxX = 26;
+    const int boxW = tft->width() - 34;
+    const int boxH = 26;
+
+    for (int s = 0; s < 3; s++) {
+        int idx = settingsScrollOffset + s;
+        if (idx >= SETTING_COUNT) break;
+
+        int y = startY + s * spacingY;
+        bool isSelected = (selectedSettingIndex == idx);
+
+        String label;
+        String value;
+
+        switch (idx) {
+            case 0:
+                label = "Sound:";
+                value = sound->isMuted() ? "[ OFF ]" : "[ ON ]";
+                break;
+            case 1:
+                label = "Brightness:";
+                value = "< " + String(currentBrightness) + "% >";
+                break;
+            case 2:
+                label = "Highscores:";
+                value = "[ RESET ]";
+                break;
+            case 3:
+                label = "Config 1:";
+                value = placeholderVal1 ? "[ ON ]" : "[ OFF ]";
+                break;
+            case 4:
+                label = "Config 2:";
+                value = "< " + String(placeholderVal2) + "% >";
+                break;
+            case 5:
+                label = "Config 3:";
+                value = (placeholderVal3 == 0) ? "[ LOW ]" : (placeholderVal3 == 1 ? "[ MED ]" : "[ HIGH ]");
+                break;
+        }
+
+        // Clear selection box around selected configuration (pure black background)
+        if (isSelected) {
+            tft->fillRoundRect(boxX, y - (boxH / 2), boxW, boxH, 4, TFT_BLACK);
+            tft->drawRoundRect(boxX, y - (boxH / 2), boxW, boxH, 4, TFT_YELLOW);
+            tft->drawRoundRect(boxX + 1, y - (boxH / 2) + 1, boxW - 2, boxH - 2, 3, TFT_YELLOW);
+        }
+
+        tft->setTextSize(2);
+        tft->setTextDatum(ML_DATUM);
+        tft->setTextColor(isSelected ? TFT_YELLOW : TFT_WHITE);
+        tft->drawString(label, boxX + 8, y);
+
+        tft->setTextDatum(MR_DATUM);
+        tft->setTextColor(isSelected ? TFT_YELLOW : TFT_WHITE);
+        tft->drawString(value, boxX + boxW - 8, y);
+    }
 
     drawBottomBar("[B] Back", TFT_WHITE);
 }

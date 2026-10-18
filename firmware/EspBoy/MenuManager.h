@@ -39,8 +39,12 @@ private:
 
     // --- Settings Logic ---
     int selectedSettingIndex;
-    static const int SETTING_COUNT = 3;
+    int settingsScrollOffset;
+    static const int SETTING_COUNT = 6;
     int currentBrightness; // Hook for future PWM brightness (10 to 100)
+    int placeholderVal1;
+    int placeholderVal2;
+    int placeholderVal3;
 
     // --- Button States ---
     bool lastLeftState, lastRightState, lastUpState, lastDownState;
