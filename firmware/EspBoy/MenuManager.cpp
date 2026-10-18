@@ -499,7 +499,7 @@ void MenuManager::drawSplashScreen() {
     tft->setTextDatum(MC_DATUM);
     tft->setTextColor(TFT_CYAN);
     tft->setTextSize(2);
-    tft->drawString("by Paixonite", tft->width() / 2, tft->height() / 2 + 30);
+    tft->drawString("by paixonite", tft->width() / 2, tft->height() / 2 + 30);
 }
 
 void MenuManager::updateBatteryDisplay() {
