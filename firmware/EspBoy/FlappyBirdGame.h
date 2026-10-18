@@ -5,7 +5,7 @@
 
 class FlappyBirdGame : public Game {
 public:
-    FlappyBirdGame(TFT_eSPI* tft_display, SoundManager* sound_manager);
+    FlappyBirdGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager);
 
 protected:
     // Only mandatory base class implementations

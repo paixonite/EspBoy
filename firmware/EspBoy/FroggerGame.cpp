@@ -10,8 +10,8 @@ static const uint16_t COLOR_ARCADE_ORANGE = 0xFA00; // Deep vivid arcade orange
 // 6 water gaps of 30px + 5 bays of 28px = 180 + 140 = 320px
 static const int BAY_X[5] = {30, 88, 146, 204, 262};
 
-FroggerGame::FroggerGame(TFT_eSPI* tft_display, SoundManager* sound_manager)
-    : Game(tft_display, sound_manager, "Frogger") {
+FroggerGame::FroggerGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager)
+    : Game(tft_display, sound_manager, input_manager, "Frogger") {
 }
 
 int FroggerGame::rowToY(int row) const {
@@ -90,39 +90,26 @@ void FroggerGame::resetGame() {
     player_row_prev = player_row;
 
     initLanes();
-
-    // Sync button states to prevent input bleed from Title Screen [A] press
-    lastUp = digitalRead(BTN_UP);
-    lastDown = digitalRead(BTN_DOWN);
-    lastLeft = digitalRead(BTN_LEFT);
-    lastRight = digitalRead(BTN_RIGHT);
-    lastA = digitalRead(BTN_A);
 }
 
 void FroggerGame::handleInputPlaying() {
-    bool curUp = digitalRead(BTN_UP);
-    bool curDown = digitalRead(BTN_DOWN);
-    bool curLeft = digitalRead(BTN_LEFT);
-    bool curRight = digitalRead(BTN_RIGHT);
-    bool curA = digitalRead(BTN_A);
-
     bool hopped = false;
 
-    if ((lastUp == LOW && curUp == HIGH) || (lastA == LOW && curA == HIGH)) {
+    if (input->wasPressed(BTN_ID_UP) || input->wasPressed(BTN_ID_A)) {
         if (player_row > 0) {
             player_row--;
             hopped = true;
         }
-    } else if (lastDown == LOW && curDown == HIGH) {
+    } else if (input->wasPressed(BTN_ID_DOWN)) {
         if (player_row < NUM_ROWS - 1) {
             player_row++;
             hopped = true;
         }
-    } else if (lastLeft == LOW && curLeft == HIGH) {
+    } else if (input->wasPressed(BTN_ID_LEFT)) {
         player_x -= ROW_HEIGHT;
         if (player_x < 0.0f) player_x = 0.0f;
         hopped = true;
-    } else if (lastRight == LOW && curRight == HIGH) {
+    } else if (input->wasPressed(BTN_ID_RIGHT)) {
         player_x += ROW_HEIGHT;
         if (player_x > DISPLAY_WIDTH - FROG_SIZE) {
             player_x = DISPLAY_WIDTH - FROG_SIZE;
@@ -133,24 +120,11 @@ void FroggerGame::handleInputPlaying() {
     if (hopped) {
         sound->play(MELODY_FROGGER_HOP, MELODY_FROGGER_HOP_LENGTH);
     }
-
-    lastUp = curUp;
-    lastDown = curDown;
-    lastLeft = curLeft;
-    lastRight = curRight;
-    lastA = curA;
 }
 
 void FroggerGame::onResume() {
     // Repaint background, lanes, frog and HUD over the pause popup
     fullRedrawRequired = true;
-
-    // Re-sync edge states so pause-menu navigation can't register as a hop
-    lastUp = digitalRead(BTN_UP);
-    lastDown = digitalRead(BTN_DOWN);
-    lastLeft = digitalRead(BTN_LEFT);
-    lastRight = digitalRead(BTN_RIGHT);
-    lastA = digitalRead(BTN_A);
 }
 
 void FroggerGame::updateTurtleDiveStates() {

@@ -12,8 +12,8 @@ static const uint16_t COLOR_RAIL_DIM    = 0x39E7; // Dim grey for inactive rail 
 
 static const float WRAP_SPAN = 400.0f; // 320px screen + 80px off-screen buffer
 
-CrossyRoadGame::CrossyRoadGame(TFT_eSPI* tft_display, SoundManager* sound_manager)
-    : Game(tft_display, sound_manager, "Crossy Road") {
+CrossyRoadGame::CrossyRoadGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager)
+    : Game(tft_display, sound_manager, input_manager, "Crossy Road") {
     defaultScores[0] = 45;
     defaultScores[1] = 25;
     defaultScores[2] = 12;
@@ -228,38 +228,18 @@ void CrossyRoadGame::onResume() {
 }
 
 void CrossyRoadGame::handleInputPlaying() {
-    static bool lastUp = LOW, lastDown = LOW, lastLeft = LOW, lastRight = LOW, lastA = LOW;
-
-    bool curUp    = digitalRead(BTN_UP);
-    bool curDown  = digitalRead(BTN_DOWN);
-    bool curLeft  = digitalRead(BTN_LEFT);
-    bool curRight = digitalRead(BTN_RIGHT);
-    bool curA     = digitalRead(BTN_A);
-
-    // Prevent input bleed right after pressing [A] on the Title Screen
-    if (millis() - stateTimer < 180) {
-        lastUp = curUp; lastDown = curDown;
-        lastLeft = curLeft; lastRight = curRight;
-        lastA = curA;
-        return;
-    }
-
     int dRow = 0;
     int dCol = 0;
 
-    if ((lastUp == LOW && curUp == HIGH) || (lastA == LOW && curA == HIGH)) {
+    if (input->wasPressed(BTN_ID_UP) || input->wasPressed(BTN_ID_A)) {
         dRow = -1;
-    } else if (lastDown == LOW && curDown == HIGH) {
+    } else if (input->wasPressed(BTN_ID_DOWN)) {
         dRow = 1;
-    } else if (lastLeft == LOW && curLeft == HIGH) {
+    } else if (input->wasPressed(BTN_ID_LEFT)) {
         dCol = -1;
-    } else if (lastRight == LOW && curRight == HIGH) {
+    } else if (input->wasPressed(BTN_ID_RIGHT)) {
         dCol = 1;
     }
-
-    lastUp = curUp; lastDown = curDown;
-    lastLeft = curLeft; lastRight = curRight;
-    lastA = curA;
 
     if (dRow == 0 && dCol == 0) return;
 

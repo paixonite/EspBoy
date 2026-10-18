@@ -5,7 +5,7 @@
 
 class TetrisGame : public Game {
 public:
-    TetrisGame(TFT_eSPI* tft_display, SoundManager* sound_manager);
+    TetrisGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager);
 
 protected:
     void resetGame() override;
@@ -80,18 +80,8 @@ private:
     bool clearingRowFlags[ROWS];
     int numClearingRows;
 
-    // Input Edge & DAS State
-    bool lastUp;
-    bool lastDown;
-    bool lastLeft;
-    bool lastRight;
-    bool lastA;
-    bool lastB;
-    bool lastSelect;
+    // Input State
     bool hardDropPending;
-    int dasDir;
-    unsigned long dasStartTime;
-    unsigned long lastArrTime;
 
     // Differential HUD Tracking
     bool fullRedrawRequired;

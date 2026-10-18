@@ -4,14 +4,9 @@
 #define MY_ORANGE tft->color565(255, 55, 0)
 #define MY_GREY tft->color565(30, 30, 40)
 const int SPLASH_DURATION_MS = 3500;
-const int NAV_DEBOUNCE_DELAY_MS = 250;
-const int LOCKOUT_TIMER_MS = 250;
 
-// Global lockout timer to prevent input bleed during menu transitions
-static unsigned long menuStateTimer = 0;
-
-MenuManager::MenuManager(TFT_eSPI* tft_display, SoundManager* sound_manager, BatteryManager* battery_manager, ConfigManager* config_manager)
-    : tft(tft_display), sound(sound_manager), battery(battery_manager), config(config_manager) {
+MenuManager::MenuManager(TFT_eSPI* tft_display, SoundManager* sound_manager, BatteryManager* battery_manager, ConfigManager* config_manager, InputManager* input_manager)
+    : tft(tft_display), sound(sound_manager), battery(battery_manager), config(config_manager), input(input_manager) {
     currentState = MENU_STATE_SPLASH;
     selectedGameIndex = 0;
     
@@ -19,11 +14,6 @@ MenuManager::MenuManager(TFT_eSPI* tft_display, SoundManager* sound_manager, Bat
     settingsScrollOffset = 0;
 
     lastBatteryUpdate = 0;
-    lastNavInputTime = 0;
-    
-    lastLeftState = LOW; lastRightState = LOW; 
-    lastUpState = LOW; lastDownState = LOW;
-    lastConfirmState = LOW; lastCancelState = LOW; lastSelectState = LOW;
 }
 
 void MenuManager::begin() {
@@ -35,17 +25,8 @@ void MenuManager::begin() {
 
 void MenuManager::returnToMenu() {
     currentState = MENU_STATE_SELECT;
-    menuStateTimer = millis(); // Start transition cooldown
+    input->consumeAll();
     drawMenu();
-    
-    // Clear inputs by forcing current read to prevent bounce
-    lastLeftState = digitalRead(BTN_LEFT);
-    lastRightState = digitalRead(BTN_RIGHT);
-    lastUpState = digitalRead(BTN_UP);
-    lastDownState = digitalRead(BTN_DOWN);
-    lastConfirmState = digitalRead(BTN_A);
-    lastCancelState = digitalRead(BTN_B);
-    lastSelectState = digitalRead(BTN_SELECT);
 }
 
 int MenuManager::update() {
@@ -53,7 +34,7 @@ int MenuManager::update() {
         case MENU_STATE_SPLASH:
             if (millis() - splashStartTime > SPLASH_DURATION_MS) {
                 currentState = MENU_STATE_SELECT;
-                menuStateTimer = millis();
+                input->consumeAll();
                 drawMenu();
             }
             return -1;
@@ -89,64 +70,40 @@ int MenuManager::update() {
 // =================================================================
 
 int MenuManager::handleSelectInput() {
-    bool currentLeftState = digitalRead(BTN_LEFT);
-    bool currentRightState = digitalRead(BTN_RIGHT);
-    bool currentConfirmState = digitalRead(BTN_A);
-    bool currentSelectState = digitalRead(BTN_SELECT);
-
-    // LOCKOUT TIMER: Ignore inputs right after state change
-    if (millis() - menuStateTimer < LOCKOUT_TIMER_MS) {
-        lastLeftState = currentLeftState; lastRightState = currentRightState;
-        lastConfirmState = currentConfirmState; lastSelectState = currentSelectState;
-        return -1;
-    }
-
-    // Go to Settings (Triggered on PRESS: LOW to HIGH)
-    if (lastSelectState == LOW && currentSelectState == HIGH) {
+    // Go to Settings
+    if (input->wasPressed(BTN_ID_SELECT)) {
         currentState = MENU_STATE_SETTINGS;
-        menuStateTimer = millis(); 
+        input->consumeAll();
         selectedSettingIndex = 0; 
         settingsScrollOffset = 0;
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
         drawSettings();
-        
-        lastSelectState = currentSelectState;
         return -1;
     }
 
     // Left/Right Navigation
-    if (millis() - lastNavInputTime > NAV_DEBOUNCE_DELAY_MS) {
-        if (lastLeftState == LOW && currentLeftState == HIGH) {
-            lastNavInputTime = millis();
-            selectedGameIndex--;
-            if (selectedGameIndex < 0) selectedGameIndex = GAME_COUNT - 1;
-            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-            tft->fillScreen(MY_GREY);
-            delay(40);
-            drawMenu();
-        }
-        else if (lastRightState == LOW && currentRightState == HIGH) {
-            lastNavInputTime = millis();
-            selectedGameIndex++;
-            if (selectedGameIndex >= GAME_COUNT) selectedGameIndex = 0;
-            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-            tft->fillScreen(MY_GREY);
-            delay(40);
-            drawMenu();
-        }
+    if (input->isRepeated(BTN_ID_LEFT, 250, 150)) {
+        selectedGameIndex--;
+        if (selectedGameIndex < 0) selectedGameIndex = GAME_COUNT - 1;
+        sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+        tft->fillScreen(MY_GREY);
+        delay(40);
+        drawMenu();
+    }
+    else if (input->isRepeated(BTN_ID_RIGHT, 250, 150)) {
+        selectedGameIndex++;
+        if (selectedGameIndex >= GAME_COUNT) selectedGameIndex = 0;
+        sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+        tft->fillScreen(MY_GREY);
+        delay(40);
+        drawMenu();
     }
 
-    int selectedGame = -1;
-    if (lastConfirmState == LOW && currentConfirmState == HIGH) {
-        selectedGame = selectedGameIndex; 
+    if (input->wasPressed(BTN_ID_A)) {
+        return selectedGameIndex;
     }
 
-    lastLeftState = currentLeftState;
-    lastRightState = currentRightState;
-    lastConfirmState = currentConfirmState;
-    lastSelectState = currentSelectState;
-
-    return selectedGame;
+    return -1;
 }
 
 // =================================================================
@@ -154,93 +111,75 @@ int MenuManager::handleSelectInput() {
 // =================================================================
 
 void MenuManager::handleSettingsInput() {
-    bool currentUpState = digitalRead(BTN_UP);
-    bool currentDownState = digitalRead(BTN_DOWN);
-    bool currentLeftState = digitalRead(BTN_LEFT);
-    bool currentRightState = digitalRead(BTN_RIGHT);
-    bool currentConfirmState = digitalRead(BTN_A);
-    bool currentCancelState = digitalRead(BTN_B);
-
-    // LOCKOUT TIMER
-    if (millis() - menuStateTimer < LOCKOUT_TIMER_MS) {
-        lastUpState = currentUpState; lastDownState = currentDownState;
-        lastLeftState = currentLeftState; lastRightState = currentRightState;
-        lastConfirmState = currentConfirmState; lastCancelState = currentCancelState;
-        return;
-    }
-
     // Return to Main Menu (B)
-    if (lastCancelState == LOW && currentCancelState == HIGH) {
+    if (input->wasPressed(BTN_ID_B)) {
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-        returnToMenu(); // returnToMenu updates timer
-        lastCancelState = currentCancelState;
+        returnToMenu();
         return;
     }
 
     // Up/Down/Left/Right Navigation
-    if (millis() - lastNavInputTime > NAV_DEBOUNCE_DELAY_MS) {
-        if (lastUpState == LOW && currentUpState == HIGH) {
-            lastNavInputTime = millis();
-            if (selectedSettingIndex > 0) {
-                selectedSettingIndex--;
-                if (selectedSettingIndex < settingsScrollOffset) {
-                    settingsScrollOffset = selectedSettingIndex;
-                }
-                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-                drawSettings();
+    if (input->isRepeated(BTN_ID_UP, 220, 130)) {
+        if (selectedSettingIndex > 0) {
+            selectedSettingIndex--;
+            if (selectedSettingIndex < settingsScrollOffset) {
+                settingsScrollOffset = selectedSettingIndex;
             }
-        }
-        else if (lastDownState == LOW && currentDownState == HIGH) {
-            lastNavInputTime = millis();
-            if (selectedSettingIndex < SETTING_COUNT - 1) {
-                selectedSettingIndex++;
-                if (selectedSettingIndex >= settingsScrollOffset + 3) {
-                    settingsScrollOffset = selectedSettingIndex - 2;
-                }
-                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-                drawSettings();
-            }
-        }
-        else if (lastLeftState == LOW && currentLeftState == HIGH) {
-            lastNavInputTime = millis();
-            if (selectedSettingIndex == 0) { // Volume
-                int newVol = config->getVolume() - 10;
-                if (newVol < 0) newVol = 0;
-                sound->setVolume(newVol);
-                if (!sound->isMuted()) {
-                    sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-                }
-            } else if (selectedSettingIndex == 1) { // Brightness
-                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-                config->setBrightness(config->getBrightness() - 10);
-            } else if (selectedSettingIndex == 2) { // Auto Sleep
-                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-                config->setSleepTimeoutIndex(config->getSleepTimeoutIndex() - 1);
-            }
+            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             drawSettings();
         }
-        else if (lastRightState == LOW && currentRightState == HIGH) {
-            lastNavInputTime = millis();
-            if (selectedSettingIndex == 0) { // Volume
-                int newVol = config->getVolume() + 10;
-                if (newVol > 100) newVol = 100;
-                sound->setVolume(newVol);
-                if (!sound->isMuted()) {
-                    sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-                }
-            } else if (selectedSettingIndex == 1) { // Brightness
-                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-                config->setBrightness(config->getBrightness() + 10);
-            } else if (selectedSettingIndex == 2) { // Auto Sleep
-                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-                config->setSleepTimeoutIndex(config->getSleepTimeoutIndex() + 1);
+    }
+    else if (input->isRepeated(BTN_ID_DOWN, 220, 130)) {
+        if (selectedSettingIndex < SETTING_COUNT - 1) {
+            selectedSettingIndex++;
+            if (selectedSettingIndex >= settingsScrollOffset + 3) {
+                settingsScrollOffset = selectedSettingIndex - 2;
             }
+            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            drawSettings();
+        }
+    }
+    else if (input->isRepeated(BTN_ID_LEFT, 220, 130)) {
+        if (selectedSettingIndex == 0) { // Volume
+            int newVol = config->getVolume() - 10;
+            if (newVol < 0) newVol = 0;
+            sound->setVolume(newVol);
+            if (!sound->isMuted()) {
+                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            }
+            drawSettings();
+        } else if (selectedSettingIndex == 1) { // Brightness
+            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            config->setBrightness(config->getBrightness() - 10);
+            drawSettings();
+        } else if (selectedSettingIndex == 2) { // Auto Sleep
+            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            config->setSleepTimeoutIndex(config->getSleepTimeoutIndex() - 1);
+            drawSettings();
+        }
+    }
+    else if (input->isRepeated(BTN_ID_RIGHT, 220, 130)) {
+        if (selectedSettingIndex == 0) { // Volume
+            int newVol = config->getVolume() + 10;
+            if (newVol > 100) newVol = 100;
+            sound->setVolume(newVol);
+            if (!sound->isMuted()) {
+                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            }
+            drawSettings();
+        } else if (selectedSettingIndex == 1) { // Brightness
+            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            config->setBrightness(config->getBrightness() + 10);
+            drawSettings();
+        } else if (selectedSettingIndex == 2) { // Auto Sleep
+            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            config->setSleepTimeoutIndex(config->getSleepTimeoutIndex() + 1);
             drawSettings();
         }
     }
 
     // Interaction with button A
-    if (lastConfirmState == LOW && currentConfirmState == HIGH) {
+    if (input->wasPressed(BTN_ID_A)) {
         if (selectedSettingIndex == 0) { // Quick Mute/Unmute toggle on Volume
             config->toggleMute();
             if (config->isMuted()) {
@@ -256,32 +195,19 @@ void MenuManager::handleSettingsInput() {
         } else if (selectedSettingIndex == 3) { // Reset Highscores
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             currentState = MENU_STATE_CONFIRM_RESET;
-            menuStateTimer = millis(); 
+            input->consumeAll();
             drawConfirmReset();
         } else if (selectedSettingIndex == 4) { // Credits
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             currentState = MENU_STATE_CREDITS;
-            menuStateTimer = millis();
+            input->consumeAll();
             drawSplashScreen();
         }
     }
-
-    lastUpState = currentUpState; lastDownState = currentDownState;
-    lastLeftState = currentLeftState; lastRightState = currentRightState;
-    lastConfirmState = currentConfirmState; lastCancelState = currentCancelState;
 }
 
 void MenuManager::handleConfirmResetInput() {
-    bool currentConfirmState = digitalRead(BTN_A);
-    bool currentCancelState = digitalRead(BTN_B);
-
-    // LOCKOUT TIMER
-    if (millis() - menuStateTimer < LOCKOUT_TIMER_MS) {
-        lastConfirmState = currentConfirmState; lastCancelState = currentCancelState;
-        return;
-    }
-
-    if (lastConfirmState == LOW && currentConfirmState == HIGH) {
+    if (input->wasPressed(BTN_ID_A)) {
         // Clear all game highscores in NVS via ConfigManager
         config->resetAllHighscores(gameNames, GAME_COUNT);
 
@@ -289,50 +215,22 @@ void MenuManager::handleConfirmResetInput() {
         sound->play(MELODY_SCORE, MELODY_SCORE_LENGTH); 
         
         currentState = MENU_STATE_SETTINGS;
-        menuStateTimer = millis(); 
+        input->consumeAll();
         drawSettings(); 
     }
-    else if (lastCancelState == LOW && currentCancelState == HIGH) {
+    else if (input->wasPressed(BTN_ID_B)) {
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
         currentState = MENU_STATE_SETTINGS;
-        menuStateTimer = millis(); 
+        input->consumeAll();
         drawSettings();
     }
-
-    lastConfirmState = currentConfirmState;
-    lastCancelState = currentCancelState;
 }
 
 void MenuManager::handleCreditsInput() {
-    // LOCKOUT TIMER: Prevent button bleed from settings menu entry
-    if (millis() - menuStateTimer < LOCKOUT_TIMER_MS) {
-        return;
-    }
-
-    // Check if any button is pressed
-    bool anyPressed = digitalRead(BTN_UP) == HIGH ||
-                      digitalRead(BTN_DOWN) == HIGH ||
-                      digitalRead(BTN_LEFT) == HIGH ||
-                      digitalRead(BTN_RIGHT) == HIGH ||
-                      digitalRead(BTN_START) == HIGH ||
-                      digitalRead(BTN_SELECT) == HIGH ||
-                      digitalRead(BTN_A) == HIGH ||
-                      digitalRead(BTN_B) == HIGH;
-
-    if (anyPressed) {
+    if (input->anyPressed()) {
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
         currentState = MENU_STATE_SETTINGS;
-        menuStateTimer = millis();
-
-        // Sync button states to avoid triggering actions immediately upon return
-        lastUpState = digitalRead(BTN_UP);
-        lastDownState = digitalRead(BTN_DOWN);
-        lastLeftState = digitalRead(BTN_LEFT);
-        lastRightState = digitalRead(BTN_RIGHT);
-        lastConfirmState = digitalRead(BTN_A);
-        lastCancelState = digitalRead(BTN_B);
-        lastSelectState = digitalRead(BTN_SELECT);
-
+        input->consumeAll();
         drawSettings();
     }
 }

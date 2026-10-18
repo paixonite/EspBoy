@@ -14,7 +14,7 @@ enum GeniusPhase {
 
 class GeniusGame : public Game {
 public:
-    GeniusGame(TFT_eSPI* tft_display, SoundManager* sound_manager);
+    GeniusGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager);
 
 protected:
     void resetGame() override;
@@ -55,10 +55,6 @@ private:
     int activePad;
     int pendingPressPad;
     unsigned long playerFlashStart;
-    bool lastUp;
-    bool lastRight;
-    bool lastDown;
-    bool lastLeft;
 
     // Differential Rendering Tracking (Zero-Flicker SPI)
     bool fullRedrawRequired;

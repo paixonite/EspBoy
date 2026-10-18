@@ -32,7 +32,7 @@ O software do EspBoy foi projetado para ser modular, escalável e responsivo:
 - **Configurações de Som Permanentes:** O estado de mudo persiste entre reinicializações, evitando o buzzer alto na inicialização.
 - **Menu de Configurações Dinâmico:** Interface no console para ajuste de volume, brilho da tela e reset de recordes.
 - **Áudio Não-Bloqueante:** Fila de som baseada em máquina de estados por contagem de milissegundos, sem congelar a física ou lógica dos jogos.
-- **Controles Responsivos:** Camada de leitura com debounce, detecção de borda e trava de transição entre menus.
+- **Controles Responsivos (`InputManager`):** Gerenciador centralizado de entradas com detecção de borda de latência zero, qualificação de soltura contra cliques duplos (debounce), repetição automática (DAS/ARR) e bloqueio de vazamento entre telas.
 
 ## 📂 Estrutura do Código
 
@@ -47,6 +47,7 @@ EspBoy/
 |
 |-- [ Sistema Operacional (Gerenciadores) ]
 |-- EspBoyCore.h/.cpp     # Orquestrador global e alternador de modos (Menu vs Jogo)
+|-- InputManager.h/.cpp   # Leitura centralizada de botões, debounce e auto-repeat
 |-- MenuManager.h/.cpp    # Gerencia Splash Screen, Carrossel de Jogos e Configurações
 |-- BatteryManager.h/.cpp # Lógica matemática e ADC para leitura da bateria
 |-- ConfigManager.h/.cpp  # Persistência centralizada de configurações na NVS

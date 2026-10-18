@@ -5,6 +5,7 @@
 #include "SoundManager.h"
 #include "BatteryManager.h"
 #include "ConfigManager.h"
+#include "InputManager.h"
 #include "pins.h"
 
 // Added new states for Settings Menu
@@ -18,7 +19,7 @@ enum MenuState {
 
 class MenuManager {
 public:
-    MenuManager(TFT_eSPI* tft, SoundManager* sound, BatteryManager* battery, ConfigManager* config);
+    MenuManager(TFT_eSPI* tft, SoundManager* sound, BatteryManager* battery, ConfigManager* config, InputManager* input);
     void begin();
     void returnToMenu();
     int update(); // Returns -1 if still in menu, or the game ID
@@ -28,11 +29,11 @@ private:
     SoundManager* sound;
     BatteryManager* battery;
     ConfigManager* config;
+    InputManager* input;
     
     MenuState currentState;
     unsigned long splashStartTime;
     unsigned long lastBatteryUpdate;
-    unsigned long lastNavInputTime;
 
     // --- Game Carousel Logic ---
     int selectedGameIndex;
@@ -44,10 +45,6 @@ private:
     int selectedSettingIndex;
     int settingsScrollOffset;
     static const int SETTING_COUNT = 5;
-
-    // --- Button States ---
-    bool lastLeftState, lastRightState, lastUpState, lastDownState;
-    bool lastConfirmState, lastCancelState, lastSelectState;
 
     // --- Drawing Functions ---
     void drawSplashScreen();

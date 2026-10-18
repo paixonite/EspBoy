@@ -18,8 +18,8 @@ static const int PAUSE_OPT_SPACING    = 26;
 static const int PAUSE_OPT_W          = 110;
 static const int PAUSE_OPT_H          = 22;
 
-Game::Game(TFT_eSPI* tft_display, SoundManager* sound_manager, const String& game_name)
-    : tft(tft_display), sound(sound_manager), gameName(game_name) {
+Game::Game(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager, const String& game_name)
+    : tft(tft_display), sound(sound_manager), input(input_manager), gameName(game_name) {
     _exit_request = false;
     score = 0;
     currentState = STATE_TITLE;
@@ -27,7 +27,6 @@ Game::Game(TFT_eSPI* tft_display, SoundManager* sound_manager, const String& gam
     pauseStartTime = 0;
     pausedTotalMs = 0;
     pauseSelection = PAUSE_OPTION_RESUME;
-    resumePending = false;
     
     // Configure universal system placeholders.
     // Any child game can override this in its own constructor.
@@ -85,6 +84,7 @@ bool Game::shouldExit() const {
 void Game::changeState(GameState newState) {
     currentState = newState;
     stateTimer = millis();
+    input->consumeAll();
 
     if (newState == STATE_TITLE) drawTitleScreen();
     else if (newState == STATE_PAUSED) drawPauseScreen();
@@ -100,17 +100,12 @@ unsigned long Game::gameMillis() const {
 }
 
 void Game::checkPauseButton() {
-    static bool lastStartState = LOW;
-    bool currentStartState = digitalRead(BTN_START);
-    
-    if (lastStartState == LOW && currentStartState == HIGH && currentState == STATE_PLAYING) {
+    if (currentState == STATE_PLAYING && input->wasPressed(BTN_ID_START)) {
         pauseStartTime = millis();
         pauseSelection = PAUSE_OPTION_RESUME;
-        resumePending = false;
         sound->play(MELODY_PAUSE, MELODY_PAUSE_LENGTH);
         changeState(STATE_PAUSED);
     }
-    lastStartState = currentStartState;
 }
 
 // =================================================================
@@ -157,59 +152,35 @@ void Game::drawPauseOptions() {
 }
 
 void Game::handlePausedInput() {
-    static bool lastUp = LOW, lastDown = LOW, lastA = LOW, lastStart = LOW;
-    bool curUp    = digitalRead(BTN_UP);
-    bool curDown  = digitalRead(BTN_DOWN);
-    bool curA     = digitalRead(BTN_A);
-    bool curStart = digitalRead(BTN_START);
-
-    if (millis() - stateTimer < 250) {
-        lastUp = curUp; lastDown = curDown; lastA = curA; lastStart = curStart;
-        return;
-    }
-
-    // A confirmed resume waits for the button release, so the press can't leak
-    // into the game's own edge detection (e.g. an unwanted Flappy Bird flap).
-    if (resumePending) {
-        if (curA == LOW && curStart == LOW) {
-            resumeFromPause();
-        }
-        lastUp = curUp; lastDown = curDown; lastA = curA; lastStart = curStart;
-        return;
-    }
-
-    if (lastUp == LOW && curUp == HIGH && pauseSelection > 0) {
+    if (input->isRepeated(BTN_ID_UP, 220, 130) && pauseSelection > 0) {
         pauseSelection--;
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
         drawPauseOptions();
     }
-    else if (lastDown == LOW && curDown == HIGH && pauseSelection < PAUSE_OPTION_COUNT - 1) {
+    else if (input->isRepeated(BTN_ID_DOWN, 220, 130) && pauseSelection < PAUSE_OPTION_COUNT - 1) {
         pauseSelection++;
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
         drawPauseOptions();
     }
-    else if (lastStart == LOW && curStart == HIGH) {
+    else if (input->wasPressed(BTN_ID_START)) {
         // [START] toggles the pause off, regardless of the highlighted option
-        resumePending = true;
+        resumeFromPause();
     }
-    else if (lastA == LOW && curA == HIGH) {
+    else if (input->wasPressed(BTN_ID_A)) {
         if (pauseSelection == PAUSE_OPTION_RESUME) {
-            resumePending = true;
+            resumeFromPause();
         } else if (pauseSelection == PAUSE_OPTION_QUIT) {
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             _exit_request = true;
         }
     }
-
-    lastUp = curUp; lastDown = curDown; lastA = curA; lastStart = curStart;
 }
 
 void Game::resumeFromPause() {
     pausedTotalMs += millis() - pauseStartTime;
-    resumePending = false;
     sound->play(MELODY_RESUME, MELODY_RESUME_LENGTH);
 
-    // Refreshing stateTimer also re-arms each game's short input lockout
+    // Consumes held buttons via changeState() so the resume press never leaks into gameplay
     changeState(STATE_PLAYING);
 
     // Repaint immediately, so even a game over on the very next tick
@@ -235,30 +206,18 @@ void Game::drawTitleScreen() {
 }
 
 void Game::handleInputTitle() {
-    static bool lastA = LOW, lastSelect = LOW, lastB = LOW;
-    bool curA = digitalRead(BTN_A);
-    bool curSelect = digitalRead(BTN_SELECT);
-    bool curB = digitalRead(BTN_B);
-
-    if (millis() - stateTimer < 250) {
-        lastA = curA; lastSelect = curSelect; lastB = curB;
-        return;
-    }
-
-    if (lastA == LOW && curA == HIGH) {
+    if (input->wasPressed(BTN_ID_A)) {
         changeState(STATE_PLAYING);
         tft->fillScreen(TFT_BLACK); 
     } 
-    else if (lastSelect == LOW && curSelect == HIGH) {
+    else if (input->wasPressed(BTN_ID_SELECT)) {
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
         changeState(STATE_HIGHSCORE_VIEW);
     }
-    else if (lastB == LOW && curB == HIGH) {
+    else if (input->wasPressed(BTN_ID_B)) {
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
         _exit_request = true;
     }
-    
-    lastA = curA; lastSelect = curSelect; lastB = curB;
 }
 
 void Game::drawGameOverScreen() {
@@ -357,18 +316,10 @@ void Game::drawHighscoreViewScreen() {
 }
 
 void Game::handleHighscoreViewInput() {
-    static bool lastB = LOW;
-    bool curB = digitalRead(BTN_B);
-
-    if (millis() - stateTimer < 250) {
-        lastB = curB; return;
-    }
-
-    if (lastB == LOW && curB == HIGH) {
+    if (input->wasPressed(BTN_ID_B)) {
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
         changeState(STATE_TITLE);
     }
-    lastB = curB;
 }
 
 // =================================================================
@@ -412,51 +363,30 @@ void Game::drawInitials() {
 }
 
 void Game::handleHighscoreEntryInput() {
-    static unsigned long lastNavTime = 0;
-    const int NAV_DELAY = 150; 
-    
-    bool curUp = digitalRead(BTN_UP);
-    bool curDown = digitalRead(BTN_DOWN);
-    bool curLeft = digitalRead(BTN_LEFT);
-    bool curRight = digitalRead(BTN_RIGHT);
-    
-    static bool lastA = LOW;
-    bool curA = digitalRead(BTN_A);
-
-    if (millis() - stateTimer < 250) {
-        lastA = curA; return;
-    }
-
     bool redraw = false;
 
-    if (millis() - lastNavTime > NAV_DELAY) {
-        if (curUp == HIGH) {
-            currentInitials[currentInitialIndex]++;
-            if (currentInitials[currentInitialIndex] > 'Z') currentInitials[currentInitialIndex] = 'A';
-            redraw = true;
-            lastNavTime = millis();
-        } 
-        else if (curDown == HIGH) {
-            currentInitials[currentInitialIndex]--;
-            if (currentInitials[currentInitialIndex] < 'A') currentInitials[currentInitialIndex] = 'Z';
-            redraw = true;
-            lastNavTime = millis();
-        } 
-        else if (curLeft == HIGH) {
-            currentInitialIndex--;
-            if (currentInitialIndex < 0) currentInitialIndex = 2;
-            redraw = true;
-            lastNavTime = millis();
-        } 
-        else if (curRight == HIGH) {
-            currentInitialIndex++;
-            if (currentInitialIndex > 2) currentInitialIndex = 0;
-            redraw = true;
-            lastNavTime = millis();
-        }
+    if (input->isRepeated(BTN_ID_UP, 200, 120)) {
+        currentInitials[currentInitialIndex]++;
+        if (currentInitials[currentInitialIndex] > 'Z') currentInitials[currentInitialIndex] = 'A';
+        redraw = true;
+    } 
+    else if (input->isRepeated(BTN_ID_DOWN, 200, 120)) {
+        currentInitials[currentInitialIndex]--;
+        if (currentInitials[currentInitialIndex] < 'A') currentInitials[currentInitialIndex] = 'Z';
+        redraw = true;
+    } 
+    else if (input->isRepeated(BTN_ID_LEFT, 200, 120)) {
+        currentInitialIndex--;
+        if (currentInitialIndex < 0) currentInitialIndex = 2;
+        redraw = true;
+    } 
+    else if (input->isRepeated(BTN_ID_RIGHT, 200, 120)) {
+        currentInitialIndex++;
+        if (currentInitialIndex > 2) currentInitialIndex = 0;
+        redraw = true;
     }
 
-    if (lastA == LOW && curA == HIGH) {
+    if (input->wasPressed(BTN_ID_A)) {
         for (int i = 0; i < 3; i++) lastInitials[i] = currentInitials[i];
 
         for (int i = 2; i > newHighscoreRank; i--) {
@@ -469,8 +399,6 @@ void Game::handleHighscoreEntryInput() {
         saveHighscores();
         sound->play(MELODY_SCORE, MELODY_SCORE_LENGTH); 
         setup(); 
-        
-        lastA = curA;
         return;
     }
 
@@ -478,8 +406,6 @@ void Game::handleHighscoreEntryInput() {
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
         drawInitials();
     }
-
-    lastA = curA;
 }
 
 

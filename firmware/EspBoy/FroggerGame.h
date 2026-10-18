@@ -11,7 +11,7 @@ enum TurtleDiveState {
 
 class FroggerGame : public Game {
 public:
-    FroggerGame(TFT_eSPI* tft_display, SoundManager* sound_manager);
+    FroggerGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager);
 
 protected:
     void resetGame() override;
@@ -78,13 +78,6 @@ private:
     int player_row_prev;
     int prev_score;
     bool fullRedrawRequired;
-
-    // Input edge-detection states
-    bool lastUp;
-    bool lastDown;
-    bool lastLeft;
-    bool lastRight;
-    bool lastA;
 
     // Active lanes (5 river + 5 road)
     Lane lanes[NUM_ACTIVE_LANES];

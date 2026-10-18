@@ -1,8 +1,8 @@
 #include "SnakeGame.h"
 #include "audio_assets.h"
 
-SnakeGame::SnakeGame(TFT_eSPI* tft_display, SoundManager* sound_manager) 
-    : Game(tft_display, sound_manager, "Snake") {
+SnakeGame::SnakeGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager) 
+    : Game(tft_display, sound_manager, input_manager, "Snake") {
 }
 
 void SnakeGame::resetGame() {
@@ -36,10 +36,10 @@ void SnakeGame::resetGame() {
 }
 
 void SnakeGame::handleInputPlaying() {
-    if (digitalRead(BTN_UP) == HIGH && currentDirection != DOWN) pendingDirection = UP;
-    if (digitalRead(BTN_DOWN) == HIGH && currentDirection != UP) pendingDirection = DOWN;
-    if (digitalRead(BTN_LEFT) == HIGH && currentDirection != RIGHT) pendingDirection = LEFT;
-    if (digitalRead(BTN_RIGHT) == HIGH && currentDirection != LEFT) pendingDirection = RIGHT;
+    if (input->isHeld(BTN_ID_UP) && currentDirection != DOWN) pendingDirection = UP;
+    if (input->isHeld(BTN_ID_DOWN) && currentDirection != UP) pendingDirection = DOWN;
+    if (input->isHeld(BTN_ID_LEFT) && currentDirection != RIGHT) pendingDirection = LEFT;
+    if (input->isHeld(BTN_ID_RIGHT) && currentDirection != LEFT) pendingDirection = RIGHT;
 }
 
 void SnakeGame::onResume() {

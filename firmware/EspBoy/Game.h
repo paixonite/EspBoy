@@ -4,6 +4,7 @@
 #include <TFT_eSPI.h>
 #include <Preferences.h>
 #include "SoundManager.h"
+#include "InputManager.h"
 #include "pins.h"
 
 enum GameState { 
@@ -17,7 +18,7 @@ enum GameState {
 
 class Game {
 public:
-    Game(TFT_eSPI* tft_display, SoundManager* sound_manager, const String& game_name);
+    Game(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager, const String& game_name);
     virtual ~Game() {}
 
     void setup();
@@ -27,6 +28,7 @@ public:
 protected:
     TFT_eSPI* tft;
     SoundManager* sound;
+    InputManager* input;
     String gameName;
     GameState currentState;
     bool _exit_request;
@@ -97,7 +99,6 @@ private:
     unsigned long pauseStartTime; // millis() when the current pause began
     unsigned long pausedTotalMs;  // Accumulated paused time, subtracted by gameMillis()
     int pauseSelection;           // Highlighted popup option (index into the option list)
-    bool resumePending;           // Resume confirmed, waiting for the button release
 };
 
 #endif // GAME_H

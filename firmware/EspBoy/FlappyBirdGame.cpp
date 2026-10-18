@@ -17,8 +17,8 @@ const int HUD_HEIGHT = 20;
 const int MIN_GAP_Y = 55;
 const int MAX_GAP_Y = 135;
 
-FlappyBirdGame::FlappyBirdGame(TFT_eSPI* tft_display, SoundManager* sound_manager)
-    : Game(tft_display, sound_manager, "Flappy Bird") {
+FlappyBirdGame::FlappyBirdGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager)
+    : Game(tft_display, sound_manager, input_manager, "Flappy Bird") {
 }
 
 void FlappyBirdGame::resetGame() {
@@ -38,14 +38,10 @@ void FlappyBirdGame::resetGame() {
 }
 
 void FlappyBirdGame::handleInputPlaying() {
-    static bool lastButtonState = LOW;
-    bool currentButtonState = digitalRead(BTN_A);
-
-    if (lastButtonState == LOW && currentButtonState == HIGH) {
+    if (input->wasPressed(BTN_ID_A)) {
         player_vel_y = FLAP_STRENGTH;
         sound->play(MELODY_FLAP, MELODY_FLAP_LENGTH);
     }
-    lastButtonState = currentButtonState;
 }
 
 void FlappyBirdGame::onResume() {

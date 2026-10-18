@@ -12,7 +12,7 @@ enum Direction { UP, DOWN, LEFT, RIGHT };
 
 class SnakeGame : public Game {
 public:
-    SnakeGame(TFT_eSPI* tft_display, SoundManager* sound_manager);
+    SnakeGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager);
 
 protected:
     void resetGame() override;

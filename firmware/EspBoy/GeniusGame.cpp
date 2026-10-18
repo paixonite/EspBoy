@@ -18,8 +18,8 @@ static const uint16_t PAD_LIT_COLOR[4] = {
     0x1D5F      // Bright Electric Blue
 };
 
-GeniusGame::GeniusGame(TFT_eSPI* tft_display, SoundManager* sound_manager)
-    : Game(tft_display, sound_manager, "Genius") {
+GeniusGame::GeniusGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager)
+    : Game(tft_display, sound_manager, input_manager, "Genius") {
     defaultScores[0] = 15;
     defaultScores[1] = 10;
     defaultScores[2] = 5;
@@ -49,11 +49,6 @@ void GeniusGame::resetGame() {
 
     prevScore     = -1;
     prevPhaseCode = -1;
-
-    lastUp    = digitalRead(BTN_UP);
-    lastRight = digitalRead(BTN_RIGHT);
-    lastDown  = digitalRead(BTN_DOWN);
-    lastLeft  = digitalRead(BTN_LEFT);
 }
 
 void GeniusGame::appendRandomStep() {
@@ -107,55 +102,37 @@ unsigned long GeniusGame::getStepGapDuration() const {
 
 bool GeniusGame::isPadHeld(int padIndex) const {
     switch (padIndex) {
-        case PAD_UP:    return digitalRead(BTN_UP) == HIGH;
-        case PAD_RIGHT: return digitalRead(BTN_RIGHT) == HIGH;
-        case PAD_DOWN:  return digitalRead(BTN_DOWN) == HIGH;
-        case PAD_LEFT:  return digitalRead(BTN_LEFT) == HIGH;
+        case PAD_UP:    return input->isHeld(BTN_ID_UP);
+        case PAD_RIGHT: return input->isHeld(BTN_ID_RIGHT);
+        case PAD_DOWN:  return input->isHeld(BTN_ID_DOWN);
+        case PAD_LEFT:  return input->isHeld(BTN_ID_LEFT);
         default:        return false;
     }
 }
 
 void GeniusGame::handleInputPlaying() {
-    bool curUp    = digitalRead(BTN_UP);
-    bool curRight = digitalRead(BTN_RIGHT);
-    bool curDown  = digitalRead(BTN_DOWN);
-    bool curLeft  = digitalRead(BTN_LEFT);
-
     if (initialStart) {
         pendingPressPad = -1;
-        lastUp    = curUp;
-        lastRight = curRight;
-        lastDown  = curDown;
-        lastLeft  = curLeft;
         return;
     }
 
     if (phase == PHASE_PLAYER_INPUT) {
-        if (lastUp == LOW && curUp == HIGH) {
+        if (input->wasPressed(BTN_ID_UP)) {
             pendingPressPad = PAD_UP;
-        } else if (lastRight == LOW && curRight == HIGH) {
+        } else if (input->wasPressed(BTN_ID_RIGHT)) {
             pendingPressPad = PAD_RIGHT;
-        } else if (lastDown == LOW && curDown == HIGH) {
+        } else if (input->wasPressed(BTN_ID_DOWN)) {
             pendingPressPad = PAD_DOWN;
-        } else if (lastLeft == LOW && curLeft == HIGH) {
+        } else if (input->wasPressed(BTN_ID_LEFT)) {
             pendingPressPad = PAD_LEFT;
         }
     } else {
         pendingPressPad = -1;
     }
-
-    lastUp    = curUp;
-    lastRight = curRight;
-    lastDown  = curDown;
-    lastLeft  = curLeft;
 }
 
 void GeniusGame::onResume() {
     fullRedrawRequired = true;
-    lastUp    = digitalRead(BTN_UP);
-    lastRight = digitalRead(BTN_RIGHT);
-    lastDown  = digitalRead(BTN_DOWN);
-    lastLeft  = digitalRead(BTN_LEFT);
 }
 
 void GeniusGame::updatePlaying() {

@@ -3,6 +3,7 @@
 
 #include <TFT_eSPI.h>
 #include "ConfigManager.h"
+#include "InputManager.h"
 #include "SoundManager.h"
 #include "BatteryManager.h"
 #include "MenuManager.h"
@@ -20,6 +21,7 @@ public:
 private:
     TFT_eSPI tft;
     ConfigManager configManager;
+    InputManager inputManager;
     SoundManager soundManager;
     BatteryManager batteryManager;
     MenuManager menuManager;
@@ -34,7 +36,6 @@ private:
 
     void loadHardware();
     void loadGame(int gameIndex);
-    bool anyButtonPressed() const;
     void handlePowerManagement();
 };
 

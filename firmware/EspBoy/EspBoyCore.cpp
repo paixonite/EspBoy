@@ -9,8 +9,9 @@
 EspBoyCore::EspBoyCore() 
     : tft(), 
       configManager(),
+      inputManager(),
       soundManager(BUZZER_PIN, &configManager), 
-      menuManager(&tft, &soundManager, &batteryManager, &configManager) {
+      menuManager(&tft, &soundManager, &batteryManager, &configManager, &inputManager) {
     currentGame = nullptr;
     currentMode = MODE_MENU;
     lastActivityTime = 0;
@@ -20,6 +21,7 @@ EspBoyCore::EspBoyCore()
 
 void EspBoyCore::begin() {
     loadHardware();
+    inputManager.begin();
     configManager.begin();
     soundManager.begin();
     batteryManager.begin();
@@ -28,6 +30,7 @@ void EspBoyCore::begin() {
 }
 
 void EspBoyCore::update() {
+    inputManager.update();
     handlePowerManagement();
     if (isSleeping) {
         return;
@@ -60,19 +63,8 @@ void EspBoyCore::update() {
     }
 }
 
-bool EspBoyCore::anyButtonPressed() const {
-    return digitalRead(BTN_UP) == HIGH ||
-           digitalRead(BTN_DOWN) == HIGH ||
-           digitalRead(BTN_LEFT) == HIGH ||
-           digitalRead(BTN_RIGHT) == HIGH ||
-           digitalRead(BTN_START) == HIGH ||
-           digitalRead(BTN_SELECT) == HIGH ||
-           digitalRead(BTN_A) == HIGH ||
-           digitalRead(BTN_B) == HIGH;
-}
-
 void EspBoyCore::handlePowerManagement() {
-    if (anyButtonPressed()) {
+    if (inputManager.anyPhysicalActivity()) {
         lastActivityTime = millis();
 
         if (isSleeping) {
@@ -84,10 +76,7 @@ void EspBoyCore::handlePowerManagement() {
             isDimmed = false;
 
             // Consume the wake button press so it does not trigger menu/game actions
-            while (anyButtonPressed()) {
-                delay(10);
-            }
-            delay(80);
+            inputManager.consumeAll();
             lastActivityTime = millis();
             return;
         }
@@ -134,15 +123,6 @@ void EspBoyCore::loadHardware() {
     Serial.begin(115200);
     tft.init();
     tft.setRotation(1);
-
-    pinMode(BTN_UP, INPUT_PULLDOWN);
-    pinMode(BTN_DOWN, INPUT_PULLDOWN);
-    pinMode(BTN_LEFT, INPUT_PULLDOWN);
-    pinMode(BTN_RIGHT, INPUT_PULLDOWN);
-    pinMode(BTN_START, INPUT_PULLDOWN);
-    pinMode(BTN_SELECT, INPUT_PULLDOWN);
-    pinMode(BTN_A, INPUT_PULLDOWN);
-    pinMode(BTN_B, INPUT_PULLDOWN);
     
     pinMode(POWER_ENABLE_PIN, OUTPUT);
     digitalWrite(POWER_ENABLE_PIN, HIGH);
@@ -157,27 +137,28 @@ void EspBoyCore::loadGame(int gameIndex) {
 
     switch (gameIndex) {
         case 0:
-            currentGame = new CrossyRoadGame(&tft, &soundManager);
+            currentGame = new CrossyRoadGame(&tft, &soundManager, &inputManager);
             break;
         case 1:
-            currentGame = new FlappyBirdGame(&tft, &soundManager);
+            currentGame = new FlappyBirdGame(&tft, &soundManager, &inputManager);
             break;
         case 2:
-            currentGame = new FroggerGame(&tft, &soundManager);
+            currentGame = new FroggerGame(&tft, &soundManager, &inputManager);
             break;
         case 3:
-            currentGame = new GeniusGame(&tft, &soundManager);
+            currentGame = new GeniusGame(&tft, &soundManager, &inputManager);
             break;
         case 4:
-            currentGame = new SnakeGame(&tft, &soundManager);
+            currentGame = new SnakeGame(&tft, &soundManager, &inputManager);
             break;
         case 5:
-            currentGame = new TetrisGame(&tft, &soundManager);
+            currentGame = new TetrisGame(&tft, &soundManager, &inputManager);
             break;
         default:
             return;
     }
 
+    inputManager.consumeAll();
     currentGame->setup();
     currentMode = MODE_GAME;
 }

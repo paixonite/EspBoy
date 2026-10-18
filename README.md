@@ -29,9 +29,9 @@ The EspBoy software was designed to be modular, scalable, and responsive.
 - **Included Games:** Currently features the classics Crossy Road, Flappy Bird, Frogger, Genius, Snake, and Tetris, running smoothly at ~60 FPS.
 - **Persistent Highscore System:** The console has built-in Flash memory that saves the Top 3 for each game, including a classic arcade-style 3-initial input screen.
 - **Dynamic Settings Menu:** A dedicated system UI allows adjusting volume, changing screen brightness, and resetting records.
-- **Object-Oriented Architecture (OOP):** The system is orchestrated by a Core (`EspBoyCore`) that delegates tasks to specific managers (`MenuManager`, `BatteryManager`). New games inherit from a `Game` superclass that provides the standard state machine and template methods.
+- **Object-Oriented Architecture (OOP):** The system is orchestrated by a Core (`EspBoyCore`) that delegates tasks to specific managers (`InputManager`, `MenuManager`, `BatteryManager`, `ConfigManager`, `SoundManager`). New games inherit from a `Game` superclass that provides the standard state machine and template methods.
 - **Non-Blocking Audio:** A sound system that plays background melodies and sound effects via a state machine, without freezing the game's physics or logic.
-- **Responsive Controls:** Button reading utilizes edge detection, debounce techniques, and input leak prevention.
+- **Responsive Controls (`InputManager`):** Centralized button reading with asymmetric zero-latency press detection, continuous-LOW release qualification (preventing double clicks), DAS/ARR auto-repeat, and state-transition consumption.
 
 ## 📂 Code Structure
 
@@ -46,6 +46,7 @@ EspBoy/
 |
 |-- [ Operating System (Managers) ]
 |-- EspBoyCore.h/.cpp     # Global state orchestrator.
+|-- InputManager.h/.cpp   # Centralized button debounce, edge detection, and auto-repeat.
 |-- MenuManager.h/.cpp    # Manages Splash Screen, Game Carousel, and Settings.
 |-- BatteryManager.h/.cpp # Math logic and ADC for battery reading.
 |-- ConfigManager.h/.cpp  # Centralized NVS configuration persistence.

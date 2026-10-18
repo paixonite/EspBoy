@@ -18,7 +18,7 @@ enum RailState {
 
 class CrossyRoadGame : public Game {
 public:
-    CrossyRoadGame(TFT_eSPI* tft_display, SoundManager* sound_manager);
+    CrossyRoadGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager);
 
 protected:
     void resetGame() override;

@@ -94,8 +94,8 @@ static const int8_t WALL_KICKS[8][2] = {
     { 1, -1}  // 7: Diagonal up-right kick
 };
 
-TetrisGame::TetrisGame(TFT_eSPI* tft_display, SoundManager* sound_manager)
-    : Game(tft_display, sound_manager, "Tetris") {
+TetrisGame::TetrisGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager)
+    : Game(tft_display, sound_manager, input_manager, "Tetris") {
 }
 
 void TetrisGame::refillBag() {
@@ -152,16 +152,8 @@ void TetrisGame::resetGame() {
     prevHoldType = -2;
     prevCanHold = true;
 
-    // Sync input states to prevent button bleed from Title Screen
-    lastUp    = digitalRead(BTN_UP);
-    lastDown  = digitalRead(BTN_DOWN);
-    lastLeft  = digitalRead(BTN_LEFT);
-    lastRight = digitalRead(BTN_RIGHT);
-    lastA     = digitalRead(BTN_A);
-    lastB     = digitalRead(BTN_B);
-    lastSelect = digitalRead(BTN_SELECT);
+    // Sync input state
     hardDropPending = false;
-    dasDir    = 0;
 
     spawnNextPiece();
 }
@@ -296,100 +288,38 @@ unsigned long TetrisGame::getGravityInterval() const {
 }
 
 void TetrisGame::handleInputPlaying() {
-    bool curUp    = digitalRead(BTN_UP);
-    bool curDown  = digitalRead(BTN_DOWN);
-    bool curLeft  = digitalRead(BTN_LEFT);
-    bool curRight = digitalRead(BTN_RIGHT);
-    bool curA     = digitalRead(BTN_A);
-    bool curB     = digitalRead(BTN_B);
-    bool curSelect = digitalRead(BTN_SELECT);
-
-    unsigned long now = gameMillis();
-
-    // Prevent input bleed right after pressing [A] on the Title Screen (or resuming from pause)
-    if (millis() - stateTimer < 180) {
-        lastUp = curUp; lastDown = curDown;
-        lastLeft = curLeft; lastRight = curRight;
-        lastA = curA; lastB = curB; lastSelect = curSelect;
-        return;
-    }
-
     if (clearingLines) {
-        lastUp = curUp; lastDown = curDown;
-        lastLeft = curLeft; lastRight = curRight;
-        lastA = curA; lastB = curB; lastSelect = curSelect;
         isSoftDropping = false;
         return;
     }
 
     // 1. Hold Piece ([SELECT])
-    if (lastSelect == LOW && curSelect == HIGH) {
+    if (input->wasPressed(BTN_ID_SELECT)) {
         triggerHold();
         if (currentState == STATE_GAME_OVER) return;
     }
 
     // 2. Rotations ([A] = Clockwise, [B] = Counter-Clockwise)
-    if (lastA == LOW && curA == HIGH) {
+    if (input->wasPressed(BTN_ID_A)) {
         tryRotate(1);
-    } else if (lastB == LOW && curB == HIGH) {
+    } else if (input->wasPressed(BTN_ID_B)) {
         tryRotate(-1);
     }
 
     // 3. Horizontal Movement with Delayed Auto Shift (DAS) & Auto Repeat Rate (ARR)
-    bool leftEdge  = (lastLeft == LOW && curLeft == HIGH);
-    bool rightEdge = (lastRight == LOW && curRight == HIGH);
-
-    if (leftEdge) {
+    if (input->isRepeated(BTN_ID_LEFT, DAS_DELAY_MS, ARR_RATE_MS)) {
         tryMove(-1, 0);
-        dasDir = -1;
-        dasStartTime = now;
-        lastArrTime = now;
-    } else if (rightEdge) {
+    } else if (input->isRepeated(BTN_ID_RIGHT, DAS_DELAY_MS, ARR_RATE_MS)) {
         tryMove(1, 0);
-        dasDir = 1;
-        dasStartTime = now;
-        lastArrTime = now;
-    } else {
-        if (dasDir == -1 && curLeft == HIGH) {
-            if (now - dasStartTime >= DAS_DELAY_MS && now - lastArrTime >= ARR_RATE_MS) {
-                tryMove(-1, 0);
-                lastArrTime = now;
-            }
-        } else if (dasDir == 1 && curRight == HIGH) {
-            if (now - dasStartTime >= DAS_DELAY_MS && now - lastArrTime >= ARR_RATE_MS) {
-                tryMove(1, 0);
-                lastArrTime = now;
-            }
-        } else {
-            if (curLeft == HIGH) {
-                dasDir = -1;
-                dasStartTime = now;
-                lastArrTime = now;
-            } else if (curRight == HIGH) {
-                dasDir = 1;
-                dasStartTime = now;
-                lastArrTime = now;
-            } else {
-                dasDir = 0;
-            }
-        }
     }
 
     // 4. Soft Drop ([DOWN] held)
-    isSoftDropping = (curDown == HIGH);
+    isSoftDropping = input->isHeld(BTN_ID_DOWN);
 
     // 5. Hard Drop ([UP] edge-triggered, processed in updatePlaying)
-    if (lastUp == LOW && curUp == HIGH) {
+    if (input->wasPressed(BTN_ID_UP)) {
         hardDropPending = true;
     }
-
-    lastUp    = curUp;
-    lastDown  = curDown;
-    lastLeft  = curLeft;
-    lastRight = curRight;
-    lastA     = curA;
-    lastB     = curB;
-    lastSelect = curSelect;
 }
 
 void TetrisGame::onResume() {
