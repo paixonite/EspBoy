@@ -1,7 +1,7 @@
 #include "Game.h"
 #include "audio_assets.h"
 
-// Inicializa a memória global do último nome usado
+// Initialize global memory for last used name
 char Game::lastInitials[3] = {'A', 'A', 'A'};
 
 Game::Game(TFT_eSPI* tft_display, SoundManager* sound_manager, const String& game_name)
@@ -10,15 +10,15 @@ Game::Game(TFT_eSPI* tft_display, SoundManager* sound_manager, const String& gam
     score = 0;
     currentState = STATE_TITLE;
     
-    // Configura os placeholders universais do sistema.
-    // Qualquer jogo filho pode sobrescrever isso no seu próprio construtor.
+    // Configure universal system placeholders.
+    // Any child game can override this in its own constructor.
     defaultScores[0] = 30; defaultNames[0] = "CPU";
     defaultScores[1] = 20; defaultNames[1] = "ESP";
     defaultScores[2] = 10; defaultNames[2] = "BOY";
 }
 
 void Game::setup() {
-    // Carrega os recordes (ou os placeholders se a flash estiver limpa) ANTES de iniciar o jogo
+    // Load highscores (or placeholders if flash is empty) BEFORE starting the game
     loadHighscores();
     resetGame();
     changeState(STATE_TITLE);
@@ -83,7 +83,7 @@ void Game::checkGlobalExit() {
 }
 
 // =================================================================
-// TELA DE TÍTULO E GAME OVER
+// TITLE SCREEN AND GAME OVER
 // =================================================================
 
 void Game::drawTitleScreen() {
@@ -155,7 +155,7 @@ void Game::handleGameOverState() {
 }
 
 // =================================================================
-// LÓGICA DE HIGHSCORES
+// HIGHSCORE LOGIC
 // =================================================================
 
 void Game::endGame() {
@@ -175,7 +175,7 @@ void Game::loadHighscores() {
     
     preferences.begin(ns.c_str(), true); 
     for (int i = 0; i < 3; i++) {
-        // Agora tenta carregar da memória; se não encontrar, usa os defaults definidos
+        // Try loading from memory; if not found, use defined defaults
         topScores[i] = preferences.getInt(("score" + String(i)).c_str(), defaultScores[i]);
         topNames[i] = preferences.getString(("name" + String(i)).c_str(), defaultNames[i]);
     }
@@ -184,7 +184,7 @@ void Game::loadHighscores() {
 
 void Game::saveHighscores() {
     String ns = gameName;
-    ns.replace(" ", "");
+    ns.replace(" ", ""); 
     
     preferences.begin(ns.c_str(), false); 
     for (int i = 0; i < 3; i++) {
@@ -195,7 +195,7 @@ void Game::saveHighscores() {
 }
 
 // =================================================================
-// TELA VIEW SCREEN (TOP SCORES)
+// VIEW SCREEN (TOP SCORES)
 // =================================================================
 
 void Game::drawHighscoreViewScreen() {
@@ -242,7 +242,7 @@ void Game::handleHighscoreViewInput() {
 }
 
 // =================================================================
-// TELA ENTRY SCREEN (DIGITAR NOME)
+// ENTRY SCREEN (INPUT INITIALS)
 // =================================================================
 
 void Game::drawHighscoreEntryScreen() {

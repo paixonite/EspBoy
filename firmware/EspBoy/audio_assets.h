@@ -2,13 +2,13 @@
 #define AUDIO_ASSETS_H
 
 // =================================================================
-// SEÇÃO 1: DEFINIÇÕES DAS NOTAS MUSICAIS
-// Tabela de referência com as frequências (em Hz) de cada nota.
+// SECTION 1: MUSICAL NOTE DEFINITIONS
+// Reference table with frequencies (in Hz) for each note.
 // =================================================================
 
-#define REST      0    // Define uma pausa (silêncio)
+#define REST      0    // Defines a rest (silence)
 
-// Oitavas
+// Octaves
 #define NOTE_A3   220
 #define NOTE_C4   262
 #define NOTE_D4   294
@@ -25,28 +25,28 @@
 
 
 // =================================================================
-// SEÇÃO 2: ESTRUTURA DE DADOS PARA UMA NOTA
-// Define um modelo para criar melodias, onde cada nota tem uma
-// frequência (o tom) e uma duração (o tempo que ela toca).
+// SECTION 2: NOTE DATA STRUCTURE
+// Defines a model for creating melodies, where each note has a
+// frequency (pitch) and a duration (the time it plays).
 // =================================================================
 
 struct Note {
-    int frequency; // Frequência em Hz (ex: NOTE_C4)
-    int duration;  // Duração em milissegundos
+    int frequency; // Frequency in Hz (e.g., NOTE_C4)
+    int duration;  // Duration in milliseconds
 };
 
 
 // =================================================================
-// SEÇÃO 3: MELODIAS E EFEITOS SONOROS (SFX)
-// Biblioteca de sons do EspBoy, separados por contexto.
+// SECTION 3: MELODIES AND SOUND EFFECTS (SFX)
+// EspBoy sound library, organized by context.
 // =================================================================
 
 // -----------------------------------------------------------------
-// 3.1 Sons do Sistema
+// 3.1 System Sounds
 // -----------------------------------------------------------------
 
-// Melodia para a Splash Screen ("EspBoy Fanfare")
-// Um arpejo ascendente de Lá Maior, que soa "brilhante" e "positivo".
+// Melody for the Splash Screen ("EspBoy Fanfare")
+// An ascending A Major arpeggio, sounding "bright" and "positive".
 const Note MELODY_SPLASH[] = {
     {NOTE_A3, 150},
     {NOTE_E4, 150},
@@ -56,13 +56,13 @@ const Note MELODY_SPLASH[] = {
 const int MELODY_SPLASH_LENGTH = sizeof(MELODY_SPLASH) / sizeof(Note);
 
 
-// Efeito sonoro para navegação no menu principal.
+// Sound effect for main menu navigation.
 const Note MELODY_MENU_NAVIGATE[] = {
     {NOTE_A5, 50}
 };
 const int MELODY_MENU_NAVIGATE_LENGTH = sizeof(MELODY_MENU_NAVIGATE) / sizeof(Note);
 
-// Fanfarra tocada quando o jogador bate um recorde (Arpejo ascendente)
+// Fanfare played when the player sets a high score (Ascending arpeggio)
 const Note MELODY_NEW_HIGHSCORE[] = {
     {NOTE_C5, 100},
     {NOTE_G5, 100},
@@ -71,10 +71,10 @@ const Note MELODY_NEW_HIGHSCORE[] = {
 const int MELODY_NEW_HIGHSCORE_LENGTH = sizeof(MELODY_NEW_HIGHSCORE) / sizeof(Note);
 
 // -----------------------------------------------------------------
-// 3.2 Sons do Jogo Snake
+// 3.2 Snake Game Sounds
 // -----------------------------------------------------------------
 
-// Efeito sonoro para quando a cobra come uma maçã.
+// Sound effect for when the snake eats an apple.
 const Note MELODY_APPLE[] = {
     {NOTE_C5, 100},
     {NOTE_G5, 100}
@@ -82,7 +82,7 @@ const Note MELODY_APPLE[] = {
 const int MELODY_APPLE_LENGTH = sizeof(MELODY_APPLE) / sizeof(Note);
 
 
-// Melodia para a tela de Game Over do Snake.
+// Melody for the Snake Game Over screen.
 const Note MELODY_GAME_OVER[] = {
     {NOTE_G4, 250},
     {NOTE_F4, 250},
@@ -93,24 +93,24 @@ const int MELODY_GAME_OVER_LENGTH = sizeof(MELODY_GAME_OVER) / sizeof(Note);
 
 
 // -----------------------------------------------------------------
-// 3.3 Sons do Jogo Flappy Bird
+// 3.3 Flappy Bird Game Sounds
 // -----------------------------------------------------------------
 
-// Efeito sonoro para o "flap" (pulo do pássaro).
+// Sound effect for the "flap" (bird jump).
 const Note MELODY_FLAP[] = {
     {NOTE_A4, 50}
 };
 const int MELODY_FLAP_LENGTH = sizeof(MELODY_FLAP) / sizeof(Note);
 
 
-// Efeito sonoro para marcar ponto ao passar por um cano.
+// Sound effect for scoring when passing through a pipe.
 const Note MELODY_SCORE[] = {
     {NOTE_C6, 80}
 };
 const int MELODY_SCORE_LENGTH = sizeof(MELODY_SCORE) / sizeof(Note);
 
 
-// Efeito sonoro para a colisão/game over.
+// Sound effect for collision / game over.
 const Note MELODY_HIT[] = {
     {NOTE_A3, 100},
     {REST, 50},

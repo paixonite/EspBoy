@@ -14,10 +14,10 @@ void SoundManager::begin() {
     prefs.end();
 }
 
-// Inicia a reprodução de uma melodia
+// Starts playing a melody
 void SoundManager::play(const Note melody[], int melody_length) {
     if (_is_muted) {
-        return; // Se o sistema está mudo, simplesmente não inicia a melodia.
+        return; // If system is muted, simply do not start melody.
     }
     _current_melody = melody;
     _melody_length = melody_length;
@@ -25,7 +25,7 @@ void SoundManager::play(const Note melody[], int melody_length) {
     _is_playing = true;
     _note_start_time = millis();
 
-    // Toca a primeira nota imediatamente
+    // Play the first note immediately
     int freq = _current_melody[0].frequency;
     int dur = _current_melody[0].duration;
     if (freq == REST) {
@@ -35,34 +35,34 @@ void SoundManager::play(const Note melody[], int melody_length) {
     }
 }
 
-// Para a reprodução
+// Stops playback
 void SoundManager::stop() {
     _is_playing = false;
     noTone(_buzzer_pin);
 }
 
-// Verifica se é hora de tocar a próxima nota
+// Check if it is time to play the next note
 void SoundManager::loop() {
     if (!_is_playing || _is_muted) {
         return;
     }
 
-    // Pega a duração da nota atual
+    // Get current note duration
     int current_note_duration = _current_melody[_current_note_index].duration;
     
-    // Adiciona uma pequena pausa entre as notas (20% da duração da nota)
+    // Add a small pause between notes (20% of note duration)
     int pause_between_notes = current_note_duration * 0.20;
 
-    // Verifica se o tempo da nota atual + a pausa já passaram
+    // Check if current note time + pause have elapsed
     if (millis() - _note_start_time > current_note_duration + pause_between_notes) {
-        _current_note_index++; // Vai para a próxima nota
+        _current_note_index++; // Advance to next note
 
-        // Se a melodia terminou
+        // If melody finished
         if (_current_note_index >= _melody_length) {
             stop();
         } else {
-            // Se não terminou, toca a próxima nota
-            _note_start_time = millis(); // Reseta o timer
+            // If not finished, play next note
+            _note_start_time = millis(); // Reset timer
             int freq = _current_melody[_current_note_index].frequency;
             int dur = _current_melody[_current_note_index].duration;
             if (freq == REST) {
@@ -77,7 +77,7 @@ void SoundManager::loop() {
 void SoundManager::setMute(bool muted) {
     _is_muted = muted;
     if (_is_muted) {
-        stop(); // Se está silenciando, para qualquer som que esteja tocando
+        stop(); // If muting, stop any currently playing sound
     }
     Preferences prefs;
     prefs.begin("sound_cfg", false);

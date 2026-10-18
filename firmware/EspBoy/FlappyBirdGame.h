@@ -8,7 +8,7 @@ public:
     FlappyBirdGame(TFT_eSPI* tft_display, SoundManager* sound_manager);
 
 protected:
-    // Apenas as implementações obrigatórias da classe base
+    // Only mandatory base class implementations
     void resetGame() override;
     void updatePlaying() override;
     void drawPlaying() override;
@@ -25,7 +25,7 @@ private:
     void checkCollisions();
     void drawHUD();
 
-    // Propriedades específicas do Flappy Bird
+    // Flappy Bird-specific properties
     float player_y;
     float player_y_prev;
     float player_vel_y;

@@ -21,7 +21,7 @@ protected:
     void handleInputPlaying() override;
 
 private:
-    // Constantes do jogo
+    // Game constants
     static const int DISPLAY_WIDTH = 320;
     static const int DISPLAY_HEIGHT = 170;
     static const int SPEED = 200;
@@ -34,7 +34,7 @@ private:
     Point spawnApple();
     void drawScoreHUD();
 
-    // Estado específico do Snake
+    // Snake-specific state
     int snakeLength;
     int grid[GRID_WIDTH][GRID_HEIGHT];
     Point snake[GRID_HEIGHT * GRID_WIDTH];

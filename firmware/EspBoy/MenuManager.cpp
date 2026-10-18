@@ -8,7 +8,7 @@ const int SPLASH_DURATION_MS = 3500;
 const int NAV_DEBOUNCE_DELAY_MS = 250;
 const int LOCKOUT_TIMER_MS = 250;
 
-// Timer de bloqueio global para evitar input bleed nas transições de menu
+// Global lockout timer to prevent input bleed during menu transitions
 static unsigned long menuStateTimer = 0;
 
 MenuManager::MenuManager(TFT_eSPI* tft_display, SoundManager* sound_manager, BatteryManager* battery_manager)
@@ -36,10 +36,10 @@ void MenuManager::begin() {
 
 void MenuManager::returnToMenu() {
     currentState = MENU_STATE_SELECT;
-    menuStateTimer = millis(); // Inicia o cooldown de transição
+    menuStateTimer = millis(); // Start transition cooldown
     drawMenu();
     
-    // Limpa os inputs forçando a leitura atual para evitar bounce
+    // Clear inputs by forcing current read to prevent bounce
     lastLeftState = digitalRead(BTN_LEFT);
     lastRightState = digitalRead(BTN_RIGHT);
     lastUpState = digitalRead(BTN_UP);
@@ -78,7 +78,7 @@ int MenuManager::update() {
 }
 
 // =================================================================
-// 1. LÓGICA DO CARROSSEL DE JOGOS
+// 1. GAME CAROUSEL LOGIC
 // =================================================================
 
 int MenuManager::handleSelectInput() {
@@ -87,14 +87,14 @@ int MenuManager::handleSelectInput() {
     bool currentConfirmState = digitalRead(BTN_A);
     bool currentSelectState = digitalRead(BTN_SELECT);
 
-    // LOCKOUT TIMER: Ignora inputs logo após a mudança de estado
+    // LOCKOUT TIMER: Ignore inputs right after state change
     if (millis() - menuStateTimer < LOCKOUT_TIMER_MS) {
         lastLeftState = currentLeftState; lastRightState = currentRightState;
         lastConfirmState = currentConfirmState; lastSelectState = currentSelectState;
         return -1;
     }
 
-    // Ir para Configurações (Gatilho no PRESS: LOW para HIGH)
+    // Go to Settings (Triggered on PRESS: LOW to HIGH)
     if (lastSelectState == LOW && currentSelectState == HIGH) {
         currentState = MENU_STATE_SETTINGS;
         menuStateTimer = millis(); 
@@ -106,7 +106,7 @@ int MenuManager::handleSelectInput() {
         return -1;
     }
 
-    // Navegação Direita/Esquerda
+    // Left/Right Navigation
     if (millis() - lastNavInputTime > NAV_DEBOUNCE_DELAY_MS) {
         if (lastLeftState == LOW && currentLeftState == HIGH) {
             lastNavInputTime = millis();
@@ -142,7 +142,7 @@ int MenuManager::handleSelectInput() {
 }
 
 // =================================================================
-// 2. LÓGICA DE CONFIGURAÇÕES
+// 2. SETTINGS LOGIC
 // =================================================================
 
 void MenuManager::handleSettingsInput() {
@@ -161,15 +161,15 @@ void MenuManager::handleSettingsInput() {
         return;
     }
 
-    // Voltar para o Menu Principal (B)
+    // Return to Main Menu (B)
     if (lastCancelState == LOW && currentCancelState == HIGH) {
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-        returnToMenu(); // returnToMenu atualiza o timer
+        returnToMenu(); // returnToMenu updates timer
         lastCancelState = currentCancelState;
         return;
     }
 
-    // Navegação Cima/Baixo/Esquerda/Direita
+    // Up/Down/Left/Right Navigation
     if (millis() - lastNavInputTime > NAV_DEBOUNCE_DELAY_MS) {
         if (lastUpState == LOW && currentUpState == HIGH) {
             lastNavInputTime = millis();
@@ -189,14 +189,14 @@ void MenuManager::handleSettingsInput() {
             lastNavInputTime = millis();
             if (selectedSettingIndex == 0) { // Sound
                 sound->setMute(!sound->isMuted());
-                // Toca o som apenas se a ação foi de LIGAR o som.
+                // Play sound only if action was to turn sound ON.
                 if (!sound->isMuted()) sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             } else if (selectedSettingIndex == 1) { // Brightness
                 sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
                 currentBrightness -= 10;
                 if (currentBrightness < 10) currentBrightness = 10;
 
-                // Mapeamento Exponencial (Gamma) com piso de 40 e teto de 254
+                // Exponential mapping (Gamma) with floor of 40 and ceiling of 254
                 float normalized = currentBrightness / 100.0;
                 int pwm = 40 + (int)(214.0 * normalized * normalized);
                 analogWrite(TFT_BL_PIN, pwm);
@@ -221,7 +221,7 @@ void MenuManager::handleSettingsInput() {
         }
     }
 
-    // Interação com o botão A (Reset Highscores)
+    // Interaction with button A (Reset Highscores)
     if (lastConfirmState == LOW && currentConfirmState == HIGH) {
         if (selectedSettingIndex == 2) {
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
@@ -248,20 +248,20 @@ void MenuManager::handleConfirmResetInput() {
 
     if (lastConfirmState == LOW && currentConfirmState == HIGH) {
         
-        // Instancia o gerenciador de memória
+        // Instantiate preferences manager
         Preferences prefs;
         
-        // Itera por todos os jogos cadastrados no menu e limpa seus recordes
+        // Iterate through all registered games in menu and clear their high scores
         for (int i = 0; i < GAME_COUNT; i++) {
             String ns = String(gameNames[i]);
-            ns.replace(" ", ""); // Garante que o nome bata com o namespace usado no Game.cpp
+            ns.replace(" ", ""); // Ensure name matches the namespace used in Game.cpp
             
-            prefs.begin(ns.c_str(), false); // Abre em modo Leitura/Escrita
-            prefs.clear();                  // Deleta todas as chaves deste namespace
-            prefs.end();                    // Fecha e salva
+            prefs.begin(ns.c_str(), false); // Open in Read/Write mode
+            prefs.clear();                  // Delete all keys in this namespace
+            prefs.end();                    // Close and save
         }
 
-        // Toca um som de pontuação para indicar sucesso na ação
+        // Play score sound to indicate action success
         sound->play(MELODY_SCORE, MELODY_SCORE_LENGTH); 
         
         currentState = MENU_STATE_SETTINGS;
@@ -280,7 +280,7 @@ void MenuManager::handleConfirmResetInput() {
 }
 
 // =================================================================
-// 3. FUNÇÕES DE DESENHO (UI)
+// 3. DRAWING FUNCTIONS (UI)
 // =================================================================
 
 void MenuManager::drawSettings() {
@@ -317,7 +317,7 @@ void MenuManager::drawSettings() {
     tft->setTextDatum(MR_DATUM);
     tft->drawString("[ RESET ]", tft->width() - 20, startY + spacingY * 2);
 
-    // Rodapé
+    // Footer
     tft->drawFastHLine(0, tft->height() - 25, tft->width(), TFT_WHITE);
     tft->setTextColor(TFT_WHITE);
     tft->setTextSize(1);

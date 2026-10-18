@@ -47,20 +47,20 @@ void SnakeGame::updatePlaying() {
     if (now - lastUpdate < SPEED) return;
     lastUpdate = now;
 
-    // Deleta o rabo na malha
+    // Delete tail from grid
     grid[snake[snakeLength - 1].x][snake[snakeLength - 1].y] = EMPTY;
     
-    // Deleta o rabo na tela (apenas se não for redraw total)
+    // Erase tail from screen (only if not a full redraw)
     if (!fullRedrawRequired) {
         tft->fillRect(snake[snakeLength - 1].x * CELL_SIZE, snake[snakeLength - 1].y * CELL_SIZE + Y_OFFSET, CELL_SIZE, CELL_SIZE, TFT_BLACK);
     }
 
-    // Anda o corpo
+    // Move the body
     for (int i = snakeLength - 1; i > 0; i--) {
         snake[i] = snake[i - 1];
     }
 
-    // Define nova posição da cabeça
+    // Determine new head position
     int dx = 0, dy = 0;
     currentDirection = pendingDirection;
     switch (currentDirection) {
@@ -74,19 +74,19 @@ void SnakeGame::updatePlaying() {
     int newY = snake[0].y + dy;
     int collided = grid[newX][newY];
 
-    // Atualiza a cabeça
+    // Update head
     snake[0].x = newX;
     snake[0].y = newY;
     grid[newX][newY] = SNAKE;
 
-    // Checa colisões críticas
+    // Check critical collisions
     if (collided == SNAKE || collided == WALL) {
         sound->play(MELODY_GAME_OVER, MELODY_GAME_OVER_LENGTH);
         endGame();
         return;
     }
 
-    // Checa colisão com maçã
+    // Check apple collision
     if (collided == APPLE) {
         snakeLength++;
         snake[snakeLength - 1] = snake[snakeLength - 2];
@@ -110,8 +110,8 @@ void SnakeGame::updatePlaying() {
 }
 
 void SnakeGame::drawPlaying() {
-    // A maior parte do desenho acontece via deltas no updatePlaying para otimização.
-    // O drawPlaying garante o setup inicial da tela quando o estado muda.
+    // Most drawing occurs via deltas in updatePlaying for optimization.
+    // drawPlaying ensures the initial screen setup when state changes.
     if (fullRedrawRequired) {
         drawGrid();
         fullRedrawRequired = false;

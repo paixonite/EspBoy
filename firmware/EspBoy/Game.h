@@ -32,7 +32,7 @@ protected:
     int score;
     unsigned long stateTimer; 
 
-    // Arrays para placeholders customizáveis por cada jogo
+    // Customizable placeholder arrays for each game
     int defaultScores[3];
     String defaultNames[3];
 
@@ -49,7 +49,7 @@ protected:
     void changeState(GameState newState);
     void checkGlobalExit(); 
     
-    // --- Lógica de Highscores ---
+    // --- Highscore Logic ---
     void endGame(); 
     void loadHighscores();
     void saveHighscores();

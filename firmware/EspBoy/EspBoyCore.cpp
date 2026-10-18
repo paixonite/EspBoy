@@ -23,7 +23,7 @@ void EspBoyCore::update() {
     if (currentMode == MODE_MENU) {
         int command = menuManager.update();
         
-        // Se o menu retornar um ID válido, inicia o jogo
+        // If the menu returns a valid ID, start the game
         if (command >= 0) {
             loadGame(command);
         }
@@ -32,13 +32,13 @@ void EspBoyCore::update() {
         if (currentGame != nullptr) {
             currentGame->loop();
             
-            // Verifica se o jogo solicitou saída (Start + Select)
+            // Check if the game requested exit (Start + Select)
             if (currentGame->shouldExit()) {
                 delete currentGame;
                 currentGame = nullptr;
                 currentMode = MODE_MENU;
                 
-                // Retorna diretamente para o carrossel, pulando a splash
+                // Return directly to the carousel, skipping the splash screen
                 menuManager.returnToMenu();
             }
         }
@@ -63,7 +63,7 @@ void EspBoyCore::loadHardware() {
     digitalWrite(POWER_ENABLE_PIN, HIGH);
 
     pinMode(TFT_BL_PIN, OUTPUT);
-    analogWrite(TFT_BL_PIN, 255); // Liga a tela com 100% de brilho (0-255)
+    analogWrite(TFT_BL_PIN, 255); // Turn on the screen with 100% brightness (0-255)
 }
 
 void EspBoyCore::loadGame(int gameIndex) {

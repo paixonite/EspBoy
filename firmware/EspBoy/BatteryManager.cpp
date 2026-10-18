@@ -56,6 +56,6 @@ int BatteryManager::getPercentage() {
 
 String BatteryManager::getStatusString() {
     int percentage = getPercentage();
-    // Lógica de isCharging() pode ser reativada aqui futuramente
+    // isCharging() logic can be re-enabled here in the future
     return String(percentage) + "%";
 }
