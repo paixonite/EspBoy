@@ -49,6 +49,7 @@ EspBoy/
 |-- EspBoyCore.h/.cpp     # Orquestrador global e alternador de modos (Menu vs Jogo)
 |-- MenuManager.h/.cpp    # Gerencia Splash Screen, Carrossel de Jogos e Configurações
 |-- BatteryManager.h/.cpp # Lógica matemática e ADC para leitura da bateria
+|-- ConfigManager.h/.cpp  # Persistência centralizada de configurações na NVS
 |
 |-- [ Motor de Jogos ]
 |-- Game.h/.cpp           # Classe base abstrata com ciclo de vida (Template Method)
@@ -76,8 +77,9 @@ EspBoy/
    ```
 2. **Gravação Direta** (PowerShell no Windows):
    ```powershell
-   powershell -File .\build_and_upload.ps1
+   powershell -ExecutionPolicy Bypass -File .\build_and_upload.ps1
    ```
+   *(Opcional: utilize `-Port COMx` para especificar a porta COM desejada).*
 
 ### Opção B: Arduino IDE
 

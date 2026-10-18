@@ -48,6 +48,7 @@ EspBoy/
 |-- EspBoyCore.h/.cpp     # Global state orchestrator.
 |-- MenuManager.h/.cpp    # Manages Splash Screen, Game Carousel, and Settings.
 |-- BatteryManager.h/.cpp # Math logic and ADC for battery reading.
+|-- ConfigManager.h/.cpp  # Centralized NVS configuration persistence.
 |
 |-- [ Game Engine ]
 |-- Game.h/.cpp           # Base abstract class with Template Methods.
@@ -67,16 +68,28 @@ EspBoy/
 
 ## 🚀 How to Compile and Use
 
-1.  **Environment:** The project was developed using the **Arduino IDE**.
-2.  **Hardware:** Assemble the circuit according to the PCB definitions.
-3.  **Libraries:**
-    - Install **ESP32** board support in the Arduino IDE.
-    - Install the **TFT_eSPI** library by Bodmer. (You may need to configure the library's `User_Setup.h` for the LILYGO T-Display S3 board, although many recent versions detect it automatically).
-4.  **Compilation:**
-    - Clone this repository.
-    - Open the `EspBoy.ino` file in the Arduino IDE.
-    - Select the correct board (LILYGO T-Display S3).
-    - Upload.
+### Option A: Command Line / Automated Script (Recommended)
+
+1. **One-Touch Build & Flash** (PowerShell on Windows):
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File .\build_and_upload.ps1
+   ```
+   *(Optional: pass `-Port COMx` to specify your COM port).*
+
+2. **Compile Only with `arduino-cli`** (WSL / Linux):
+   ```bash
+   arduino-cli compile --fqbn esp32:esp32:lilygo_t_display_s3 firmware/EspBoy
+   ```
+
+### Option B: Arduino IDE
+
+1. **Board Support:** Install **ESP32** board support in the Arduino IDE Boards Manager.
+2. **Libraries:** Install the **TFT_eSPI** library by Bodmer.
+3. **Display Configuration:** In `TFT_eSPI/User_Setup_Select.h`, uncomment `#include <User_Setups/Setup206_LilyGo_T_Display_S3.h>`.
+4. **Compilation & Upload:**
+   - Open `firmware/EspBoy/EspBoy.ino`.
+   - Select the **LilyGo T-Display-S3** board and the corresponding port.
+   - Click **Upload**.
 
 ## 👤 Author
 
