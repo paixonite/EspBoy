@@ -210,4 +210,46 @@ const Note MELODY_TETRIS_FOUR[] = {
 };
 const int MELODY_TETRIS_FOUR_LENGTH = sizeof(MELODY_TETRIS_FOUR) / sizeof(Note);
 
+
+// -----------------------------------------------------------------
+// 3.7 Genius Game Sounds
+// -----------------------------------------------------------------
+
+// Classic harmonic A-major triad tones for the 4 colored Genius pads.
+const Note MELODY_GENIUS_GREEN[] = {
+    {NOTE_E5, 190}
+};
+const int MELODY_GENIUS_GREEN_LENGTH = sizeof(MELODY_GENIUS_GREEN) / sizeof(Note);
+
+const Note MELODY_GENIUS_RED[] = {
+    {NOTE_A4, 190}
+};
+const int MELODY_GENIUS_RED_LENGTH = sizeof(MELODY_GENIUS_RED) / sizeof(Note);
+
+const Note MELODY_GENIUS_YELLOW[] = {
+    {NOTE_CS5, 190}
+};
+const int MELODY_GENIUS_YELLOW_LENGTH = sizeof(MELODY_GENIUS_YELLOW) / sizeof(Note);
+
+const Note MELODY_GENIUS_BLUE[] = {
+    {NOTE_E4, 190}
+};
+const int MELODY_GENIUS_BLUE_LENGTH = sizeof(MELODY_GENIUS_BLUE) / sizeof(Note);
+
+// Uplifting arpeggio played upon completing a full sequence round.
+const Note MELODY_GENIUS_SUCCESS[] = {
+    {NOTE_A4, 50},
+    {NOTE_CS5, 50},
+    {NOTE_E5, 50},
+    {NOTE_A5, 130}
+};
+const int MELODY_GENIUS_SUCCESS_LENGTH = sizeof(MELODY_GENIUS_SUCCESS) / sizeof(Note);
+
+// Low dissonant buzz when the player presses the wrong pad.
+const Note MELODY_GENIUS_ERROR[] = {
+    {NOTE_D4, 160},
+    {NOTE_A3, 360}
+};
+const int MELODY_GENIUS_ERROR_LENGTH = sizeof(MELODY_GENIUS_ERROR) / sizeof(Note);
+
 #endif // AUDIO_ASSETS_H

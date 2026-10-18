@@ -26,7 +26,7 @@ O objetivo do EspBoy é criar uma plataforma modular e robusta de hardware e sof
 
 O software do EspBoy foi projetado para ser modular, escalável e responsivo:
 
-- **Jogos Inclusos:** Clássicos **Crossy Road**, **Flappy Bird**, **Frogger**, **Snake** e **Tetris** rodando a ~60 FPS com alta fluidez.
+- **Jogos Inclusos:** Clássicos **Crossy Road**, **Flappy Bird**, **Frogger**, **Genius**, **Snake** e **Tetris** rodando a ~60 FPS com alta fluidez.
 - **Renderização por Diferença (Delta/Zero-Flicker):** Pipeline gráfico otimizado para barramento SPI/paralelo que calcula apenas o que mudou entre os quadros, apagando e redesenhando estritamente os pixels em movimento para eliminar cintilações.
 - **Sistema de Recordes Persistente:** Memória Flash integrada (Preferences/NVS) que salva o Top 3 de cada jogo, incluindo tela clássica estilo arcade para inserir 3 iniciais.
 - **Configurações de Som Permanentes:** O estado de mudo persiste entre reinicializações, evitando o buzzer alto na inicialização.
@@ -61,6 +61,7 @@ EspBoy/
 |-- CrossyRoadGame.h/.cpp # Lógica isolada do jogo Crossy Road
 |-- FlappyBirdGame.h/.cpp # Lógica isolada do jogo Flappy Bird
 |-- FroggerGame.h/.cpp    # Lógica isolada do jogo Frogger
+|-- GeniusGame.h/.cpp     # Lógica isolada do jogo Genius
 |-- SnakeGame.h/.cpp      # Lógica isolada do jogo Snake
 |-- TetrisGame.h/.cpp     # Lógica isolada do jogo Tetris
 ```
