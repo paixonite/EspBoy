@@ -1,6 +1,7 @@
 #include "EspBoyCore.h"
 #include "SnakeGame.h"
 #include "FlappyBirdGame.h"
+#include "CrossyRoadGame.h"
 #include "FroggerGame.h"
 
 EspBoyCore::EspBoyCore() 
@@ -80,6 +81,9 @@ void EspBoyCore::loadGame(int gameIndex) {
             currentGame = new FlappyBirdGame(&tft, &soundManager);
             break;
         case 2:
+            currentGame = new CrossyRoadGame(&tft, &soundManager);
+            break;
+        case 3:
             currentGame = new FroggerGame(&tft, &soundManager);
             break;
         default:

@@ -120,6 +120,31 @@ const int MELODY_HIT_LENGTH = sizeof(MELODY_HIT) / sizeof(Note);
 
 
 // -----------------------------------------------------------------
+// 3.4 Crossy Road Game Sounds
+// -----------------------------------------------------------------
+
+// Crisp, deep tactile blip for directional hops (left/right/back or non-scoring forward).
+const Note MELODY_HOP[] = {
+    {NOTE_C4, 30}
+};
+const int MELODY_HOP_LENGTH = sizeof(MELODY_HOP) / sizeof(Note);
+
+// Deep, subtle step tone when advancing to a new forward lane (+1 point).
+const Note MELODY_CROSSY_POINT[] = {
+    {NOTE_E4, 35}
+};
+const int MELODY_CROSSY_POINT_LENGTH = sizeof(MELODY_CROSSY_POINT) / sizeof(Note);
+
+// Urgent railroad crossing warning chime before a train streaks across.
+const Note MELODY_TRAIN_WARN[] = {
+    {NOTE_A5, 60},
+    {REST, 40},
+    {NOTE_A5, 60}
+};
+const int MELODY_TRAIN_WARN_LENGTH = sizeof(MELODY_TRAIN_WARN) / sizeof(Note);
+
+
+// -----------------------------------------------------------------
 // 3.4 Frogger Game Sounds
 // -----------------------------------------------------------------
 
