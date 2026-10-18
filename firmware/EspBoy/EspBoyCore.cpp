@@ -12,6 +12,7 @@ EspBoyCore::EspBoyCore()
 
 void EspBoyCore::begin() {
     loadHardware();
+    soundManager.begin();
     batteryManager.begin();
     menuManager.begin();
 }

@@ -7,6 +7,13 @@ SoundManager::SoundManager(int buzzer_pin) {
     _is_muted = false;
 }
 
+void SoundManager::begin() {
+    Preferences prefs;
+    prefs.begin("sound_cfg", true);
+    _is_muted = prefs.getBool("muted", false);
+    prefs.end();
+}
+
 // Inicia a reprodução de uma melodia
 void SoundManager::play(const Note melody[], int melody_length) {
     if (_is_muted) {
@@ -72,6 +79,10 @@ void SoundManager::setMute(bool muted) {
     if (_is_muted) {
         stop(); // Se está silenciando, para qualquer som que esteja tocando
     }
+    Preferences prefs;
+    prefs.begin("sound_cfg", false);
+    prefs.putBool("muted", _is_muted);
+    prefs.end();
 }
 
 bool SoundManager::isMuted() const {

@@ -2,11 +2,13 @@
 #define SOUNDMANAGER_H
 
 #include "Arduino.h"
+#include <Preferences.h>
 #include "audio_assets.h"
 
 class SoundManager {
 public:
     SoundManager(int buzzer_pin);
+    void begin();
     void play(const Note melody[], int melody_length);
     void stop();
     void loop();
