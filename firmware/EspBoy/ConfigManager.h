@@ -1,0 +1,46 @@
+#ifndef CONFIGMANAGER_H
+#define CONFIGMANAGER_H
+
+#include <Arduino.h>
+#include <Preferences.h>
+#include "pins.h"
+
+class ConfigManager {
+public:
+    static const int SLEEP_OPTION_COUNT = 5;
+
+    ConfigManager();
+    void begin();
+
+    // --- Volume (0% to 100%, 0% = OFF) ---
+    int getVolume() const;
+    void setVolume(int vol);
+    void toggleMute();
+    bool isMuted() const;
+
+    // --- Brightness (10% to 100%) ---
+    int getBrightness() const;
+    void setBrightness(int val);
+    void applyBrightness() const;
+    void setBacklightRaw(uint8_t pwm) const;
+
+    // --- Auto-Sleep Timeout ---
+    int getSleepTimeoutIndex() const;
+    void setSleepTimeoutIndex(int idx);
+    unsigned long getSleepTimeoutMs() const;
+    const char* getSleepTimeoutLabel() const;
+
+    // --- Highscore Management ---
+    void resetAllHighscores(const char* const gameNames[], int gameCount);
+
+private:
+    int _volume;
+    int _lastNonZeroVolume;
+    int _brightness;
+    int _sleepTimeoutIndex;
+
+    static const unsigned long SLEEP_TIMEOUTS_MS[SLEEP_OPTION_COUNT];
+    static const char* const SLEEP_LABELS[SLEEP_OPTION_COUNT];
+};
+
+#endif // CONFIGMANAGER_H

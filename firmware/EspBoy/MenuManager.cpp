@@ -1,6 +1,5 @@
 #include "MenuManager.h"
 #include "audio_assets.h"
-#include <Preferences.h>
 
 #define MY_ORANGE tft->color565(255, 55, 0)
 #define MY_GREY tft->color565(30, 30, 40)
@@ -11,17 +10,13 @@ const int LOCKOUT_TIMER_MS = 250;
 // Global lockout timer to prevent input bleed during menu transitions
 static unsigned long menuStateTimer = 0;
 
-MenuManager::MenuManager(TFT_eSPI* tft_display, SoundManager* sound_manager, BatteryManager* battery_manager)
-    : tft(tft_display), sound(sound_manager), battery(battery_manager) {
+MenuManager::MenuManager(TFT_eSPI* tft_display, SoundManager* sound_manager, BatteryManager* battery_manager, ConfigManager* config_manager)
+    : tft(tft_display), sound(sound_manager), battery(battery_manager), config(config_manager) {
     currentState = MENU_STATE_SPLASH;
     selectedGameIndex = 0;
     
     selectedSettingIndex = 0;
     settingsScrollOffset = 0;
-    currentBrightness = 100;
-    placeholderVal1 = 1;
-    placeholderVal2 = 50;
-    placeholderVal3 = 0;
 
     lastBatteryUpdate = 0;
     lastNavInputTime = 0;
@@ -204,49 +199,37 @@ void MenuManager::handleSettingsInput() {
         }
         else if (lastLeftState == LOW && currentLeftState == HIGH) {
             lastNavInputTime = millis();
-            if (selectedSettingIndex == 0) { // Sound
-                sound->setMute(!sound->isMuted());
-                if (!sound->isMuted()) sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            if (selectedSettingIndex == 0) { // Volume
+                int newVol = config->getVolume() - 10;
+                if (newVol < 0) newVol = 0;
+                sound->setVolume(newVol);
+                if (!sound->isMuted()) {
+                    sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+                }
             } else if (selectedSettingIndex == 1) { // Brightness
                 sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-                currentBrightness -= 10;
-                if (currentBrightness < 10) currentBrightness = 10;
-                applyBrightness();
-            } else if (selectedSettingIndex == 3) { // Config 1
+                config->setBrightness(config->getBrightness() - 10);
+            } else if (selectedSettingIndex == 2) { // Auto Sleep
                 sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-                placeholderVal1 = !placeholderVal1;
-            } else if (selectedSettingIndex == 4) { // Config 2
-                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-                placeholderVal2 -= 10;
-                if (placeholderVal2 < 0) placeholderVal2 = 0;
-            } else if (selectedSettingIndex == 5) { // Config 3
-                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-                placeholderVal3--;
-                if (placeholderVal3 < 0) placeholderVal3 = 2;
+                config->setSleepTimeoutIndex(config->getSleepTimeoutIndex() - 1);
             }
             drawSettings();
         }
         else if (lastRightState == LOW && currentRightState == HIGH) {
             lastNavInputTime = millis();
-            if (selectedSettingIndex == 0) { // Sound
-                sound->setMute(!sound->isMuted());
-                if (!sound->isMuted()) sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            if (selectedSettingIndex == 0) { // Volume
+                int newVol = config->getVolume() + 10;
+                if (newVol > 100) newVol = 100;
+                sound->setVolume(newVol);
+                if (!sound->isMuted()) {
+                    sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+                }
             } else if (selectedSettingIndex == 1) { // Brightness
                 sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-                currentBrightness += 10;
-                if (currentBrightness > 100) currentBrightness = 100;
-                applyBrightness();
-            } else if (selectedSettingIndex == 3) { // Config 1
+                config->setBrightness(config->getBrightness() + 10);
+            } else if (selectedSettingIndex == 2) { // Auto Sleep
                 sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-                placeholderVal1 = !placeholderVal1;
-            } else if (selectedSettingIndex == 4) { // Config 2
-                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-                placeholderVal2 += 10;
-                if (placeholderVal2 > 100) placeholderVal2 = 100;
-            } else if (selectedSettingIndex == 5) { // Config 3
-                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-                placeholderVal3++;
-                if (placeholderVal3 > 2) placeholderVal3 = 0;
+                config->setSleepTimeoutIndex(config->getSleepTimeoutIndex() + 1);
             }
             drawSettings();
         }
@@ -254,33 +237,29 @@ void MenuManager::handleSettingsInput() {
 
     // Interaction with button A
     if (lastConfirmState == LOW && currentConfirmState == HIGH) {
-        if (selectedSettingIndex == 2) {
+        if (selectedSettingIndex == 0) { // Quick Mute/Unmute toggle on Volume
+            config->toggleMute();
+            if (config->isMuted()) {
+                sound->stop();
+            } else {
+                sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            }
+            drawSettings();
+        } else if (selectedSettingIndex == 2) { // Cycle Auto Sleep preset
+            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            config->setSleepTimeoutIndex(config->getSleepTimeoutIndex() + 1);
+            drawSettings();
+        } else if (selectedSettingIndex == 3) { // Reset Highscores
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             currentState = MENU_STATE_CONFIRM_RESET;
             menuStateTimer = millis(); 
             drawConfirmReset();
-        } else if (selectedSettingIndex == 3) {
-            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-            placeholderVal1 = !placeholderVal1;
-            drawSettings();
-        } else if (selectedSettingIndex == 5) {
-            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-            placeholderVal3 = (placeholderVal3 + 1) % 3;
-            drawSettings();
         }
     }
 
     lastUpState = currentUpState; lastDownState = currentDownState;
     lastLeftState = currentLeftState; lastRightState = currentRightState;
     lastConfirmState = currentConfirmState; lastCancelState = currentCancelState;
-}
-
-void MenuManager::applyBrightness() {
-    // Squared curve compensates for the eye's non-linear brightness perception.
-    // Range: ~42 (10%) up to 254 (100%), so the screen never goes fully dark.
-    float normalized = currentBrightness / 100.0;
-    int pwm = 40 + (int)(214.0 * normalized * normalized);
-    analogWrite(TFT_BL_PIN, pwm);
 }
 
 void MenuManager::handleConfirmResetInput() {
@@ -294,19 +273,8 @@ void MenuManager::handleConfirmResetInput() {
     }
 
     if (lastConfirmState == LOW && currentConfirmState == HIGH) {
-        
-        // Instantiate preferences manager
-        Preferences prefs;
-        
-        // Iterate through all registered games in menu and clear their high scores
-        for (int i = 0; i < GAME_COUNT; i++) {
-            String ns = String(gameNames[i]);
-            ns.replace(" ", ""); // Ensure name matches the namespace used in Game.cpp
-            
-            prefs.begin(ns.c_str(), false); // Open in Read/Write mode
-            prefs.clear();                  // Delete all keys in this namespace
-            prefs.end();                    // Close and save
-        }
+        // Clear all game highscores in NVS via ConfigManager
+        config->resetAllHighscores(gameNames, GAME_COUNT);
 
         // Play score sound to indicate action success
         sound->play(MELODY_SCORE, MELODY_SCORE_LENGTH); 
@@ -363,28 +331,20 @@ void MenuManager::drawSettings() {
 
         switch (idx) {
             case 0:
-                label = "Sound:";
-                value = sound->isMuted() ? "[ OFF ]" : "[ ON ]";
+                label = "Volume:";
+                value = config->isMuted() ? "[ OFF ]" : ("< " + String(config->getVolume()) + "% >");
                 break;
             case 1:
                 label = "Brightness:";
-                value = "< " + String(currentBrightness) + "% >";
+                value = "< " + String(config->getBrightness()) + "% >";
                 break;
             case 2:
-                label = "Highscores:";
-                value = "[ RESET ]";
+                label = "Auto Sleep:";
+                value = config->getSleepTimeoutLabel();
                 break;
             case 3:
-                label = "Config 1:";
-                value = placeholderVal1 ? "[ ON ]" : "[ OFF ]";
-                break;
-            case 4:
-                label = "Config 2:";
-                value = "< " + String(placeholderVal2) + "% >";
-                break;
-            case 5:
-                label = "Config 3:";
-                value = (placeholderVal3 == 0) ? "[ LOW ]" : (placeholderVal3 == 1 ? "[ MED ]" : "[ HIGH ]");
+                label = "Highscores:";
+                value = "[ RESET ]";
                 break;
         }
 

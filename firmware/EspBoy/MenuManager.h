@@ -4,6 +4,7 @@
 #include <TFT_eSPI.h>
 #include "SoundManager.h"
 #include "BatteryManager.h"
+#include "ConfigManager.h"
 #include "pins.h"
 
 // Added new states for Settings Menu
@@ -16,7 +17,7 @@ enum MenuState {
 
 class MenuManager {
 public:
-    MenuManager(TFT_eSPI* tft, SoundManager* sound, BatteryManager* battery);
+    MenuManager(TFT_eSPI* tft, SoundManager* sound, BatteryManager* battery, ConfigManager* config);
     void begin();
     void returnToMenu();
     int update(); // Returns -1 if still in menu, or the game ID
@@ -25,6 +26,7 @@ private:
     TFT_eSPI* tft;
     SoundManager* sound;
     BatteryManager* battery;
+    ConfigManager* config;
     
     MenuState currentState;
     unsigned long splashStartTime;
@@ -33,18 +35,14 @@ private:
 
     // --- Game Carousel Logic ---
     int selectedGameIndex;
-    static const int GAME_COUNT = 5;
+    static const int GAME_COUNT = 6;
     // Games are listed in alphabetical order
-    const char* gameNames[GAME_COUNT] = {"Crossy Road", "Flappy Bird", "Frogger", "Snake", "Tetris"};
+    const char* gameNames[GAME_COUNT] = {"Crossy Road", "Flappy Bird", "Frogger", "Genius", "Snake", "Tetris"};
 
     // --- Settings Logic ---
     int selectedSettingIndex;
     int settingsScrollOffset;
-    static const int SETTING_COUNT = 6;
-    int currentBrightness; // Hook for future PWM brightness (10 to 100)
-    int placeholderVal1;
-    int placeholderVal2;
-    int placeholderVal3;
+    static const int SETTING_COUNT = 4;
 
     // --- Button States ---
     bool lastLeftState, lastRightState, lastUpState, lastDownState;
@@ -65,9 +63,6 @@ private:
     int handleSelectInput();
     void handleSettingsInput();
     void handleConfirmResetInput();
-
-    // Converts currentBrightness (10-100%) to a gamma-corrected backlight PWM value
-    void applyBrightness();
 };
 
 #endif // MENUMANAGER_H

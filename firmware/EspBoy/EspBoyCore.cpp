@@ -2,25 +2,37 @@
 #include "CrossyRoadGame.h"
 #include "FlappyBirdGame.h"
 #include "FroggerGame.h"
+#include "GeniusGame.h"
 #include "SnakeGame.h"
 #include "TetrisGame.h"
 
 EspBoyCore::EspBoyCore() 
     : tft(), 
-      soundManager(BUZZER_PIN), 
-      menuManager(&tft, &soundManager, &batteryManager) {
+      configManager(),
+      soundManager(BUZZER_PIN, &configManager), 
+      menuManager(&tft, &soundManager, &batteryManager, &configManager) {
     currentGame = nullptr;
     currentMode = MODE_MENU;
+    lastActivityTime = 0;
+    isSleeping = false;
+    isDimmed = false;
 }
 
 void EspBoyCore::begin() {
     loadHardware();
+    configManager.begin();
     soundManager.begin();
     batteryManager.begin();
     menuManager.begin();
+    lastActivityTime = millis();
 }
 
 void EspBoyCore::update() {
+    handlePowerManagement();
+    if (isSleeping) {
+        return;
+    }
+
     soundManager.loop();
 
     if (currentMode == MODE_MENU) {
@@ -48,6 +60,76 @@ void EspBoyCore::update() {
     }
 }
 
+bool EspBoyCore::anyButtonPressed() const {
+    return digitalRead(BTN_UP) == HIGH ||
+           digitalRead(BTN_DOWN) == HIGH ||
+           digitalRead(BTN_LEFT) == HIGH ||
+           digitalRead(BTN_RIGHT) == HIGH ||
+           digitalRead(BTN_START) == HIGH ||
+           digitalRead(BTN_SELECT) == HIGH ||
+           digitalRead(BTN_A) == HIGH ||
+           digitalRead(BTN_B) == HIGH;
+}
+
+void EspBoyCore::handlePowerManagement() {
+    if (anyButtonPressed()) {
+        lastActivityTime = millis();
+
+        if (isSleeping) {
+            // Wake ST7789 display controller
+            tft.writecommand(0x11); // ST7789_SLPOUT
+            delay(120);
+            configManager.applyBrightness();
+            isSleeping = false;
+            isDimmed = false;
+
+            // Consume the wake button press so it does not trigger menu/game actions
+            while (anyButtonPressed()) {
+                delay(10);
+            }
+            delay(80);
+            lastActivityTime = millis();
+            return;
+        }
+
+        if (isDimmed) {
+            configManager.applyBrightness();
+            isDimmed = false;
+        }
+        return;
+    }
+
+    if (isSleeping) {
+        delay(40);
+        return;
+    }
+
+    unsigned long timeoutMs = configManager.getSleepTimeoutMs();
+    if (timeoutMs == 0) {
+        if (isDimmed) {
+            configManager.applyBrightness();
+            isDimmed = false;
+        }
+        return;
+    }
+
+    unsigned long idleMs = millis() - lastActivityTime;
+    const unsigned long DIM_WARNING_MS = 5000;
+
+    if (idleMs >= timeoutMs) {
+        soundManager.stop();
+        configManager.setBacklightRaw(0);
+        tft.writecommand(0x10); // ST7789_SLPIN
+        isSleeping = true;
+        isDimmed = false;
+    } else if (timeoutMs > DIM_WARNING_MS && idleMs >= (timeoutMs - DIM_WARNING_MS)) {
+        if (!isDimmed) {
+            configManager.setBacklightRaw(30);
+            isDimmed = true;
+        }
+    }
+}
+
 void EspBoyCore::loadHardware() {
     Serial.begin(115200);
     tft.init();
@@ -66,7 +148,6 @@ void EspBoyCore::loadHardware() {
     digitalWrite(POWER_ENABLE_PIN, HIGH);
 
     pinMode(TFT_BL_PIN, OUTPUT);
-    analogWrite(TFT_BL_PIN, 255); // Turn on the screen with 100% brightness (0-255)
 }
 
 void EspBoyCore::loadGame(int gameIndex) {
@@ -85,9 +166,12 @@ void EspBoyCore::loadGame(int gameIndex) {
             currentGame = new FroggerGame(&tft, &soundManager);
             break;
         case 3:
-            currentGame = new SnakeGame(&tft, &soundManager);
+            currentGame = new GeniusGame(&tft, &soundManager);
             break;
         case 4:
+            currentGame = new SnakeGame(&tft, &soundManager);
+            break;
+        case 5:
             currentGame = new TetrisGame(&tft, &soundManager);
             break;
         default:

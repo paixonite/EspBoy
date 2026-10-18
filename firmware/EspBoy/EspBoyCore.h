@@ -2,6 +2,7 @@
 #define ESPBOYCORE_H
 
 #include <TFT_eSPI.h>
+#include "ConfigManager.h"
 #include "SoundManager.h"
 #include "BatteryManager.h"
 #include "MenuManager.h"
@@ -18,6 +19,7 @@ public:
 
 private:
     TFT_eSPI tft;
+    ConfigManager configManager;
     SoundManager soundManager;
     BatteryManager batteryManager;
     MenuManager menuManager;
@@ -25,8 +27,15 @@ private:
     CoreMode currentMode;
     Game* currentGame;
 
+    // --- Power & Auto-Sleep State ---
+    unsigned long lastActivityTime;
+    bool isSleeping;
+    bool isDimmed;
+
     void loadHardware();
     void loadGame(int gameIndex);
+    bool anyButtonPressed() const;
+    void handlePowerManagement();
 };
 
 #endif // ESPBOYCORE_H
