@@ -5,8 +5,6 @@
 // Custom RGB565 Palette for Crisp Retro Arcade Aesthetics
 static const uint16_t COLOR_GRID_DOT     = 0x2104; // Subtle dark slate guide dot
 static const uint16_t COLOR_BORDER_OUTER = 0x4A69; // Steel grey outer frame
-static const uint16_t COLOR_PANEL_BORDER = 0x39E7; // Framed HUD box border
-static const uint16_t COLOR_PANEL_HEADER = 0x18E3; // Subtle dark header strip inside HUD boxes
 static const uint16_t COLOR_L_ORANGE     = 0xFB60; // Title screen orange (RGB: 255, 55, 0)
 
 // 7 Tetromino Solid Colors: I, O, T, S, Z, J (Inverted L), L
@@ -601,39 +599,39 @@ void TetrisGame::drawStaticLayout() {
     tft->setTextSize(1);
     tft->setTextDatum(MC_DATUM);
 
-    // --- LEFT PANEL: HOLD, LEVEL, LINES ---
+    // --- LEFT PANEL: HOLD, LEVEL, SCORE ---
     // 1. HOLD Box (y = 5..56)
-    tft->drawRect(LEFT_PANEL_X, 5, PANEL_W, 52, COLOR_PANEL_BORDER);
-    tft->fillRect(LEFT_PANEL_X + 1, 6, PANEL_W - 2, 12, COLOR_PANEL_HEADER);
-    tft->setTextColor(TFT_CYAN);
-    tft->drawString("HOLD", LEFT_PANEL_X + PANEL_W / 2, 12);
+    tft->drawRect(LEFT_PANEL_X, 5, PANEL_W, 52, TFT_WHITE);
+    tft->drawFastHLine(LEFT_PANEL_X, 19, PANEL_W, TFT_WHITE);
+    tft->setTextColor(TFT_YELLOW, TFT_BLACK);
+    tft->drawString("HOLD", LEFT_PANEL_X + PANEL_W / 2, 13);
 
     // 2. LEVEL Box (y = 64..110)
-    tft->drawRect(LEFT_PANEL_X, 64, PANEL_W, 47, COLOR_PANEL_BORDER);
-    tft->fillRect(LEFT_PANEL_X + 1, 65, PANEL_W - 2, 12, COLOR_PANEL_HEADER);
-    tft->setTextColor(TFT_YELLOW);
-    tft->drawString("LEVEL", LEFT_PANEL_X + PANEL_W / 2, 71);
+    tft->drawRect(LEFT_PANEL_X, 64, PANEL_W, 47, TFT_WHITE);
+    tft->drawFastHLine(LEFT_PANEL_X, 78, PANEL_W, TFT_WHITE);
+    tft->setTextColor(TFT_YELLOW, TFT_BLACK);
+    tft->drawString("LEVEL", LEFT_PANEL_X + PANEL_W / 2, 72);
 
     // 3. SCORE Box (y = 118..164)
-    tft->drawRect(LEFT_PANEL_X, 118, PANEL_W, 47, COLOR_PANEL_BORDER);
-    tft->fillRect(LEFT_PANEL_X + 1, 119, PANEL_W - 2, 12, COLOR_PANEL_HEADER);
-    tft->setTextColor(TFT_YELLOW);
-    tft->drawString("SCORE", LEFT_PANEL_X + PANEL_W / 2, 125);
+    tft->drawRect(LEFT_PANEL_X, 118, PANEL_W, 47, TFT_WHITE);
+    tft->drawFastHLine(LEFT_PANEL_X, 132, PANEL_W, TFT_WHITE);
+    tft->setTextColor(TFT_YELLOW, TFT_BLACK);
+    tft->drawString("SCORE", LEFT_PANEL_X + PANEL_W / 2, 126);
 
-    // --- RIGHT PANEL: NEXT & INSTRUCTIONS ---
+    // --- RIGHT PANEL: NEXT & CONTROLS ---
     // 1. NEXT Box (y = 5..56)
-    tft->drawRect(RIGHT_PANEL_X, 5, PANEL_W, 52, COLOR_PANEL_BORDER);
-    tft->fillRect(RIGHT_PANEL_X + 1, 6, PANEL_W - 2, 12, COLOR_PANEL_HEADER);
-    tft->setTextColor(TFT_YELLOW);
-    tft->drawString("NEXT", RIGHT_PANEL_X + PANEL_W / 2, 12);
+    tft->drawRect(RIGHT_PANEL_X, 5, PANEL_W, 52, TFT_WHITE);
+    tft->drawFastHLine(RIGHT_PANEL_X, 19, PANEL_W, TFT_WHITE);
+    tft->setTextColor(TFT_YELLOW, TFT_BLACK);
+    tft->drawString("NEXT", RIGHT_PANEL_X + PANEL_W / 2, 13);
 
-    // 2. INSTRUCTIONS Box (y = 64..164)
-    tft->drawRect(RIGHT_PANEL_X, 64, PANEL_W, 101, COLOR_PANEL_BORDER);
-    tft->fillRect(RIGHT_PANEL_X + 1, 65, PANEL_W - 2, 12, COLOR_PANEL_HEADER);
-    tft->setTextColor(TFT_YELLOW);
-    tft->drawString("CONTROLS", RIGHT_PANEL_X + PANEL_W / 2, 71);
+    // 2. CONTROLS Box (y = 64..164)
+    tft->drawRect(RIGHT_PANEL_X, 64, PANEL_W, 101, TFT_WHITE);
+    tft->drawFastHLine(RIGHT_PANEL_X, 78, PANEL_W, TFT_WHITE);
+    tft->setTextColor(TFT_YELLOW, TFT_BLACK);
+    tft->drawString("CONTROLS", RIGHT_PANEL_X + PANEL_W / 2, 72);
 
-    tft->setTextColor(TFT_LIGHTGREY);
+    tft->setTextColor(TFT_WHITE, TFT_BLACK);
     tft->drawString("[A/B] Rotate",   RIGHT_PANEL_X + PANEL_W / 2, 96);
     tft->drawString("[UP] Hard Drop", RIGHT_PANEL_X + PANEL_W / 2, 120);
     tft->drawString("[SELECT] Hold",  RIGHT_PANEL_X + PANEL_W / 2, 144);
