@@ -75,7 +75,7 @@ void Game::checkGlobalExit() {
     bool currentSelectState = digitalRead(BTN_SELECT);
     
     if (lastSelectState == LOW && currentSelectState == HIGH) {
-        if (currentState == STATE_TITLE || currentState == STATE_PLAYING || currentState == STATE_GAME_OVER) {
+        if (currentState == STATE_PLAYING || currentState == STATE_GAME_OVER) {
             _exit_request = true;
         }
     }
@@ -95,16 +95,17 @@ void Game::drawTitleScreen() {
     tft->setTextSize(2);
     tft->drawString("[A] Play", tft->width() / 2, tft->height() / 2);
 
-    drawBottomBar("[SELECT] Quit   [START] Top Scores", TFT_WHITE);
+    drawBottomBar("[SELECT] Highscores    [B] Back", TFT_WHITE);
 }
 
 void Game::handleInputTitle() {
-    static bool lastA = LOW, lastStart = LOW;
+    static bool lastA = LOW, lastSelect = LOW, lastB = LOW;
     bool curA = digitalRead(BTN_A);
-    bool curStart = digitalRead(BTN_START);
+    bool curSelect = digitalRead(BTN_SELECT);
+    bool curB = digitalRead(BTN_B);
 
     if (millis() - stateTimer < 250) {
-        lastA = curA; lastStart = curStart;
+        lastA = curA; lastSelect = curSelect; lastB = curB;
         return;
     }
 
@@ -112,12 +113,16 @@ void Game::handleInputTitle() {
         changeState(STATE_PLAYING);
         tft->fillScreen(TFT_BLACK); 
     } 
-    else if (lastStart == LOW && curStart == HIGH) {
+    else if (lastSelect == LOW && curSelect == HIGH) {
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
         changeState(STATE_HIGHSCORE_VIEW);
     }
+    else if (lastB == LOW && curB == HIGH) {
+        sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+        _exit_request = true;
+    }
     
-    lastA = curA; lastStart = curStart;
+    lastA = curA; lastSelect = curSelect; lastB = curB;
 }
 
 void Game::drawGameOverScreen() {
