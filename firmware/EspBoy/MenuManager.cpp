@@ -339,13 +339,47 @@ void MenuManager::drawMenu() {
     tft->fillScreen(TFT_BLACK);
     drawTopBar("CHOOSE A GAME", TFT_YELLOW);
     
-    String gameText = "< " + String(gameNames[selectedGameIndex]) + " >";
-    tft->setTextDatum(MC_DATUM);
-    tft->setTextColor(TFT_WHITE);
-    tft->setTextSize(2);
-    tft->drawString(gameText, tft->width() / 2, tft->height() / 2);
+    int gameY = (tft->height() / 2) - 2;
     
+    // Fixed navigation arrows on display sides
+    tft->setTextSize(3);
+    tft->setTextColor(TFT_WHITE);
+    
+    tft->setTextDatum(ML_DATUM);
+    tft->drawString("<", 16, gameY);
+    
+    tft->setTextDatum(MR_DATUM);
+    tft->drawString(">", tft->width() - 16, gameY);
+    
+    // Centered game name (size 3)
+    tft->setTextDatum(MC_DATUM);
+    tft->drawString(gameNames[selectedGameIndex], tft->width() / 2, gameY);
+    
+    drawCarouselIndicators();
+
     drawBottomBar("[SELECT] Settings    [A] Play", TFT_WHITE);
+}
+
+void MenuManager::drawCarouselIndicators() {
+    const int dotRadius = 3;
+    const int dotDiameter = 6;
+    const int dashWidth = 18;
+    const int gap = 8;
+    const int indicatorY = 118;
+
+    int totalWidth = dashWidth + (GAME_COUNT - 1) * dotDiameter + (GAME_COUNT - 1) * gap;
+    int currentX = (tft->width() - totalWidth) / 2;
+    uint16_t inactiveColor = tft->color565(110, 110, 120);
+
+    for (int i = 0; i < GAME_COUNT; i++) {
+        if (i == selectedGameIndex) {
+            tft->fillRoundRect(currentX, indicatorY - dotRadius, dashWidth, dotDiameter, dotRadius, TFT_WHITE);
+            currentX += dashWidth + gap;
+        } else {
+            tft->fillCircle(currentX + dotRadius, indicatorY, dotRadius, inactiveColor);
+            currentX += dotDiameter + gap;
+        }
+    }
 }
 
 void MenuManager::drawSplashScreen() {
