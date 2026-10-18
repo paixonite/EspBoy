@@ -411,10 +411,47 @@ void MenuManager::drawSplashScreen() {
 void MenuManager::updateBatteryDisplay() {
     lastBatteryUpdate = millis();
     tft->fillRect(tft->width() - 65, 0, 65, BAR_HEIGHT - 1, TFT_BLACK);
+    
+    int pct = battery->getPercentage();
+    if (pct < 0) pct = 0;
+    if (pct > 100) pct = 100;
+
+    // Battery dimensions (vertically centered in 25px top bar)
+    const int batW = 22;
+    const int batH = 12;
+    const int termW = 2;
+    const int termH = 6;
+    const int batX = tft->width() - batW - termW - 5;
+    const int batY = (BAR_HEIGHT / 2) - (batH / 2);
+
+    // 1. Percentage text
+    String pctStr = String(pct) + "%";
     tft->setTextDatum(MR_DATUM);
-    tft->setTextColor(TFT_GREEN);
-    tft->setTextSize(2);
-    tft->drawString(battery->getStatusString(), tft->width() - 8, BAR_HEIGHT / 2);
+    tft->setTextColor(TFT_WHITE);
+    tft->setTextSize(1);
+    tft->drawString(pctStr, batX - 5, BAR_HEIGHT / 2);
+
+    // 2. Battery outline & terminal cap
+    tft->drawRoundRect(batX, batY, batW, batH, 2, TFT_WHITE);
+    tft->fillRect(batX + batW, batY + (batH - termH) / 2, termW, termH, TFT_WHITE);
+
+    // 3. Battery interior fill
+    const int innerW = batW - 4;
+    const int innerH = batH - 4;
+    int fillW = map(pct, 0, 100, 0, innerW);
+    if (fillW > innerW) fillW = innerW;
+    if (fillW < 0) fillW = 0;
+
+    uint16_t fillColor = TFT_GREEN;
+    if (pct <= 20) {
+        fillColor = TFT_RED;
+    } else if (pct <= 45) {
+        fillColor = TFT_YELLOW;
+    }
+
+    if (fillW > 0) {
+        tft->fillRect(batX + 2, batY + 2, fillW, innerH, fillColor);
+    }
 }
 
 void MenuManager::drawTopBar(const String& title, uint16_t color) {
