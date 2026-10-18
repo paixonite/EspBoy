@@ -73,47 +73,7 @@ const Note MELODY_NEW_HIGHSCORE[] = {
 };
 const int MELODY_NEW_HIGHSCORE_LENGTH = sizeof(MELODY_NEW_HIGHSCORE) / sizeof(Note);
 
-// -----------------------------------------------------------------
-// 3.2 Snake Game Sounds
-// -----------------------------------------------------------------
-
-// Sound effect for when the snake eats an apple.
-const Note MELODY_APPLE[] = {
-    {NOTE_C5, 100},
-    {NOTE_G5, 100}
-};
-const int MELODY_APPLE_LENGTH = sizeof(MELODY_APPLE) / sizeof(Note);
-
-
-// Melody for the Snake Game Over screen.
-const Note MELODY_GAME_OVER[] = {
-    {NOTE_G4, 250},
-    {NOTE_F4, 250},
-    {NOTE_E4, 250},
-    {NOTE_D4, 500}
-};
-const int MELODY_GAME_OVER_LENGTH = sizeof(MELODY_GAME_OVER) / sizeof(Note);
-
-
-// -----------------------------------------------------------------
-// 3.3 Flappy Bird Game Sounds
-// -----------------------------------------------------------------
-
-// Sound effect for the "flap" (bird jump).
-const Note MELODY_FLAP[] = {
-    {NOTE_A4, 50}
-};
-const int MELODY_FLAP_LENGTH = sizeof(MELODY_FLAP) / sizeof(Note);
-
-
-// Sound effect for scoring when passing through a pipe.
-const Note MELODY_SCORE[] = {
-    {NOTE_C6, 80}
-};
-const int MELODY_SCORE_LENGTH = sizeof(MELODY_SCORE) / sizeof(Note);
-
-
-// Sound effect for collision / game over.
+// Sound effect for universal collision / game over.
 const Note MELODY_HIT[] = {
     {NOTE_A3, 100},
     {REST, 50},
@@ -123,7 +83,7 @@ const int MELODY_HIT_LENGTH = sizeof(MELODY_HIT) / sizeof(Note);
 
 
 // -----------------------------------------------------------------
-// 3.4 Crossy Road Game Sounds
+// 3.2 Crossy Road Game Sounds
 // -----------------------------------------------------------------
 
 // Crisp, deep tactile blip for directional hops (left/right/back or non-scoring forward).
@@ -148,6 +108,23 @@ const int MELODY_TRAIN_WARN_LENGTH = sizeof(MELODY_TRAIN_WARN) / sizeof(Note);
 
 
 // -----------------------------------------------------------------
+// 3.3 Flappy Bird Game Sounds
+// -----------------------------------------------------------------
+
+// Sound effect for the "flap" (bird jump).
+const Note MELODY_FLAP[] = {
+    {NOTE_A4, 50}
+};
+const int MELODY_FLAP_LENGTH = sizeof(MELODY_FLAP) / sizeof(Note);
+
+// Sound effect for scoring when passing through a pipe.
+const Note MELODY_SCORE[] = {
+    {NOTE_C6, 80}
+};
+const int MELODY_SCORE_LENGTH = sizeof(MELODY_SCORE) / sizeof(Note);
+
+
+// -----------------------------------------------------------------
 // 3.4 Frogger Game Sounds
 // -----------------------------------------------------------------
 
@@ -166,6 +143,27 @@ const Note MELODY_FROGGER_GOAL[] = {
     {NOTE_G5, 130}
 };
 const int MELODY_FROGGER_GOAL_LENGTH = sizeof(MELODY_FROGGER_GOAL) / sizeof(Note);
+
+
+// -----------------------------------------------------------------
+// 3.5 Snake Game Sounds
+// -----------------------------------------------------------------
+
+// Sound effect for when the snake eats an apple.
+const Note MELODY_APPLE[] = {
+    {NOTE_C5, 100},
+    {NOTE_G5, 100}
+};
+const int MELODY_APPLE_LENGTH = sizeof(MELODY_APPLE) / sizeof(Note);
+
+// Melody for the Snake Game Over screen.
+const Note MELODY_GAME_OVER[] = {
+    {NOTE_G4, 250},
+    {NOTE_F4, 250},
+    {NOTE_E4, 250},
+    {NOTE_D4, 500}
+};
+const int MELODY_GAME_OVER_LENGTH = sizeof(MELODY_GAME_OVER) / sizeof(Note);
 
 
 // -----------------------------------------------------------------

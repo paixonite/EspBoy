@@ -34,7 +34,8 @@ private:
     // --- Game Carousel Logic ---
     int selectedGameIndex;
     static const int GAME_COUNT = 5;
-    const char* gameNames[GAME_COUNT] = {"Snake", "Flappy Bird", "Crossy Road", "Frogger", "Tetris"};
+    // Games are listed in alphabetical order
+    const char* gameNames[GAME_COUNT] = {"Crossy Road", "Flappy Bird", "Frogger", "Snake", "Tetris"};
 
     // --- Settings Logic ---
     int selectedSettingIndex;
