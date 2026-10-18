@@ -12,7 +12,8 @@ enum MenuState {
     MENU_STATE_SPLASH, 
     MENU_STATE_SELECT, 
     MENU_STATE_SETTINGS, 
-    MENU_STATE_CONFIRM_RESET 
+    MENU_STATE_CONFIRM_RESET,
+    MENU_STATE_CREDITS
 };
 
 class MenuManager {
@@ -42,7 +43,7 @@ private:
     // --- Settings Logic ---
     int selectedSettingIndex;
     int settingsScrollOffset;
-    static const int SETTING_COUNT = 4;
+    static const int SETTING_COUNT = 5;
 
     // --- Button States ---
     bool lastLeftState, lastRightState, lastUpState, lastDownState;
@@ -63,6 +64,7 @@ private:
     int handleSelectInput();
     void handleSettingsInput();
     void handleConfirmResetInput();
+    void handleCreditsInput();
 };
 
 #endif // MENUMANAGER_H

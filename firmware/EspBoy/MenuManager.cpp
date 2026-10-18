@@ -76,6 +76,10 @@ int MenuManager::update() {
         case MENU_STATE_CONFIRM_RESET:
             handleConfirmResetInput();
             return -1;
+
+        case MENU_STATE_CREDITS:
+            handleCreditsInput();
+            return -1;
     }
     return -1;
 }
@@ -254,6 +258,11 @@ void MenuManager::handleSettingsInput() {
             currentState = MENU_STATE_CONFIRM_RESET;
             menuStateTimer = millis(); 
             drawConfirmReset();
+        } else if (selectedSettingIndex == 4) { // Credits
+            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            currentState = MENU_STATE_CREDITS;
+            menuStateTimer = millis();
+            drawSplashScreen();
         }
     }
 
@@ -292,6 +301,40 @@ void MenuManager::handleConfirmResetInput() {
 
     lastConfirmState = currentConfirmState;
     lastCancelState = currentCancelState;
+}
+
+void MenuManager::handleCreditsInput() {
+    // LOCKOUT TIMER: Prevent button bleed from settings menu entry
+    if (millis() - menuStateTimer < LOCKOUT_TIMER_MS) {
+        return;
+    }
+
+    // Check if any button is pressed
+    bool anyPressed = digitalRead(BTN_UP) == HIGH ||
+                      digitalRead(BTN_DOWN) == HIGH ||
+                      digitalRead(BTN_LEFT) == HIGH ||
+                      digitalRead(BTN_RIGHT) == HIGH ||
+                      digitalRead(BTN_START) == HIGH ||
+                      digitalRead(BTN_SELECT) == HIGH ||
+                      digitalRead(BTN_A) == HIGH ||
+                      digitalRead(BTN_B) == HIGH;
+
+    if (anyPressed) {
+        sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+        currentState = MENU_STATE_SETTINGS;
+        menuStateTimer = millis();
+
+        // Sync button states to avoid triggering actions immediately upon return
+        lastUpState = digitalRead(BTN_UP);
+        lastDownState = digitalRead(BTN_DOWN);
+        lastLeftState = digitalRead(BTN_LEFT);
+        lastRightState = digitalRead(BTN_RIGHT);
+        lastConfirmState = digitalRead(BTN_A);
+        lastCancelState = digitalRead(BTN_B);
+        lastSelectState = digitalRead(BTN_SELECT);
+
+        drawSettings();
+    }
 }
 
 // =================================================================
@@ -345,6 +388,10 @@ void MenuManager::drawSettings() {
             case 3:
                 label = "Highscores:";
                 value = "[ RESET ]";
+                break;
+            case 4:
+                label = "Credits:";
+                value = "[ VIEW ]";
                 break;
         }
 
