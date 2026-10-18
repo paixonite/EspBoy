@@ -3,6 +3,7 @@
 #include "pins.h"
 
 // Custom RGB565 Palette for Crisp Retro Arcade Aesthetics
+static const uint16_t COLOR_BG_NAVY      = 0x0045; // Really dark almost black navy blue (RGB: ~0, 8, 41)
 static const uint16_t COLOR_GRID_DOT     = 0x2104; // Subtle dark slate guide dot
 static const uint16_t COLOR_BORDER_OUTER = 0x4A69; // Steel grey outer frame
 static const uint16_t COLOR_L_ORANGE     = 0xFB60; // Title screen orange (RGB: 255, 55, 0)
@@ -520,9 +521,10 @@ void TetrisGame::drawPreviewBox(int panelX, int boxY, int type, bool dimmed) {
 }
 
 void TetrisGame::drawStaticLayout() {
-    tft->fillScreen(TFT_BLACK);
+    tft->fillScreen(COLOR_BG_NAVY);
 
-    // Center Playfield Double Frame
+    // Center Playfield Double Frame & Black Interior
+    tft->fillRect(BOARD_X, BOARD_Y, BOARD_W, BOARD_H, TFT_BLACK);
     tft->drawRect(BOARD_X - 1, BOARD_Y - 1, BOARD_W + 2, BOARD_H + 2, TFT_WHITE);
     tft->drawRect(BOARD_X - 2, BOARD_Y - 2, BOARD_W + 4, BOARD_H + 4, COLOR_BORDER_OUTER);
 
@@ -531,18 +533,21 @@ void TetrisGame::drawStaticLayout() {
 
     // --- LEFT PANEL: HOLD, LEVEL, SCORE ---
     // 1. HOLD Box (y = 5..56)
+    tft->fillRect(LEFT_PANEL_X, 5, PANEL_W, 52, TFT_BLACK);
     tft->drawRect(LEFT_PANEL_X, 5, PANEL_W, 52, TFT_WHITE);
     tft->drawFastHLine(LEFT_PANEL_X, 19, PANEL_W, TFT_WHITE);
     tft->setTextColor(TFT_YELLOW, TFT_BLACK);
     tft->drawString("HOLD", LEFT_PANEL_X + PANEL_W / 2, 13);
 
     // 2. LEVEL Box (y = 64..110)
+    tft->fillRect(LEFT_PANEL_X, 64, PANEL_W, 47, TFT_BLACK);
     tft->drawRect(LEFT_PANEL_X, 64, PANEL_W, 47, TFT_WHITE);
     tft->drawFastHLine(LEFT_PANEL_X, 78, PANEL_W, TFT_WHITE);
     tft->setTextColor(TFT_YELLOW, TFT_BLACK);
     tft->drawString("LEVEL", LEFT_PANEL_X + PANEL_W / 2, 72);
 
     // 3. SCORE Box (y = 118..164)
+    tft->fillRect(LEFT_PANEL_X, 118, PANEL_W, 47, TFT_BLACK);
     tft->drawRect(LEFT_PANEL_X, 118, PANEL_W, 47, TFT_WHITE);
     tft->drawFastHLine(LEFT_PANEL_X, 132, PANEL_W, TFT_WHITE);
     tft->setTextColor(TFT_YELLOW, TFT_BLACK);
@@ -550,12 +555,14 @@ void TetrisGame::drawStaticLayout() {
 
     // --- RIGHT PANEL: NEXT & CONTROLS ---
     // 1. NEXT Box (y = 5..56)
+    tft->fillRect(RIGHT_PANEL_X, 5, PANEL_W, 52, TFT_BLACK);
     tft->drawRect(RIGHT_PANEL_X, 5, PANEL_W, 52, TFT_WHITE);
     tft->drawFastHLine(RIGHT_PANEL_X, 19, PANEL_W, TFT_WHITE);
     tft->setTextColor(TFT_YELLOW, TFT_BLACK);
     tft->drawString("NEXT", RIGHT_PANEL_X + PANEL_W / 2, 13);
 
     // 2. CONTROLS Box (y = 64..164)
+    tft->fillRect(RIGHT_PANEL_X, 64, PANEL_W, 101, TFT_BLACK);
     tft->drawRect(RIGHT_PANEL_X, 64, PANEL_W, 101, TFT_WHITE);
     tft->drawFastHLine(RIGHT_PANEL_X, 78, PANEL_W, TFT_WHITE);
     tft->setTextColor(TFT_YELLOW, TFT_BLACK);
