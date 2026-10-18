@@ -48,6 +48,11 @@ void FlappyBirdGame::handleInputPlaying() {
     lastButtonState = currentButtonState;
 }
 
+void FlappyBirdGame::onResume() {
+    // Clear the pause popup and redraw pipes, bird and HUD at their current positions
+    fullRedrawRequired = true;
+}
+
 void FlappyBirdGame::updatePlaying() {
     player_vel_y += GRAVITY;
     player_y += player_vel_y;

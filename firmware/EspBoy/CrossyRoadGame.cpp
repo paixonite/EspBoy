@@ -65,7 +65,7 @@ void CrossyRoadGame::generateLane(int rowIdx, int worldDist, const Lane* adjacen
         lane.trees[c] = false;
     }
     lane.railState = RAIL_COOLDOWN;
-    lane.railTimer = millis();
+    lane.railTimer = gameMillis();
     lane.cooldownDuration = 2500;
     lane.trainX = -TRAIN_WIDTH;
     lane.trainXPrev = -TRAIN_WIDTH;
@@ -208,7 +208,7 @@ void CrossyRoadGame::generateLane(int rowIdx, int worldDist, const Lane* adjacen
         lane.railState = RAIL_COOLDOWN;
         lane.cooldownDuration = 2400 - (effDist * 900) / 60 + random(0, 800);
         // Stagger initial timer so newly spawned rails don't all fire at once
-        lane.railTimer = millis() - random(0, lane.cooldownDuration / 2);
+        lane.railTimer = gameMillis() - random(0, lane.cooldownDuration / 2);
         lane.trainX = (dir > 0) ? -TRAIN_WIDTH : DISPLAY_WIDTH;
         lane.trainXPrev = lane.trainX;
     }
@@ -220,6 +220,11 @@ void CrossyRoadGame::shiftWorldDown() {
     }
     int topWorldDist = currentWorldRow + CAMERA_THRESHOLD_ROW;
     generateLane(0, topWorldDist, &lanes[1]);
+}
+
+void CrossyRoadGame::onResume() {
+    // Repaint HUD and all 10 lanes (with the player) over the pause popup
+    fullRedrawRequired = true;
 }
 
 void CrossyRoadGame::handleInputPlaying() {
@@ -324,7 +329,7 @@ void CrossyRoadGame::handleInputPlaying() {
 }
 
 void CrossyRoadGame::updatePlaying() {
-    unsigned long now = millis();
+    unsigned long now = gameMillis();
 
     for (int r = 0; r < NUM_LANES; r++) {
         Lane& lane = lanes[r];

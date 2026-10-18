@@ -42,8 +42,13 @@ void SnakeGame::handleInputPlaying() {
     if (digitalRead(BTN_RIGHT) == HIGH && currentDirection != LEFT) pendingDirection = RIGHT;
 }
 
+void SnakeGame::onResume() {
+    // Repaint the whole grid (walls, snake, apple) and HUD over the pause popup
+    fullRedrawRequired = true;
+}
+
 void SnakeGame::updatePlaying() {
-    now = millis();
+    now = gameMillis();
     if (now - lastUpdate < SPEED) return;
     lastUpdate = now;
 

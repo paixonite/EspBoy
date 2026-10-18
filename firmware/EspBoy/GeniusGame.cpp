@@ -39,9 +39,10 @@ void GeniusGame::resetGame() {
     appendRandomStep();
 
     phase = PHASE_ROUND_INTRO;
-    phaseStartTime = millis();
+    phaseStartTime = gameMillis();
 
     fullRedrawRequired = true;
+    initialStart = true;
     for (int i = 0; i < 4; i++) {
         renderedPadLit[i] = false;
     }
@@ -120,7 +121,7 @@ void GeniusGame::handleInputPlaying() {
     bool curDown  = digitalRead(BTN_DOWN);
     bool curLeft  = digitalRead(BTN_LEFT);
 
-    if (fullRedrawRequired) {
+    if (initialStart) {
         pendingPressPad = -1;
         lastUp    = curUp;
         lastRight = curRight;
@@ -149,13 +150,22 @@ void GeniusGame::handleInputPlaying() {
     lastLeft  = curLeft;
 }
 
-void GeniusGame::updatePlaying() {
-    unsigned long now = millis();
+void GeniusGame::onResume() {
+    fullRedrawRequired = true;
+    lastUp    = digitalRead(BTN_UP);
+    lastRight = digitalRead(BTN_RIGHT);
+    lastDown  = digitalRead(BTN_DOWN);
+    lastLeft  = digitalRead(BTN_LEFT);
+}
 
-    if (fullRedrawRequired) {
+void GeniusGame::updatePlaying() {
+    unsigned long now = gameMillis();
+
+    if (initialStart) {
         randomSeed(micros());
         sequence[0] = (uint8_t)random(0, 4);
         phaseStartTime = now;
+        initialStart = false;
         return;
     }
 
@@ -377,7 +387,7 @@ void GeniusGame::drawPlaying() {
 
     bool wantLit[4] = {false, false, false, false};
     if (phase == PHASE_MISTAKE) {
-        bool blinkOn = (((millis() - phaseStartTime) / 130) % 2 == 0);
+        bool blinkOn = (((gameMillis() - phaseStartTime) / 130) % 2 == 0);
         int expectedPad = sequence[inputIndex];
         if (expectedPad >= 0 && expectedPad < 4) {
             wantLit[expectedPad] = blinkOn;

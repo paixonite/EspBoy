@@ -13,6 +13,7 @@ protected:
     void updatePlaying() override;
     void drawPlaying() override;
     void handleInputPlaying() override;
+    void onResume() override;
 
 private:
     struct Pipe {

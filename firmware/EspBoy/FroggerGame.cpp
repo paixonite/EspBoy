@@ -38,7 +38,7 @@ uint16_t FroggerGame::getObstacleColor(const Lane& lane, const Obstacle& obs) co
     }
     if (obs.diveState == TURTLE_WARNING) {
         // Blink between vivid orange and dark green every 180ms to warn before diving
-        return ((millis() / 180) % 2 == 0) ? COLOR_ARCADE_ORANGE : TFT_DARKGREEN;
+        return ((gameMillis() / 180) % 2 == 0) ? COLOR_ARCADE_ORANGE : TFT_DARKGREEN;
     }
     return lane.color;
 }
@@ -141,6 +141,18 @@ void FroggerGame::handleInputPlaying() {
     lastA = curA;
 }
 
+void FroggerGame::onResume() {
+    // Repaint background, lanes, frog and HUD over the pause popup
+    fullRedrawRequired = true;
+
+    // Re-sync edge states so pause-menu navigation can't register as a hop
+    lastUp = digitalRead(BTN_UP);
+    lastDown = digitalRead(BTN_DOWN);
+    lastLeft = digitalRead(BTN_LEFT);
+    lastRight = digitalRead(BTN_RIGHT);
+    lastA = digitalRead(BTN_A);
+}
+
 void FroggerGame::updateTurtleDiveStates() {
     float mult = getSpeedMultiplier();
     unsigned long surfacedLen = (unsigned long)(3000.0f / mult);
@@ -148,7 +160,7 @@ void FroggerGame::updateTurtleDiveStates() {
     unsigned long submergeLen = (unsigned long)(1100.0f / mult);
     unsigned long cycleLen    = surfacedLen + warningLen + submergeLen;
 
-    unsigned long now = millis();
+    unsigned long now = gameMillis();
 
     for (int l = 0; l < NUM_ACTIVE_LANES; l++) {
         if (!lanes[l].isTurtle) continue;

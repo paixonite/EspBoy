@@ -65,6 +65,20 @@ const Note MELODY_MENU_NAVIGATE[] = {
 };
 const int MELODY_MENU_NAVIGATE_LENGTH = sizeof(MELODY_MENU_NAVIGATE) / sizeof(Note);
 
+// Pause chime (descending fourth) played when [START] opens the pause popup.
+const Note MELODY_PAUSE[] = {
+    {NOTE_E5, 60},
+    {NOTE_B4, 110}
+};
+const int MELODY_PAUSE_LENGTH = sizeof(MELODY_PAUSE) / sizeof(Note);
+
+// Resume chime (ascending mirror of the pause chime) played when gameplay continues.
+const Note MELODY_RESUME[] = {
+    {NOTE_B4, 60},
+    {NOTE_E5, 110}
+};
+const int MELODY_RESUME_LENGTH = sizeof(MELODY_RESUME) / sizeof(Note);
+
 // Fanfare played when the player sets a high score (Ascending arpeggio)
 const Note MELODY_NEW_HIGHSCORE[] = {
     {NOTE_C5, 100},

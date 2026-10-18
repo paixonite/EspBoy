@@ -47,7 +47,7 @@ void EspBoyCore::update() {
         if (currentGame != nullptr) {
             currentGame->loop();
             
-            // Check if the game requested exit (SELECT during play / game over, or B on the title screen)
+            // Check if the game requested exit (Quit in the pause popup, or B on the title screen)
             if (currentGame->shouldExit()) {
                 delete currentGame;
                 currentGame = nullptr;

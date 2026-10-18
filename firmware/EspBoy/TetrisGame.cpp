@@ -161,7 +161,7 @@ void TetrisGame::resetGame() {
     lastRight = digitalRead(BTN_RIGHT);
     lastA     = digitalRead(BTN_A);
     lastB     = digitalRead(BTN_B);
-    lastStart = digitalRead(BTN_START);
+    lastSelect = digitalRead(BTN_SELECT);
     hardDropPending = false;
     dasDir    = 0;
 
@@ -175,7 +175,7 @@ void TetrisGame::spawnNextPiece() {
     activeY    = 0;
     activeRot  = 0;
 
-    unsigned long now = millis();
+    unsigned long now = gameMillis();
     lastGravityTime  = now;
     lastSoftDropTime = now;
     lockTimerActive  = false;
@@ -215,7 +215,7 @@ bool TetrisGame::canFit(int px, int py, int rot, int type) const {
 
 void TetrisGame::notifyPieceAdjusted() {
     if (lockTimerActive && lockResetCount < MAX_LOCK_RESETS) {
-        lockStartTime = millis();
+        lockStartTime = gameMillis();
         lockResetCount++;
     }
 }
@@ -266,7 +266,7 @@ void TetrisGame::triggerHold() {
         activeX = 3;
         activeY = 0;
         activeRot = 0;
-        unsigned long now = millis();
+        unsigned long now = gameMillis();
         lastGravityTime  = now;
         lastSoftDropTime = now;
         lockTimerActive  = false;
@@ -304,28 +304,28 @@ void TetrisGame::handleInputPlaying() {
     bool curRight = digitalRead(BTN_RIGHT);
     bool curA     = digitalRead(BTN_A);
     bool curB     = digitalRead(BTN_B);
-    bool curStart = digitalRead(BTN_START);
+    bool curSelect = digitalRead(BTN_SELECT);
 
-    unsigned long now = millis();
+    unsigned long now = gameMillis();
 
-    // Prevent input bleed right after pressing [A] on the Title Screen
-    if (now - stateTimer < 180) {
+    // Prevent input bleed right after pressing [A] on the Title Screen (or resuming from pause)
+    if (millis() - stateTimer < 180) {
         lastUp = curUp; lastDown = curDown;
         lastLeft = curLeft; lastRight = curRight;
-        lastA = curA; lastB = curB; lastStart = curStart;
+        lastA = curA; lastB = curB; lastSelect = curSelect;
         return;
     }
 
     if (clearingLines) {
         lastUp = curUp; lastDown = curDown;
         lastLeft = curLeft; lastRight = curRight;
-        lastA = curA; lastB = curB; lastStart = curStart;
+        lastA = curA; lastB = curB; lastSelect = curSelect;
         isSoftDropping = false;
         return;
     }
 
-    // 1. Hold Piece ([START])
-    if (lastStart == LOW && curStart == HIGH) {
+    // 1. Hold Piece ([SELECT])
+    if (lastSelect == LOW && curSelect == HIGH) {
         triggerHold();
         if (currentState == STATE_GAME_OVER) return;
     }
@@ -391,7 +391,12 @@ void TetrisGame::handleInputPlaying() {
     lastRight = curRight;
     lastA     = curA;
     lastB     = curB;
-    lastStart = curStart;
+    lastSelect = curSelect;
+}
+
+void TetrisGame::onResume() {
+    // Repaint frame, side panels and every board cell over the pause popup
+    fullRedrawRequired = true;
 }
 
 void TetrisGame::lockPiece() {
@@ -424,7 +429,7 @@ void TetrisGame::lockPiece() {
 
     if (numClearingRows > 0) {
         clearingLines = true;
-        lineClearStartTime = millis();
+        lineClearStartTime = gameMillis();
         if (numClearingRows == 4) {
             sound->play(MELODY_TETRIS_FOUR, MELODY_TETRIS_FOUR_LENGTH);
         } else {
@@ -473,7 +478,7 @@ void TetrisGame::finishLineClear() {
 void TetrisGame::updatePlaying() {
     if (currentState == STATE_GAME_OVER) return;
 
-    unsigned long now = millis();
+    unsigned long now = gameMillis();
 
     if (clearingLines) {
         if (now - lineClearStartTime >= LINE_CLEAR_MS) {
@@ -631,7 +636,7 @@ void TetrisGame::drawStaticLayout() {
     tft->setTextColor(TFT_LIGHTGREY);
     tft->drawString("[A/B] Rotate",   RIGHT_PANEL_X + PANEL_W / 2, 96);
     tft->drawString("[UP] Hard Drop", RIGHT_PANEL_X + PANEL_W / 2, 120);
-    tft->drawString("[START] Hold",   RIGHT_PANEL_X + PANEL_W / 2, 144);
+    tft->drawString("[SELECT] Hold",  RIGHT_PANEL_X + PANEL_W / 2, 144);
 }
 
 void TetrisGame::drawHUDUpdates() {
@@ -685,7 +690,7 @@ void TetrisGame::drawPlaying() {
     }
 
     if (clearingLines) {
-        uint8_t flashState = (((millis() - lineClearStartTime) / 55) % 2 == 0)
+        uint8_t flashState = (((gameMillis() - lineClearStartTime) / 55) % 2 == 0)
                              ? CELL_FLASH_WHITE
                              : CELL_FLASH_CYAN;
         for (int r = 0; r < ROWS; r++) {

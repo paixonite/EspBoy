@@ -21,6 +21,7 @@ protected:
     void updatePlaying() override;
     void drawPlaying() override;
     void handleInputPlaying() override;
+    void onResume() override;
 
 private:
     // Display & HUD Geometry (320 x 170 landscape)
@@ -61,6 +62,7 @@ private:
 
     // Differential Rendering Tracking (Zero-Flicker SPI)
     bool fullRedrawRequired;
+    bool initialStart;
     bool renderedPadLit[4];
     int prevScore;
     int prevPhaseCode;

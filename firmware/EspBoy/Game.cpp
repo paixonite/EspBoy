@@ -4,11 +4,30 @@
 // Initialize global memory for last used name
 char Game::lastInitials[3] = {'A', 'A', 'A'};
 
+// Pause popup layout (centered on the 320x170 landscape canvas)
+static const char* const PAUSE_OPTIONS[] = {"Resume", "Quit"};
+static const int PAUSE_OPTION_COUNT   = sizeof(PAUSE_OPTIONS) / sizeof(PAUSE_OPTIONS[0]);
+static const int PAUSE_OPTION_RESUME  = 0;
+static const int PAUSE_OPTION_QUIT    = 1;
+
+static const int PAUSE_BOX_W          = 180;
+static const int PAUSE_BOX_H          = 104;
+static const int PAUSE_TITLE_OFFSET_Y = 20; // Title center, relative to the box top
+static const int PAUSE_FIRST_OPT_Y    = 57; // First option center, relative to the box top
+static const int PAUSE_OPT_SPACING    = 26;
+static const int PAUSE_OPT_W          = 110;
+static const int PAUSE_OPT_H          = 22;
+
 Game::Game(TFT_eSPI* tft_display, SoundManager* sound_manager, const String& game_name)
     : tft(tft_display), sound(sound_manager), gameName(game_name) {
     _exit_request = false;
     score = 0;
     currentState = STATE_TITLE;
+
+    pauseStartTime = 0;
+    pausedTotalMs = 0;
+    pauseSelection = PAUSE_OPTION_RESUME;
+    resumePending = false;
     
     // Configure universal system placeholders.
     // Any child game can override this in its own constructor.
@@ -25,8 +44,7 @@ void Game::setup() {
 }
 
 void Game::loop() {
-    checkGlobalExit();
-    if (_exit_request) return;
+    checkPauseButton();
 
     switch (currentState) {
         case STATE_TITLE:
@@ -44,6 +62,10 @@ void Game::loop() {
             
             drawPlaying();
             delay(16); 
+            break;
+
+        case STATE_PAUSED:
+            handlePausedInput();
             break;
 
         case STATE_GAME_OVER:
@@ -65,21 +87,135 @@ void Game::changeState(GameState newState) {
     stateTimer = millis();
 
     if (newState == STATE_TITLE) drawTitleScreen();
+    else if (newState == STATE_PAUSED) drawPauseScreen();
     else if (newState == STATE_GAME_OVER) drawGameOverScreen();
     else if (newState == STATE_HIGHSCORE_VIEW) drawHighscoreViewScreen();
     else if (newState == STATE_HIGHSCORE_ENTRY) drawHighscoreEntryScreen();
 }
 
-void Game::checkGlobalExit() {
-    static bool lastSelectState = LOW;
-    bool currentSelectState = digitalRead(BTN_SELECT);
+unsigned long Game::gameMillis() const {
+    // While paused, the clock is frozen at the instant the pause began
+    unsigned long now = (currentState == STATE_PAUSED) ? pauseStartTime : millis();
+    return now - pausedTotalMs;
+}
+
+void Game::checkPauseButton() {
+    static bool lastStartState = LOW;
+    bool currentStartState = digitalRead(BTN_START);
     
-    if (lastSelectState == LOW && currentSelectState == HIGH) {
-        if (currentState == STATE_PLAYING || currentState == STATE_GAME_OVER) {
+    if (lastStartState == LOW && currentStartState == HIGH && currentState == STATE_PLAYING) {
+        pauseStartTime = millis();
+        pauseSelection = PAUSE_OPTION_RESUME;
+        resumePending = false;
+        sound->play(MELODY_PAUSE, MELODY_PAUSE_LENGTH);
+        changeState(STATE_PAUSED);
+    }
+    lastStartState = currentStartState;
+}
+
+// =================================================================
+// PAUSE POPUP
+// =================================================================
+
+void Game::drawPauseScreen() {
+    int boxX = (tft->width() - PAUSE_BOX_W) / 2;
+    int boxY = (tft->height() - PAUSE_BOX_H) / 2;
+
+    tft->fillRect(boxX, boxY, PAUSE_BOX_W, PAUSE_BOX_H, TFT_BLACK);
+    tft->drawRect(boxX, boxY, PAUSE_BOX_W, PAUSE_BOX_H, TFT_WHITE);
+
+    tft->setTextDatum(MC_DATUM);
+    tft->setTextColor(TFT_YELLOW);
+    tft->setTextSize(3);
+    tft->drawString("PAUSED", tft->width() / 2, boxY + PAUSE_TITLE_OFFSET_Y);
+
+    drawPauseOptions();
+}
+
+void Game::drawPauseOptions() {
+    int boxY = (tft->height() - PAUSE_BOX_H) / 2;
+    int optX = (tft->width() - PAUSE_OPT_W) / 2;
+
+    tft->setTextDatum(MC_DATUM);
+    tft->setTextSize(2);
+
+    for (int i = 0; i < PAUSE_OPTION_COUNT; i++) {
+        int centerY = boxY + PAUSE_FIRST_OPT_Y + (i * PAUSE_OPT_SPACING);
+        int optY = centerY - (PAUSE_OPT_H / 2);
+        bool selected = (i == pauseSelection);
+
+        // Same highlight language as the Settings rows: double-thick yellow outline
+        tft->fillRect(optX, optY, PAUSE_OPT_W, PAUSE_OPT_H, TFT_BLACK);
+        if (selected) {
+            tft->drawRoundRect(optX, optY, PAUSE_OPT_W, PAUSE_OPT_H, 4, TFT_YELLOW);
+            tft->drawRoundRect(optX + 1, optY + 1, PAUSE_OPT_W - 2, PAUSE_OPT_H - 2, 3, TFT_YELLOW);
+        }
+
+        tft->setTextColor(selected ? TFT_YELLOW : TFT_WHITE);
+        tft->drawString(PAUSE_OPTIONS[i], tft->width() / 2, centerY);
+    }
+}
+
+void Game::handlePausedInput() {
+    static bool lastUp = LOW, lastDown = LOW, lastA = LOW, lastStart = LOW;
+    bool curUp    = digitalRead(BTN_UP);
+    bool curDown  = digitalRead(BTN_DOWN);
+    bool curA     = digitalRead(BTN_A);
+    bool curStart = digitalRead(BTN_START);
+
+    if (millis() - stateTimer < 250) {
+        lastUp = curUp; lastDown = curDown; lastA = curA; lastStart = curStart;
+        return;
+    }
+
+    // A confirmed resume waits for the button release, so the press can't leak
+    // into the game's own edge detection (e.g. an unwanted Flappy Bird flap).
+    if (resumePending) {
+        if (curA == LOW && curStart == LOW) {
+            resumeFromPause();
+        }
+        lastUp = curUp; lastDown = curDown; lastA = curA; lastStart = curStart;
+        return;
+    }
+
+    if (lastUp == LOW && curUp == HIGH && pauseSelection > 0) {
+        pauseSelection--;
+        sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+        drawPauseOptions();
+    }
+    else if (lastDown == LOW && curDown == HIGH && pauseSelection < PAUSE_OPTION_COUNT - 1) {
+        pauseSelection++;
+        sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+        drawPauseOptions();
+    }
+    else if (lastStart == LOW && curStart == HIGH) {
+        // [START] toggles the pause off, regardless of the highlighted option
+        resumePending = true;
+    }
+    else if (lastA == LOW && curA == HIGH) {
+        if (pauseSelection == PAUSE_OPTION_RESUME) {
+            resumePending = true;
+        } else if (pauseSelection == PAUSE_OPTION_QUIT) {
+            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             _exit_request = true;
         }
     }
-    lastSelectState = currentSelectState;
+
+    lastUp = curUp; lastDown = curDown; lastA = curA; lastStart = curStart;
+}
+
+void Game::resumeFromPause() {
+    pausedTotalMs += millis() - pauseStartTime;
+    resumePending = false;
+    sound->play(MELODY_RESUME, MELODY_RESUME_LENGTH);
+
+    // Refreshing stateTimer also re-arms each game's short input lockout
+    changeState(STATE_PLAYING);
+
+    // Repaint immediately, so even a game over on the very next tick
+    // never leaves popup leftovers behind the GAME OVER box
+    onResume();
+    drawPlaying();
 }
 
 // =================================================================

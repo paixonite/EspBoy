@@ -12,6 +12,7 @@ protected:
     void updatePlaying() override;
     void drawPlaying() override;
     void handleInputPlaying() override;
+    void onResume() override;
 
 private:
     // Display & Playfield Geometry (320 x 170 landscape)
@@ -86,7 +87,7 @@ private:
     bool lastRight;
     bool lastA;
     bool lastB;
-    bool lastStart;
+    bool lastSelect;
     bool hardDropPending;
     int dasDir;
     unsigned long dasStartTime;
