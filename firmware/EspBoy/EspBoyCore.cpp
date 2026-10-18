@@ -3,6 +3,7 @@
 #include "FlappyBirdGame.h"
 #include "CrossyRoadGame.h"
 #include "FroggerGame.h"
+#include "TetrisGame.h"
 
 EspBoyCore::EspBoyCore() 
     : tft(), 
@@ -85,6 +86,9 @@ void EspBoyCore::loadGame(int gameIndex) {
             break;
         case 3:
             currentGame = new FroggerGame(&tft, &soundManager);
+            break;
+        case 4:
+            currentGame = new TetrisGame(&tft, &soundManager);
             break;
         default:
             return;

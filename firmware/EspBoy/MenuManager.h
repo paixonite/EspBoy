@@ -33,8 +33,8 @@ private:
 
     // --- Game Carousel Logic ---
     int selectedGameIndex;
-    static const int GAME_COUNT = 4;
-    const char* gameNames[GAME_COUNT] = {"Snake", "Flappy Bird", "Crossy Road", "Frogger"};
+    static const int GAME_COUNT = 5;
+    const char* gameNames[GAME_COUNT] = {"Snake", "Flappy Bird", "Crossy Road", "Frogger", "Tetris"};
 
     // --- Settings Logic ---
     int selectedSettingIndex;

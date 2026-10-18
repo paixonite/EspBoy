@@ -19,6 +19,9 @@
 #define NOTE_B4   494
 #define NOTE_C5   523
 #define NOTE_CS5  554
+#define NOTE_D5   587
+#define NOTE_E5   659
+#define NOTE_F5   698
 #define NOTE_G5   784
 #define NOTE_A5   880
 #define NOTE_C6   1047
@@ -163,5 +166,50 @@ const Note MELODY_FROGGER_GOAL[] = {
     {NOTE_G5, 130}
 };
 const int MELODY_FROGGER_GOAL_LENGTH = sizeof(MELODY_FROGGER_GOAL) / sizeof(Note);
+
+
+// -----------------------------------------------------------------
+// 3.6 Tetris Game Sounds
+// -----------------------------------------------------------------
+
+// Crisp upward blip when rotating a tetromino.
+const Note MELODY_TETRIS_ROTATE[] = {
+    {NOTE_E5, 22},
+    {NOTE_G5, 28}
+};
+const int MELODY_TETRIS_ROTATE_LENGTH = sizeof(MELODY_TETRIS_ROTATE) / sizeof(Note);
+
+// Punchy low thud when a piece locks or hard-drops into place.
+const Note MELODY_TETRIS_DROP[] = {
+    {NOTE_E4, 25},
+    {NOTE_A3, 40}
+};
+const int MELODY_TETRIS_DROP_LENGTH = sizeof(MELODY_TETRIS_DROP) / sizeof(Note);
+
+// Quick two-note swap chirp when holding a piece.
+const Note MELODY_TETRIS_HOLD[] = {
+    {NOTE_A4, 25},
+    {NOTE_E5, 35}
+};
+const int MELODY_TETRIS_HOLD_LENGTH = sizeof(MELODY_TETRIS_HOLD) / sizeof(Note);
+
+// Bright ascending chime for clearing 1 to 3 lines.
+const Note MELODY_TETRIS_LINE[] = {
+    {NOTE_C5, 50},
+    {NOTE_E5, 50},
+    {NOTE_G5, 100}
+};
+const int MELODY_TETRIS_LINE_LENGTH = sizeof(MELODY_TETRIS_LINE) / sizeof(Note);
+
+// Celebratory arcade fanfare for clearing 4 lines at once (TETRIS!).
+const Note MELODY_TETRIS_FOUR[] = {
+    {NOTE_E5, 45},
+    {NOTE_G5, 45},
+    {NOTE_A5, 45},
+    {NOTE_C6, 65},
+    {NOTE_A5, 45},
+    {NOTE_C6, 150}
+};
+const int MELODY_TETRIS_FOUR_LENGTH = sizeof(MELODY_TETRIS_FOUR) / sizeof(Note);
 
 #endif // AUDIO_ASSETS_H
