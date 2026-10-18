@@ -61,6 +61,11 @@ protected:
     void handleHighscoreViewInput();
     void handleHighscoreEntryInput();
 
+    // --- UI Helpers ---
+    void drawTopBar(const String& title, uint16_t color = TFT_YELLOW);
+    void drawBottomBar(const String& text, uint16_t color = TFT_WHITE);
+    static const int BAR_HEIGHT = 25;
+
 private:
     Preferences preferences;
     int topScores[3];

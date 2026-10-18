@@ -52,6 +52,9 @@ private:
     void updateBatteryDisplay();
     void drawSettings();
     void drawConfirmReset();
+    void drawTopBar(const String& title, uint16_t color = TFT_YELLOW);
+    void drawBottomBar(const String& text, uint16_t color = TFT_WHITE);
+    static const int BAR_HEIGHT = 25;
 
     // --- Input Handlers ---
     int handleSelectInput();

@@ -67,6 +67,10 @@ int MenuManager::update() {
             return handleSelectInput();
 
         case MENU_STATE_SETTINGS:
+            if (millis() - lastBatteryUpdate > 5000) {
+                lastBatteryUpdate = millis();
+                updateBatteryDisplay();
+            }
             handleSettingsInput();
             return -1;
 
@@ -285,13 +289,10 @@ void MenuManager::handleConfirmResetInput() {
 
 void MenuManager::drawSettings() {
     tft->fillScreen(TFT_BLACK);
-    
-    tft->setTextColor(TFT_YELLOW);
-    tft->setTextSize(2);
-    tft->setTextDatum(TC_DATUM);
-    tft->drawString("-- SETTINGS --", tft->width() / 2, 10);
+    drawTopBar("SETTINGS", TFT_YELLOW);
 
-    int startY = 60;
+    tft->setTextSize(2);
+    int startY = 55;
     int spacingY = 30;
 
     // 0: Sound
@@ -317,22 +318,17 @@ void MenuManager::drawSettings() {
     tft->setTextDatum(MR_DATUM);
     tft->drawString("[ RESET ]", tft->width() - 20, startY + spacingY * 2);
 
-    // Footer
-    tft->drawFastHLine(0, tft->height() - 25, tft->width(), TFT_WHITE);
-    tft->setTextColor(TFT_WHITE);
-    tft->setTextSize(1);
-    tft->setTextDatum(MC_DATUM);
-    tft->drawString("[B] Back", tft->width() / 2, tft->height() - 12);
+    drawBottomBar("[B] Back", TFT_WHITE);
 }
 
 void MenuManager::drawConfirmReset() {
-    tft->fillRect(tft->width() / 2 - 100, tft->height() / 2 - 45, 200, 90, TFT_BLACK);
-    tft->drawRect(tft->width() / 2 - 100, tft->height() / 2 - 45, 200, 90, TFT_RED);
+    tft->fillRect(tft->width() / 2 - 110, tft->height() / 2 - 45, 220, 90, TFT_BLACK);
+    tft->drawRect(tft->width() / 2 - 110, tft->height() / 2 - 45, 220, 90, TFT_RED);
     
     tft->setTextColor(TFT_RED);
     tft->setTextSize(2);
     tft->setTextDatum(MC_DATUM);
-    tft->drawString("RESET SCORES?", tft->width() / 2, tft->height() / 2 - 15);
+    tft->drawString("RESET HIGHSCORES?", tft->width() / 2, tft->height() / 2 - 15);
     
     tft->setTextColor(TFT_WHITE);
     tft->setTextSize(1);
@@ -341,20 +337,15 @@ void MenuManager::drawConfirmReset() {
 
 void MenuManager::drawMenu() {
     tft->fillScreen(TFT_BLACK);
-    tft->setTextColor(TFT_YELLOW);
-    tft->setTextSize(2);
-    tft->setTextDatum(MC_DATUM);
-    tft->drawString("-- SELECT A GAME --", tft->width() / 2, tft->height() / 4);
+    drawTopBar("CHOOSE A GAME", TFT_YELLOW);
     
     String gameText = "< " + String(gameNames[selectedGameIndex]) + " >";
+    tft->setTextDatum(MC_DATUM);
     tft->setTextColor(TFT_WHITE);
+    tft->setTextSize(2);
     tft->drawString(gameText, tft->width() / 2, tft->height() / 2);
     
-    tft->drawFastHLine(0, tft->height() - 25, tft->width(), TFT_WHITE);
-    tft->setTextSize(1);
-    tft->drawString("[A] Play    [SELECT] Settings", tft->width() / 2, tft->height() - 12);
-    
-    updateBatteryDisplay();
+    drawBottomBar("[SELECT] Settings    [A] Play", TFT_WHITE);
 }
 
 void MenuManager::drawSplashScreen() {
@@ -384,9 +375,27 @@ void MenuManager::drawSplashScreen() {
 }
 
 void MenuManager::updateBatteryDisplay() {
-    tft->setTextDatum(TR_DATUM);
+    lastBatteryUpdate = millis();
+    tft->fillRect(tft->width() - 65, 0, 65, BAR_HEIGHT - 1, TFT_BLACK);
+    tft->setTextDatum(MR_DATUM);
     tft->setTextColor(TFT_GREEN);
     tft->setTextSize(2);
-    tft->fillRect(tft->width() - 60, 5, 60, 16, TFT_BLACK);
-    tft->drawString(battery->getStatusString(), tft->width() - 5, 5);
+    tft->drawString(battery->getStatusString(), tft->width() - 8, BAR_HEIGHT / 2);
+}
+
+void MenuManager::drawTopBar(const String& title, uint16_t color) {
+    tft->drawFastHLine(0, BAR_HEIGHT - 1, tft->width(), TFT_WHITE);
+    tft->setTextDatum(MC_DATUM);
+    tft->setTextColor(color);
+    tft->setTextSize(2);
+    tft->drawString(title, tft->width() / 2, BAR_HEIGHT / 2);
+    updateBatteryDisplay();
+}
+
+void MenuManager::drawBottomBar(const String& text, uint16_t color) {
+    tft->drawFastHLine(0, tft->height() - BAR_HEIGHT, tft->width(), TFT_WHITE);
+    tft->setTextDatum(MC_DATUM);
+    tft->setTextColor(color);
+    tft->setTextSize(1);
+    tft->drawString(text, tft->width() / 2, tft->height() - (BAR_HEIGHT / 2));
 }

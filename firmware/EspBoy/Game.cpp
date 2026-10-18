@@ -88,18 +88,14 @@ void Game::checkGlobalExit() {
 
 void Game::drawTitleScreen() {
     tft->fillScreen(TFT_BLACK);
-    tft->setTextColor(TFT_YELLOW);
-    tft->setTextSize(3);
-    tft->setTextDatum(MC_DATUM);
-    tft->drawString(gameName, tft->width() / 2, tft->height() / 2 - 25);
+    drawTopBar(gameName, TFT_YELLOW);
     
-    tft->setTextSize(2);
+    tft->setTextDatum(MC_DATUM);
     tft->setTextColor(TFT_WHITE);
-    tft->drawString("[A] Play", tft->width() / 2, tft->height() / 2 + 10);
+    tft->setTextSize(2);
+    tft->drawString("[A] Play", tft->width() / 2, tft->height() / 2);
 
-    tft->setTextSize(1);
-    tft->setTextColor(TFT_LIGHTGREY);
-    tft->drawString("[SELECT] Quit   [START] Top Scores", tft->width() / 2, tft->height() / 2 + 40);
+    drawBottomBar("[SELECT] Quit   [START] Top Scores", TFT_WHITE);
 }
 
 void Game::handleInputTitle() {
@@ -200,13 +196,10 @@ void Game::saveHighscores() {
 
 void Game::drawHighscoreViewScreen() {
     tft->fillScreen(TFT_BLACK);
-    tft->setTextColor(TFT_YELLOW);
-    tft->setTextSize(2);
-    tft->setTextDatum(TC_DATUM);
-    tft->drawString("TOP SCORES", tft->width() / 2, 10);
+    drawTopBar("HIGHSCORES", TFT_YELLOW);
 
     tft->setTextSize(2);
-    int startY = 50;
+    int startY = 55;
     int spacingY = 30;
     
     for (int i = 0; i < 3; i++) {
@@ -219,11 +212,7 @@ void Game::drawHighscoreViewScreen() {
         tft->drawString(String(topScores[i]), tft->width() - 40, y);
     }
 
-    tft->drawFastHLine(0, tft->height() - 25, tft->width(), TFT_WHITE);
-    tft->setTextColor(TFT_WHITE);
-    tft->setTextSize(1);
-    tft->setTextDatum(MC_DATUM);
-    tft->drawString("[B] Back", tft->width() / 2, tft->height() - 12);
+    drawBottomBar("[B] Back", TFT_WHITE);
 }
 
 void Game::handleHighscoreViewInput() {
@@ -247,17 +236,14 @@ void Game::handleHighscoreViewInput() {
 
 void Game::drawHighscoreEntryScreen() {
     tft->fillScreen(TFT_BLACK);
-    tft->setTextColor(TFT_GREEN);
-    tft->setTextSize(2);
-    tft->setTextDatum(TC_DATUM);
-    tft->drawString("NEW TOP SCORE!", tft->width() / 2, 15);
+    drawTopBar("NEW TOP SCORE!", TFT_GREEN);
     
+    tft->setTextDatum(MC_DATUM);
     tft->setTextColor(TFT_WHITE);
-    tft->drawString("Score: " + String(score), tft->width() / 2, 45);
+    tft->setTextSize(2);
+    tft->drawString("Score: " + String(score), tft->width() / 2, 52);
 
-    tft->setTextSize(1);
-    tft->setTextColor(TFT_LIGHTGREY);
-    tft->drawString("[A] Confirm", tft->width() / 2, tft->height() - 15);
+    drawBottomBar("[A] Confirm", TFT_WHITE);
 
     drawInitials();
 }
@@ -266,7 +252,7 @@ void Game::drawInitials() {
     tft->setTextSize(4);
     int charSpacing = 35;
     int startX = (tft->width() / 2) - charSpacing;
-    int yPos = 95;
+    int yPos = 98;
 
     tft->setTextDatum(MC_DATUM);
 
@@ -353,4 +339,25 @@ void Game::handleHighscoreEntryInput() {
     }
 
     lastA = curA;
+}
+
+
+// =================================================================
+// UI HELPERS (STANDARDIZED BARS)
+// =================================================================
+
+void Game::drawTopBar(const String& title, uint16_t color) {
+    tft->drawFastHLine(0, BAR_HEIGHT - 1, tft->width(), TFT_WHITE);
+    tft->setTextDatum(MC_DATUM);
+    tft->setTextColor(color);
+    tft->setTextSize(2);
+    tft->drawString(title, tft->width() / 2, BAR_HEIGHT / 2);
+}
+
+void Game::drawBottomBar(const String& text, uint16_t color) {
+    tft->drawFastHLine(0, tft->height() - BAR_HEIGHT, tft->width(), TFT_WHITE);
+    tft->setTextDatum(MC_DATUM);
+    tft->setTextColor(color);
+    tft->setTextSize(1);
+    tft->drawString(text, tft->width() / 2, tft->height() - (BAR_HEIGHT / 2));
 }
