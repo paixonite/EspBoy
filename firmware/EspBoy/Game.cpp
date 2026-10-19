@@ -199,7 +199,7 @@ void Game::drawTitleScreen() {
     
     tft->setTextDatum(MC_DATUM);
     tft->setTextColor(TFT_WHITE);
-    tft->setTextSize(2);
+    tft->setTextSize(3);
     tft->drawString("[A] Play", tft->width() / 2, tft->height() / 2);
 
     drawBottomBar("[SELECT] Highscores    [B] Back", TFT_WHITE);
