@@ -6,6 +6,8 @@
 #include "BatteryManager.h"
 #include "ConfigManager.h"
 #include "InputManager.h"
+#include "Localization.h"
+#include "TextRenderer.h"
 #include "pins.h"
 
 // Added new states for Settings Menu
@@ -44,7 +46,17 @@ private:
     // --- Settings Logic ---
     int selectedSettingIndex;
     int settingsScrollOffset;
-    static const int SETTING_COUNT = 5;
+    // Row order in the Settings list (Language first)
+    enum SettingItem {
+        SETTING_LANGUAGE,
+        SETTING_VOLUME,
+        SETTING_BRIGHTNESS,
+        SETTING_AUTO_SLEEP,
+        SETTING_HIGHSCORES,
+        SETTING_CREDITS,
+        SETTING_ITEM_COUNT
+    };
+    static const int SETTING_COUNT = SETTING_ITEM_COUNT;
 
     // --- Drawing Functions ---
     void drawSplashScreen();
@@ -60,6 +72,7 @@ private:
     // --- Input Handlers ---
     int handleSelectInput();
     void handleSettingsInput();
+    void cycleLanguage(int direction);
     void handleConfirmResetInput();
     void handleCreditsInput();
 };

@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <Preferences.h>
 #include "pins.h"
+#include "Localization.h"
 
 class ConfigManager {
 public:
@@ -30,7 +31,10 @@ public:
     int getSleepTimeoutIndex() const;
     void setSleepTimeoutIndex(int idx);
     unsigned long getSleepTimeoutMs() const;
-    const char* getSleepTimeoutLabel() const;
+
+    // --- Language ---
+    Language getLanguage() const;
+    void setLanguage(Language lang);
 
     // --- Highscore Management ---
     void resetAllHighscores(const char* const gameNames[], int gameCount);
@@ -40,9 +44,9 @@ private:
     int _lastNonZeroVolume;
     int _brightness;
     int _sleepTimeoutIndex;
+    Language _language;
 
     static const unsigned long SLEEP_TIMEOUTS_MS[SLEEP_OPTION_COUNT];
-    static const char* const SLEEP_LABELS[SLEEP_OPTION_COUNT];
 };
 
 #endif // CONFIGMANAGER_H

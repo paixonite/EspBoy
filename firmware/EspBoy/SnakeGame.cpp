@@ -154,6 +154,5 @@ void SnakeGame::drawScoreHUD() {
     tft->setTextColor(TFT_YELLOW, TFT_BLACK);
     tft->setTextSize(1);
     tft->setTextDatum(MC_DATUM);
-    String s = "Score: " + String(score);
-    tft->drawString(s, tft->width() / 2, Y_OFFSET / 2);
+    TextRenderer::draw(tft, I18n::fmt(STR_SCORE_FMT, score), tft->width() / 2, Y_OFFSET / 2);
 }

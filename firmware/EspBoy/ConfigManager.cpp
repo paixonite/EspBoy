@@ -8,19 +8,12 @@ const unsigned long ConfigManager::SLEEP_TIMEOUTS_MS[ConfigManager::SLEEP_OPTION
     300000   // 4: 5 minutes
 };
 
-const char* const ConfigManager::SLEEP_LABELS[ConfigManager::SLEEP_OPTION_COUNT] = {
-    "[ OFF ]",
-    "< 30s >",
-    "< 1m >",
-    "< 3m >",
-    "< 5m >"
-};
-
 ConfigManager::ConfigManager()
     : _volume(80),
       _lastNonZeroVolume(80),
       _brightness(100),
-      _sleepTimeoutIndex(2) {
+      _sleepTimeoutIndex(2),
+      _language(LANG_EN) {
 }
 
 void ConfigManager::begin() {
@@ -30,6 +23,7 @@ void ConfigManager::begin() {
     _lastNonZeroVolume = prefs.getInt("last_vol", 80);
     _brightness = prefs.getInt("brightness", 100);
     _sleepTimeoutIndex = prefs.getInt("sleep_idx", 2);
+    int storedLanguage = prefs.getInt("lang", LANG_EN);
     prefs.end();
 
     if (_volume < 0) _volume = 0;
@@ -41,6 +35,9 @@ void ConfigManager::begin() {
     if (_sleepTimeoutIndex < 0 || _sleepTimeoutIndex >= SLEEP_OPTION_COUNT) {
         _sleepTimeoutIndex = 2;
     }
+
+    _language = (storedLanguage >= 0 && storedLanguage < LANG_COUNT) ? (Language)storedLanguage : LANG_EN;
+    I18n::setLanguage(_language);
 
     applyBrightness();
 }
@@ -133,8 +130,19 @@ unsigned long ConfigManager::getSleepTimeoutMs() const {
     return SLEEP_TIMEOUTS_MS[_sleepTimeoutIndex];
 }
 
-const char* ConfigManager::getSleepTimeoutLabel() const {
-    return SLEEP_LABELS[_sleepTimeoutIndex];
+Language ConfigManager::getLanguage() const {
+    return _language;
+}
+
+void ConfigManager::setLanguage(Language lang) {
+    if (lang >= LANG_COUNT) lang = LANG_EN;
+    _language = lang;
+    I18n::setLanguage(lang);
+
+    Preferences prefs;
+    prefs.begin("system_cfg", false);
+    prefs.putInt("lang", _language);
+    prefs.end();
 }
 
 void ConfigManager::resetAllHighscores(const char* const gameNames[], int gameCount) {

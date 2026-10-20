@@ -5,6 +5,11 @@
 #define MY_GREY tft->color565(30, 30, 40)
 const int SPLASH_DURATION_MS = 3500;
 
+// Auto-sleep value labels, indexed like ConfigManager's sleep presets
+static const StrId SLEEP_LABEL_IDS[ConfigManager::SLEEP_OPTION_COUNT] = {
+    STR_VAL_OFF, STR_SLEEP_30S, STR_SLEEP_1M, STR_SLEEP_3M, STR_SLEEP_5M
+};
+
 MenuManager::MenuManager(TFT_eSPI* tft_display, SoundManager* sound_manager, BatteryManager* battery_manager, ConfigManager* config_manager, InputManager* input_manager)
     : tft(tft_display), sound(sound_manager), battery(battery_manager), config(config_manager), input(input_manager) {
     currentState = MENU_STATE_SPLASH;
@@ -140,7 +145,9 @@ void MenuManager::handleSettingsInput() {
         }
     }
     else if (input->isRepeated(BTN_ID_LEFT, 220, 130)) {
-        if (selectedSettingIndex == 0) { // Volume
+        if (selectedSettingIndex == SETTING_LANGUAGE) {
+            cycleLanguage(-1);
+        } else if (selectedSettingIndex == SETTING_VOLUME) {
             int newVol = config->getVolume() - 10;
             if (newVol < 0) newVol = 0;
             sound->setVolume(newVol);
@@ -148,18 +155,20 @@ void MenuManager::handleSettingsInput() {
                 sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             }
             drawSettings();
-        } else if (selectedSettingIndex == 1) { // Brightness
+        } else if (selectedSettingIndex == SETTING_BRIGHTNESS) {
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             config->setBrightness(config->getBrightness() - 10);
             drawSettings();
-        } else if (selectedSettingIndex == 2) { // Auto Sleep
+        } else if (selectedSettingIndex == SETTING_AUTO_SLEEP) {
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             config->setSleepTimeoutIndex(config->getSleepTimeoutIndex() - 1);
             drawSettings();
         }
     }
     else if (input->isRepeated(BTN_ID_RIGHT, 220, 130)) {
-        if (selectedSettingIndex == 0) { // Volume
+        if (selectedSettingIndex == SETTING_LANGUAGE) {
+            cycleLanguage(1);
+        } else if (selectedSettingIndex == SETTING_VOLUME) {
             int newVol = config->getVolume() + 10;
             if (newVol > 100) newVol = 100;
             sound->setVolume(newVol);
@@ -167,11 +176,11 @@ void MenuManager::handleSettingsInput() {
                 sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             }
             drawSettings();
-        } else if (selectedSettingIndex == 1) { // Brightness
+        } else if (selectedSettingIndex == SETTING_BRIGHTNESS) {
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             config->setBrightness(config->getBrightness() + 10);
             drawSettings();
-        } else if (selectedSettingIndex == 2) { // Auto Sleep
+        } else if (selectedSettingIndex == SETTING_AUTO_SLEEP) {
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             config->setSleepTimeoutIndex(config->getSleepTimeoutIndex() + 1);
             drawSettings();
@@ -180,7 +189,9 @@ void MenuManager::handleSettingsInput() {
 
     // Interaction with button A
     if (input->wasPressed(BTN_ID_A)) {
-        if (selectedSettingIndex == 0) { // Quick Mute/Unmute toggle on Volume
+        if (selectedSettingIndex == SETTING_LANGUAGE) {
+            cycleLanguage(1);
+        } else if (selectedSettingIndex == SETTING_VOLUME) { // Quick Mute/Unmute toggle
             config->toggleMute();
             if (config->isMuted()) {
                 sound->stop();
@@ -188,22 +199,29 @@ void MenuManager::handleSettingsInput() {
                 sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             }
             drawSettings();
-        } else if (selectedSettingIndex == 2) { // Cycle Auto Sleep preset
+        } else if (selectedSettingIndex == SETTING_AUTO_SLEEP) { // Cycle preset
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             config->setSleepTimeoutIndex(config->getSleepTimeoutIndex() + 1);
             drawSettings();
-        } else if (selectedSettingIndex == 3) { // Reset Highscores
+        } else if (selectedSettingIndex == SETTING_HIGHSCORES) { // Reset Highscores
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             currentState = MENU_STATE_CONFIRM_RESET;
             input->consumeAll();
             drawConfirmReset();
-        } else if (selectedSettingIndex == 4) { // Credits
+        } else if (selectedSettingIndex == SETTING_CREDITS) {
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             currentState = MENU_STATE_CREDITS;
             input->consumeAll();
             drawSplashScreen();
         }
     }
+}
+
+void MenuManager::cycleLanguage(int direction) {
+    int next = ((int)config->getLanguage() + direction + LANG_COUNT) % LANG_COUNT;
+    config->setLanguage((Language)next);
+    sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+    drawSettings(); // Full redraw: every label switches immediately
 }
 
 void MenuManager::handleConfirmResetInput() {
@@ -241,7 +259,7 @@ void MenuManager::handleCreditsInput() {
 
 void MenuManager::drawSettings() {
     tft->fillScreen(TFT_BLACK);
-    drawTopBar("SETTINGS", TFT_YELLOW);
+    drawTopBar(tr(STR_SETTINGS_TITLE), TFT_YELLOW);
 
     int startY = 55;
     int spacingY = 30;
@@ -271,25 +289,29 @@ void MenuManager::drawSettings() {
         String value;
 
         switch (idx) {
-            case 0:
-                label = "Volume:";
-                value = config->isMuted() ? "[ OFF ]" : ("< " + String(config->getVolume()) + "% >");
+            case SETTING_LANGUAGE:
+                label = tr(STR_SET_LANGUAGE);
+                value = String("< ") + I18n::languageName(config->getLanguage()) + " >"; // i18n-ignore (arrows)
                 break;
-            case 1:
-                label = "Brightness:";
+            case SETTING_VOLUME:
+                label = tr(STR_SET_VOLUME);
+                value = config->isMuted() ? String(tr(STR_VAL_OFF)) : ("< " + String(config->getVolume()) + "% >");
+                break;
+            case SETTING_BRIGHTNESS:
+                label = tr(STR_SET_BRIGHTNESS);
                 value = "< " + String(config->getBrightness()) + "% >";
                 break;
-            case 2:
-                label = "Auto Sleep:";
-                value = config->getSleepTimeoutLabel();
+            case SETTING_AUTO_SLEEP:
+                label = tr(STR_SET_AUTO_SLEEP);
+                value = tr(SLEEP_LABEL_IDS[config->getSleepTimeoutIndex()]);
                 break;
-            case 3:
-                label = "Highscores:";
-                value = "[ RESET ]";
+            case SETTING_HIGHSCORES:
+                label = tr(STR_SET_HIGHSCORES);
+                value = tr(STR_VAL_RESET);
                 break;
-            case 4:
-                label = "Credits:";
-                value = "[ VIEW ]";
+            case SETTING_CREDITS:
+                label = tr(STR_SET_CREDITS);
+                value = tr(STR_VAL_VIEW);
                 break;
         }
 
@@ -303,14 +325,14 @@ void MenuManager::drawSettings() {
         tft->setTextSize(2);
         tft->setTextDatum(ML_DATUM);
         tft->setTextColor(isSelected ? TFT_YELLOW : TFT_WHITE);
-        tft->drawString(label, boxX + 8, y);
+        TextRenderer::draw(tft, label, boxX + 8, y);
 
         tft->setTextDatum(MR_DATUM);
         tft->setTextColor(isSelected ? TFT_YELLOW : TFT_WHITE);
-        tft->drawString(value, boxX + boxW - 8, y);
+        TextRenderer::draw(tft, value, boxX + boxW - 8, y);
     }
 
-    drawBottomBar("[B] Back", TFT_WHITE);
+    drawBottomBar(tr(STR_HINT_BACK), TFT_WHITE);
 }
 
 void MenuManager::drawConfirmReset() {
@@ -320,16 +342,16 @@ void MenuManager::drawConfirmReset() {
     tft->setTextColor(TFT_RED);
     tft->setTextSize(2);
     tft->setTextDatum(MC_DATUM);
-    tft->drawString("RESET HIGHSCORES?", tft->width() / 2, tft->height() / 2 - 15);
+    TextRenderer::draw(tft, tr(STR_RESET_TITLE), tft->width() / 2, tft->height() / 2 - 15);
     
     tft->setTextColor(TFT_WHITE);
     tft->setTextSize(1);
-    tft->drawString("[A] Yes    [B] No", tft->width() / 2, tft->height() / 2 + 15);
+    TextRenderer::draw(tft, tr(STR_HINT_YES_NO), tft->width() / 2, tft->height() / 2 + 15);
 }
 
 void MenuManager::drawMenu() {
     tft->fillScreen(TFT_BLACK);
-    drawTopBar("CHOOSE A GAME", TFT_YELLOW);
+    drawTopBar(tr(STR_CHOOSE_GAME_TITLE), TFT_YELLOW);
     
     int gameY = (tft->height() / 2) - 2;
     
@@ -349,7 +371,7 @@ void MenuManager::drawMenu() {
     
     drawCarouselIndicators();
 
-    drawBottomBar("[SELECT] Settings    [A] Play", TFT_WHITE);
+    drawBottomBar(tr(STR_HINT_MENU), TFT_WHITE);
 }
 
 void MenuManager::drawCarouselIndicators() {
@@ -379,7 +401,7 @@ void MenuManager::drawSplashScreen() {
     tft->setTextDatum(MC_DATUM);
     tft->setTextSize(5);
 
-    String title = "EspBoy";
+    String title = "EspBoy"; // i18n-ignore (brand name)
     uint16_t rainbowColors[] = {TFT_RED, MY_ORANGE, TFT_YELLOW, TFT_GREEN, TFT_BLUE, TFT_PURPLE};
     
     int totalWidth = tft->textWidth(title);
@@ -397,7 +419,7 @@ void MenuManager::drawSplashScreen() {
     tft->setTextDatum(MC_DATUM);
     tft->setTextColor(TFT_CYAN);
     tft->setTextSize(2);
-    tft->drawString("by paixonite", tft->width() / 2, tft->height() / 2 + 30);
+    TextRenderer::draw(tft, tr(STR_SPLASH_BY), tft->width() / 2, tft->height() / 2 + 30);
 }
 
 void MenuManager::updateBatteryDisplay() {
@@ -451,7 +473,7 @@ void MenuManager::drawTopBar(const String& title, uint16_t color) {
     tft->setTextDatum(MC_DATUM);
     tft->setTextColor(color);
     tft->setTextSize(2);
-    tft->drawString(title, tft->width() / 2, BAR_HEIGHT / 2);
+    TextRenderer::draw(tft, title, tft->width() / 2, BAR_HEIGHT / 2);
     updateBatteryDisplay();
 }
 
@@ -460,5 +482,5 @@ void MenuManager::drawBottomBar(const String& text, uint16_t color) {
     tft->setTextDatum(MC_DATUM);
     tft->setTextColor(color);
     tft->setTextSize(1);
-    tft->drawString(text, tft->width() / 2, tft->height() - (BAR_HEIGHT / 2));
+    TextRenderer::draw(tft, text, tft->width() / 2, tft->height() - (BAR_HEIGHT / 2));
 }

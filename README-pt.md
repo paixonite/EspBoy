@@ -30,6 +30,7 @@ O software do EspBoy foi projetado para ser modular, escalável e responsivo:
 - **Renderização por Diferença (Delta/Zero-Flicker):** Pipeline gráfico otimizado para barramento SPI/paralelo que calcula apenas o que mudou entre os quadros, apagando e redesenhando estritamente os pixels em movimento para eliminar cintilações.
 - **Sistema de Recordes Persistente:** Memória Flash integrada (Preferences/NVS) que salva o Top 3 de cada jogo, incluindo tela clássica estilo arcade para inserir 3 iniciais.
 - **Configurações de Som Permanentes:** O estado de mudo persiste entre reinicializações, evitando o buzzer alto na inicialização.
+- **Interface Multilíngue:** Inglês (padrão) e Português do Brasil, selecionáveis nas Configurações. Todo texto da tela fica em uma única tabela (`i18n_strings.h`), e as letras acentuadas são desenhadas sobre a fonte pixelada retrô pelo `TextRenderer`.
 - **Menu de Configurações Dinâmico:** Interface no console para ajuste de volume, brilho da tela e reset de recordes.
 - **Áudio Não-Bloqueante:** Fila de som baseada em máquina de estados por contagem de milissegundos, sem congelar a física ou lógica dos jogos.
 - **Controles Responsivos (`InputManager`):** Gerenciador centralizado de entradas com detecção de borda de latência zero, qualificação de soltura contra cliques duplos (debounce), repetição automática (DAS/ARR) e bloqueio de vazamento entre telas.
@@ -51,6 +52,10 @@ EspBoy/
 |-- MenuManager.h/.cpp    # Gerencia Splash Screen, Carrossel de Jogos e Configurações
 |-- BatteryManager.h/.cpp # Lógica matemática e ADC para leitura da bateria
 |-- ConfigManager.h/.cpp  # Persistência centralizada de configurações na NVS
+|-- Localization.h/.cpp   # Seleção de idioma e busca de textos (tr()).
+|-- i18n_strings.h        # Tabela única com todos os textos em todos os idiomas.
+|-- TextRenderer.h/.cpp   # Desenho de texto UTF-8 com acentos na fonte pixelada.
+|-- Utf8Text.h/.cpp       # Funções puras de UTF-8 / decomposição de acentos.
 |
 |-- [ Motor de Jogos ]
 |-- Game.h/.cpp           # Classe base abstrata com ciclo de vida (Template Method)

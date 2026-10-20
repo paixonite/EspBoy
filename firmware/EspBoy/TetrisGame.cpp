@@ -537,21 +537,21 @@ void TetrisGame::drawStaticLayout() {
     tft->drawRect(LEFT_PANEL_X, 5, PANEL_W, 52, TFT_WHITE);
     tft->drawFastHLine(LEFT_PANEL_X, 19, PANEL_W, TFT_WHITE);
     tft->setTextColor(TFT_YELLOW, TFT_BLACK);
-    tft->drawString("HOLD", LEFT_PANEL_X + PANEL_W / 2, 13);
+    TextRenderer::draw(tft, tr(STR_TETRIS_HOLD), LEFT_PANEL_X + PANEL_W / 2, 13);
 
     // 2. LEVEL Box (y = 64..110)
     tft->fillRect(LEFT_PANEL_X, 64, PANEL_W, 47, TFT_BLACK);
     tft->drawRect(LEFT_PANEL_X, 64, PANEL_W, 47, TFT_WHITE);
     tft->drawFastHLine(LEFT_PANEL_X, 78, PANEL_W, TFT_WHITE);
     tft->setTextColor(TFT_YELLOW, TFT_BLACK);
-    tft->drawString("LEVEL", LEFT_PANEL_X + PANEL_W / 2, 72);
+    TextRenderer::draw(tft, tr(STR_TETRIS_LEVEL), LEFT_PANEL_X + PANEL_W / 2, 72);
 
     // 3. SCORE Box (y = 118..164)
     tft->fillRect(LEFT_PANEL_X, 118, PANEL_W, 47, TFT_BLACK);
     tft->drawRect(LEFT_PANEL_X, 118, PANEL_W, 47, TFT_WHITE);
     tft->drawFastHLine(LEFT_PANEL_X, 132, PANEL_W, TFT_WHITE);
     tft->setTextColor(TFT_YELLOW, TFT_BLACK);
-    tft->drawString("SCORE", LEFT_PANEL_X + PANEL_W / 2, 126);
+    TextRenderer::draw(tft, tr(STR_TETRIS_SCORE), LEFT_PANEL_X + PANEL_W / 2, 126);
 
     // --- RIGHT PANEL: NEXT & CONTROLS ---
     // 1. NEXT Box (y = 5..56)
@@ -559,19 +559,19 @@ void TetrisGame::drawStaticLayout() {
     tft->drawRect(RIGHT_PANEL_X, 5, PANEL_W, 52, TFT_WHITE);
     tft->drawFastHLine(RIGHT_PANEL_X, 19, PANEL_W, TFT_WHITE);
     tft->setTextColor(TFT_YELLOW, TFT_BLACK);
-    tft->drawString("NEXT", RIGHT_PANEL_X + PANEL_W / 2, 13);
+    TextRenderer::draw(tft, tr(STR_TETRIS_NEXT), RIGHT_PANEL_X + PANEL_W / 2, 13);
 
     // 2. CONTROLS Box (y = 64..164)
     tft->fillRect(RIGHT_PANEL_X, 64, PANEL_W, 101, TFT_BLACK);
     tft->drawRect(RIGHT_PANEL_X, 64, PANEL_W, 101, TFT_WHITE);
     tft->drawFastHLine(RIGHT_PANEL_X, 78, PANEL_W, TFT_WHITE);
     tft->setTextColor(TFT_YELLOW, TFT_BLACK);
-    tft->drawString("CONTROLS", RIGHT_PANEL_X + PANEL_W / 2, 72);
+    TextRenderer::draw(tft, tr(STR_TETRIS_CONTROLS), RIGHT_PANEL_X + PANEL_W / 2, 72);
 
     tft->setTextColor(TFT_WHITE, TFT_BLACK);
-    tft->drawString("[A/B] Rotate",   RIGHT_PANEL_X + PANEL_W / 2, 96);
-    tft->drawString("[UP] Hard Drop", RIGHT_PANEL_X + PANEL_W / 2, 120);
-    tft->drawString("[SELECT] Hold",  RIGHT_PANEL_X + PANEL_W / 2, 144);
+    TextRenderer::draw(tft, tr(STR_TETRIS_ROTATE), RIGHT_PANEL_X + PANEL_W / 2, 96);
+    TextRenderer::draw(tft, tr(STR_TETRIS_HARD_DROP), RIGHT_PANEL_X + PANEL_W / 2, 120);
+    TextRenderer::draw(tft, tr(STR_TETRIS_HOLD_HINT), RIGHT_PANEL_X + PANEL_W / 2, 144);
 }
 
 void TetrisGame::drawHUDUpdates() {

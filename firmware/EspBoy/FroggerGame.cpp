@@ -316,7 +316,7 @@ void FroggerGame::drawHUD() {
     tft->setTextColor(TFT_YELLOW, TFT_BLACK);
     tft->setTextSize(1);
     tft->setTextDatum(MC_DATUM);
-    tft->drawString("Score: " + String(score), DISPLAY_WIDTH / 2, HUD_HEIGHT / 2);
+    TextRenderer::draw(tft, I18n::fmt(STR_SCORE_FMT, score), DISPLAY_WIDTH / 2, HUD_HEIGHT / 2);
 }
 
 void FroggerGame::drawPlaying() {

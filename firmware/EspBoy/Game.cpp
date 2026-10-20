@@ -5,7 +5,7 @@
 char Game::lastInitials[3] = {'A', 'A', 'A'};
 
 // Pause popup layout (centered on the 320x170 landscape canvas)
-static const char* const PAUSE_OPTIONS[] = {"Resume", "Quit"};
+static const StrId PAUSE_OPTIONS[] = {STR_RESUME, STR_QUIT};
 static const int PAUSE_OPTION_COUNT   = sizeof(PAUSE_OPTIONS) / sizeof(PAUSE_OPTIONS[0]);
 static const int PAUSE_OPTION_RESUME  = 0;
 static const int PAUSE_OPTION_QUIT    = 1;
@@ -122,7 +122,7 @@ void Game::drawPauseScreen() {
     tft->setTextDatum(MC_DATUM);
     tft->setTextColor(TFT_YELLOW);
     tft->setTextSize(3);
-    tft->drawString("PAUSED", tft->width() / 2, boxY + PAUSE_TITLE_OFFSET_Y);
+    TextRenderer::draw(tft, tr(STR_PAUSED), tft->width() / 2, boxY + PAUSE_TITLE_OFFSET_Y);
 
     drawPauseOptions();
 }
@@ -147,7 +147,7 @@ void Game::drawPauseOptions() {
         }
 
         tft->setTextColor(selected ? TFT_YELLOW : TFT_WHITE);
-        tft->drawString(PAUSE_OPTIONS[i], tft->width() / 2, centerY);
+        TextRenderer::draw(tft, tr(PAUSE_OPTIONS[i]), tft->width() / 2, centerY);
     }
 }
 
@@ -200,9 +200,9 @@ void Game::drawTitleScreen() {
     tft->setTextDatum(MC_DATUM);
     tft->setTextColor(TFT_WHITE);
     tft->setTextSize(3);
-    tft->drawString("[A] Play", tft->width() / 2, tft->height() / 2);
+    TextRenderer::draw(tft, tr(STR_PLAY), tft->width() / 2, tft->height() / 2);
 
-    drawBottomBar("[SELECT] Highscores    [B] Back", TFT_WHITE);
+    drawBottomBar(tr(STR_HINT_TITLE), TFT_WHITE);
 }
 
 void Game::handleInputTitle() {
@@ -221,17 +221,22 @@ void Game::handleInputTitle() {
 }
 
 void Game::drawGameOverScreen() {
-    tft->fillRect(tft->width() / 2 - 90, tft->height() / 2 - 40, 175, 80, TFT_BLACK);
-    tft->drawRect(tft->width() / 2 - 90, tft->height() / 2 - 40, 175, 80, TFT_WHITE);
+    // The box grows with the translated title (text size 3); stays 175 px wide in English
+    tft->setTextSize(3);
+    const char* title = tr(STR_GAME_OVER);
+    int boxW = max(175, TextRenderer::width(tft, title) + 20);
+    int boxX = tft->width() / 2 - 90 - (boxW - 175) / 2;
+
+    tft->fillRect(boxX, tft->height() / 2 - 40, boxW, 80, TFT_BLACK);
+    tft->drawRect(boxX, tft->height() / 2 - 40, boxW, 80, TFT_WHITE);
     
     tft->setTextColor(TFT_RED);
-    tft->setTextSize(3);
     tft->setTextDatum(MC_DATUM);
-    tft->drawString("GAME OVER", tft->width() / 2, tft->height() / 2 - 10);
+    TextRenderer::draw(tft, title, tft->width() / 2, tft->height() / 2 - 10);
     
     tft->setTextColor(TFT_WHITE);
     tft->setTextSize(2);
-    tft->drawString("Score: " + String(score), tft->width() / 2, tft->height() / 2 + 20);
+    TextRenderer::draw(tft, I18n::fmt(STR_SCORE_FMT, score), tft->width() / 2, tft->height() / 2 + 20);
 }
 
 void Game::handleGameOverState() {
@@ -296,7 +301,7 @@ void Game::saveHighscores() {
 
 void Game::drawHighscoreViewScreen() {
     tft->fillScreen(TFT_BLACK);
-    drawTopBar("HIGHSCORES", TFT_YELLOW);
+    drawTopBar(tr(STR_HIGHSCORES_TITLE), TFT_YELLOW);
 
     tft->setTextSize(2);
     int startY = 55;
@@ -312,7 +317,7 @@ void Game::drawHighscoreViewScreen() {
         tft->drawString(String(topScores[i]), tft->width() - 40, y);
     }
 
-    drawBottomBar("[B] Back", TFT_WHITE);
+    drawBottomBar(tr(STR_HINT_BACK), TFT_WHITE);
 }
 
 void Game::handleHighscoreViewInput() {
@@ -328,14 +333,14 @@ void Game::handleHighscoreViewInput() {
 
 void Game::drawHighscoreEntryScreen() {
     tft->fillScreen(TFT_BLACK);
-    drawTopBar("NEW TOP SCORE!", TFT_GREEN);
+    drawTopBar(tr(STR_NEW_TOP_SCORE), TFT_GREEN);
     
     tft->setTextDatum(MC_DATUM);
     tft->setTextColor(TFT_WHITE);
     tft->setTextSize(2);
-    tft->drawString("Score: " + String(score), tft->width() / 2, 52);
+    TextRenderer::draw(tft, I18n::fmt(STR_SCORE_FMT, score), tft->width() / 2, 52);
 
-    drawBottomBar("[A] Confirm", TFT_WHITE);
+    drawBottomBar(tr(STR_HINT_CONFIRM), TFT_WHITE);
 
     drawInitials();
 }
@@ -418,7 +423,7 @@ void Game::drawTopBar(const String& title, uint16_t color) {
     tft->setTextDatum(MC_DATUM);
     tft->setTextColor(color);
     tft->setTextSize(2);
-    tft->drawString(title, tft->width() / 2, BAR_HEIGHT / 2);
+    TextRenderer::draw(tft, title, tft->width() / 2, BAR_HEIGHT / 2);
 }
 
 void Game::drawBottomBar(const String& text, uint16_t color) {
@@ -426,5 +431,5 @@ void Game::drawBottomBar(const String& text, uint16_t color) {
     tft->setTextDatum(MC_DATUM);
     tft->setTextColor(color);
     tft->setTextSize(1);
-    tft->drawString(text, tft->width() / 2, tft->height() - (BAR_HEIGHT / 2));
+    TextRenderer::draw(tft, text, tft->width() / 2, tft->height() - (BAR_HEIGHT / 2));
 }

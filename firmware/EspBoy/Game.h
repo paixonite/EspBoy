@@ -5,6 +5,8 @@
 #include <Preferences.h>
 #include "SoundManager.h"
 #include "InputManager.h"
+#include "Localization.h"
+#include "TextRenderer.h"
 #include "pins.h"
 
 enum GameState { 
