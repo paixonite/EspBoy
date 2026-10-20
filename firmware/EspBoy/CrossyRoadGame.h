@@ -26,6 +26,7 @@ protected:
     void drawPlaying() override;
     void handleInputPlaying() override;
     void onResume() override;
+    void drawTutorialContent() override;
 
 private:
     // Display & Grid Geometry (320 x 170)

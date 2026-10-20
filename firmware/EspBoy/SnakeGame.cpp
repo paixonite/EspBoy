@@ -47,6 +47,17 @@ void SnakeGame::onResume() {
     fullRedrawRequired = true;
 }
 
+void SnakeGame::drawTutorialContent() {
+    drawTutorialHeader(tr(STR_TUT_SEC_CONTROLS), 39);
+    drawTutorialLine(tr(STR_SN_TUT_C1), 52);
+
+    drawTutorialHeader(tr(STR_TUT_SEC_OBJECTIVE), 70);
+    drawTutorialLine(tr(STR_SN_TUT_O1), 83);
+    drawTutorialLine(tr(STR_SN_TUT_O2), 96);
+    drawTutorialLine(tr(STR_SN_TUT_O3), 109);
+    drawTutorialLine(tr(STR_SN_TUT_O4), 122);
+}
+
 void SnakeGame::updatePlaying() {
     now = gameMillis();
     if (now - lastUpdate < SPEED) return;

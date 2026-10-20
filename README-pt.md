@@ -29,6 +29,7 @@ O software do EspBoy foi projetado para ser modular, escalável e responsivo:
 - **Jogos Inclusos:** Clássicos **Crossy Road**, **Flappy Bird**, **Frogger**, **Genius**, **Snake** e **Tetris** rodando a ~60 FPS com alta fluidez.
 - **Renderização por Diferença (Delta/Zero-Flicker):** Pipeline gráfico otimizado para barramento SPI/paralelo que calcula apenas o que mudou entre os quadros, apagando e redesenhando estritamente os pixels em movimento para eliminar cintilações.
 - **Sistema de Recordes Persistente:** Memória Flash integrada (Preferences/NVS) que salva o Top 3 de cada jogo, incluindo tela clássica estilo arcade para inserir 3 iniciais.
+- **Tutoriais Integrados:** Todos os jogos contam com uma tela dedicada de tutorial acessível a partir do menu inicial em carrossel vertical de 3 opções (Jogar, Tutorial, Recordes), explicando controles e objetivos em inglês e português.
 - **Configurações de Som Permanentes:** O estado de mudo persiste entre reinicializações, evitando o buzzer alto na inicialização.
 - **Interface Multilíngue:** Inglês (padrão) e Português do Brasil, selecionáveis nas Configurações. Todo texto da tela fica em uma única tabela (`i18n_strings.h`), e as letras acentuadas são desenhadas sobre a fonte pixelada retrô pelo `TextRenderer`.
 - **Menu de Configurações Dinâmico:** Interface no console para ajuste de volume, brilho da tela e reset de recordes.

@@ -19,6 +19,7 @@ protected:
     void drawPlaying() override;
     void handleInputPlaying() override;
     void onResume() override;
+    void drawTutorialContent() override;
 
 private:
     static constexpr int DISPLAY_WIDTH = 320;

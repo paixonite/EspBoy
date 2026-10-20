@@ -135,6 +135,18 @@ void GeniusGame::onResume() {
     fullRedrawRequired = true;
 }
 
+void GeniusGame::drawTutorialContent() {
+    drawTutorialHeader(tr(STR_TUT_SEC_CONTROLS), 37);
+    drawTutorialLine(tr(STR_GN_TUT_C1), 49);
+    drawTutorialLine(tr(STR_GN_TUT_C2), 61);
+
+    drawTutorialHeader(tr(STR_TUT_SEC_OBJECTIVE), 77);
+    drawTutorialLine(tr(STR_GN_TUT_O1), 89);
+    drawTutorialLine(tr(STR_GN_TUT_O2), 101);
+    drawTutorialLine(tr(STR_GN_TUT_O3), 113);
+    drawTutorialLine(tr(STR_GN_TUT_O4), 125);
+}
+
 void GeniusGame::updatePlaying() {
     unsigned long now = gameMillis();
 

@@ -14,6 +14,7 @@ protected:
     void drawPlaying() override;
     void handleInputPlaying() override;
     void onResume() override;
+    void drawTutorialContent() override;
 
 private:
     struct Pipe {

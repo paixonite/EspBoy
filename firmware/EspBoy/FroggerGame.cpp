@@ -127,6 +127,18 @@ void FroggerGame::onResume() {
     fullRedrawRequired = true;
 }
 
+void FroggerGame::drawTutorialContent() {
+    drawTutorialHeader(tr(STR_TUT_SEC_CONTROLS), 37);
+    drawTutorialLine(tr(STR_FR_TUT_C1), 49);
+    drawTutorialLine(tr(STR_FR_TUT_C2), 61);
+
+    drawTutorialHeader(tr(STR_TUT_SEC_OBJECTIVE), 77);
+    drawTutorialLine(tr(STR_FR_TUT_O1), 89);
+    drawTutorialLine(tr(STR_FR_TUT_O2), 101);
+    drawTutorialLine(tr(STR_FR_TUT_O3), 113);
+    drawTutorialLine(tr(STR_FR_TUT_O4), 125);
+}
+
 void FroggerGame::updateTurtleDiveStates() {
     float mult = getSpeedMultiplier();
     unsigned long surfacedLen = (unsigned long)(3000.0f / mult);

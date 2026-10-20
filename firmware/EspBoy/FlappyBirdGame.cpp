@@ -49,6 +49,17 @@ void FlappyBirdGame::onResume() {
     fullRedrawRequired = true;
 }
 
+void FlappyBirdGame::drawTutorialContent() {
+    drawTutorialHeader(tr(STR_TUT_SEC_CONTROLS), 39);
+    drawTutorialLine(tr(STR_FB_TUT_C1), 52);
+
+    drawTutorialHeader(tr(STR_TUT_SEC_OBJECTIVE), 70);
+    drawTutorialLine(tr(STR_FB_TUT_O1), 83);
+    drawTutorialLine(tr(STR_FB_TUT_O2), 96);
+    drawTutorialLine(tr(STR_FB_TUT_O3), 109);
+    drawTutorialLine(tr(STR_FB_TUT_O4), 122);
+}
+
 void FlappyBirdGame::updatePlaying() {
     player_vel_y += GRAVITY;
     player_y += player_vel_y;

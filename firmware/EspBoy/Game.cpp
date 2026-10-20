@@ -18,11 +18,25 @@ static const int PAUSE_OPT_SPACING    = 26;
 static const int PAUSE_OPT_W          = 110;
 static const int PAUSE_OPT_H          = 22;
 
+// Title menu vertical carousel layout
+static const StrId TITLE_OPTIONS[] = {STR_OPT_PLAY, STR_OPT_TUTORIAL, STR_OPT_HIGHSCORES};
+static const int TITLE_OPTION_COUNT      = sizeof(TITLE_OPTIONS) / sizeof(TITLE_OPTIONS[0]);
+static const int TITLE_OPTION_PLAY       = 0;
+static const int TITLE_OPTION_TUTORIAL   = 1;
+static const int TITLE_OPTION_HIGHSCORES = 2;
+
+static const int TITLE_OPT_W          = 160;
+static const int TITLE_OPT_H          = 24;
+static const int TITLE_FIRST_OPT_Y    = 55;
+static const int TITLE_OPT_SPACING    = 30;
+
 Game::Game(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager, const String& game_name)
     : tft(tft_display), sound(sound_manager), input(input_manager), gameName(game_name) {
     _exit_request = false;
     score = 0;
     currentState = STATE_TITLE;
+
+    titleSelection = TITLE_OPTION_PLAY;
 
     pauseStartTime = 0;
     pausedTotalMs = 0;
@@ -39,6 +53,7 @@ void Game::setup() {
     // Load highscores (or placeholders if flash is empty) BEFORE starting the game
     loadHighscores();
     resetGame();
+    titleSelection = TITLE_OPTION_PLAY;
     changeState(STATE_TITLE);
 }
 
@@ -52,6 +67,10 @@ void Game::loop() {
             
         case STATE_HIGHSCORE_VIEW:
             handleHighscoreViewInput();
+            break;
+
+        case STATE_TUTORIAL:
+            handleTutorialInput();
             break;
 
         case STATE_PLAYING:
@@ -86,11 +105,15 @@ void Game::changeState(GameState newState) {
     stateTimer = millis();
     input->consumeAll();
 
-    if (newState == STATE_TITLE) drawTitleScreen();
+    if (newState == STATE_TITLE) {
+        titleSelection = TITLE_OPTION_PLAY;
+        drawTitleScreen();
+    }
     else if (newState == STATE_PAUSED) drawPauseScreen();
     else if (newState == STATE_GAME_OVER) drawGameOverScreen();
     else if (newState == STATE_HIGHSCORE_VIEW) drawHighscoreViewScreen();
     else if (newState == STATE_HIGHSCORE_ENTRY) drawHighscoreEntryScreen();
+    else if (newState == STATE_TUTORIAL) drawTutorialScreen();
 }
 
 unsigned long Game::gameMillis() const {
@@ -196,27 +219,73 @@ void Game::resumeFromPause() {
 void Game::drawTitleScreen() {
     tft->fillScreen(TFT_BLACK);
     drawTopBar(gameName, TFT_YELLOW);
-    
-    tft->setTextDatum(MC_DATUM);
-    tft->setTextColor(TFT_WHITE);
-    tft->setTextSize(3);
-    TextRenderer::draw(tft, tr(STR_PLAY), tft->width() / 2, tft->height() / 2);
-
+    drawTitleOptions();
     drawBottomBar(tr(STR_HINT_TITLE), TFT_WHITE);
 }
 
+void Game::drawTitleOptions() {
+    int optX = (tft->width() - TITLE_OPT_W) / 2;
+
+    tft->setTextDatum(MC_DATUM);
+    tft->setTextSize(2);
+
+    for (int i = 0; i < TITLE_OPTION_COUNT; i++) {
+        int centerY = TITLE_FIRST_OPT_Y + (i * TITLE_OPT_SPACING);
+        int optY = centerY - (TITLE_OPT_H / 2);
+        bool selected = (i == titleSelection);
+
+        // Highlight language matching Settings rows and pause menu: double-thick yellow outline
+        tft->fillRect(optX, optY, TITLE_OPT_W, TITLE_OPT_H, TFT_BLACK);
+        if (selected) {
+            tft->drawRoundRect(optX, optY, TITLE_OPT_W, TITLE_OPT_H, 4, TFT_YELLOW);
+            tft->drawRoundRect(optX + 1, optY + 1, TITLE_OPT_W - 2, TITLE_OPT_H - 2, 3, TFT_YELLOW);
+        }
+
+        tft->setTextColor(selected ? TFT_YELLOW : TFT_WHITE);
+        TextRenderer::draw(tft, tr(TITLE_OPTIONS[i]), tft->width() / 2, centerY);
+    }
+}
+
 void Game::handleInputTitle() {
-    if (input->wasPressed(BTN_ID_A)) {
-        changeState(STATE_PLAYING);
-        tft->fillScreen(TFT_BLACK); 
-    } 
-    else if (input->wasPressed(BTN_ID_SELECT)) {
+    if (input->isRepeated(BTN_ID_UP, 220, 130) && titleSelection > 0) {
+        titleSelection--;
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-        changeState(STATE_HIGHSCORE_VIEW);
+        drawTitleOptions();
+    }
+    else if (input->isRepeated(BTN_ID_DOWN, 220, 130) && titleSelection < TITLE_OPTION_COUNT - 1) {
+        titleSelection++;
+        sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+        drawTitleOptions();
+    }
+    else if (input->wasPressed(BTN_ID_A)) {
+        if (titleSelection == TITLE_OPTION_PLAY) {
+            changeState(STATE_PLAYING);
+            tft->fillScreen(TFT_BLACK); 
+        } else if (titleSelection == TITLE_OPTION_TUTORIAL) {
+            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            changeState(STATE_TUTORIAL);
+        } else if (titleSelection == TITLE_OPTION_HIGHSCORES) {
+            sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+            changeState(STATE_HIGHSCORE_VIEW);
+        }
     }
     else if (input->wasPressed(BTN_ID_B)) {
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
         _exit_request = true;
+    }
+}
+
+void Game::drawTutorialScreen() {
+    tft->fillScreen(TFT_BLACK);
+    drawTopBar(tr(STR_TUTORIAL_TITLE), TFT_YELLOW);
+    drawTutorialContent();
+    drawBottomBar(tr(STR_HINT_BACK), TFT_WHITE);
+}
+
+void Game::handleTutorialInput() {
+    if (input->wasPressed(BTN_ID_B)) {
+        sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+        changeState(STATE_TITLE);
     }
 }
 
@@ -432,4 +501,18 @@ void Game::drawBottomBar(const String& text, uint16_t color) {
     tft->setTextColor(color);
     tft->setTextSize(1);
     TextRenderer::draw(tft, text, tft->width() / 2, tft->height() - (BAR_HEIGHT / 2));
+}
+
+void Game::drawTutorialHeader(const char* title, int y) {
+    tft->setTextDatum(TL_DATUM);
+    tft->setTextColor(TFT_YELLOW);
+    tft->setTextSize(1);
+    TextRenderer::draw(tft, title, 16, y);
+}
+
+void Game::drawTutorialLine(const char* text, int y, uint16_t color) {
+    tft->setTextDatum(TL_DATUM);
+    tft->setTextColor(color);
+    tft->setTextSize(1);
+    TextRenderer::draw(tft, text, 20, y);
 }

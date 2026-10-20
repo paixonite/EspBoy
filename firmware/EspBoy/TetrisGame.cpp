@@ -328,6 +328,20 @@ void TetrisGame::onResume() {
     fullRedrawRequired = true;
 }
 
+void TetrisGame::drawTutorialContent() {
+    drawTutorialHeader(tr(STR_TUT_SEC_CONTROLS), 34);
+    drawTutorialLine(tr(STR_TT_TUT_C1), 44);
+    drawTutorialLine(tr(STR_TT_TUT_C2), 54);
+    drawTutorialLine(tr(STR_TT_TUT_C3), 64);
+    drawTutorialLine(tr(STR_TT_TUT_C4), 74);
+
+    drawTutorialHeader(tr(STR_TUT_SEC_OBJECTIVE), 88);
+    drawTutorialLine(tr(STR_TT_TUT_O1), 98);
+    drawTutorialLine(tr(STR_TT_TUT_O2), 108);
+    drawTutorialLine(tr(STR_TT_TUT_O3), 118);
+    drawTutorialLine(tr(STR_TT_TUT_O4), 128);
+}
+
 void TetrisGame::lockPiece() {
     for (int i = 0; i < 4; i++) {
         int c = activeX + TETROMINOES[activeType][activeRot][i][0];

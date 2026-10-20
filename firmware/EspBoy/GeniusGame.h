@@ -22,6 +22,7 @@ protected:
     void drawPlaying() override;
     void handleInputPlaying() override;
     void onResume() override;
+    void drawTutorialContent() override;
 
 private:
     // Display & HUD Geometry (320 x 170 landscape)

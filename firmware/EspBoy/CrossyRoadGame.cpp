@@ -227,6 +227,18 @@ void CrossyRoadGame::onResume() {
     fullRedrawRequired = true;
 }
 
+void CrossyRoadGame::drawTutorialContent() {
+    drawTutorialHeader(tr(STR_TUT_SEC_CONTROLS), 37);
+    drawTutorialLine(tr(STR_CR_TUT_C1), 49);
+    drawTutorialLine(tr(STR_CR_TUT_C2), 61);
+
+    drawTutorialHeader(tr(STR_TUT_SEC_OBJECTIVE), 77);
+    drawTutorialLine(tr(STR_CR_TUT_O1), 89);
+    drawTutorialLine(tr(STR_CR_TUT_O2), 101);
+    drawTutorialLine(tr(STR_CR_TUT_O3), 113);
+    drawTutorialLine(tr(STR_CR_TUT_O4), 125);
+}
+
 void CrossyRoadGame::handleInputPlaying() {
     int dRow = 0;
     int dCol = 0;

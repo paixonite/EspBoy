@@ -15,7 +15,8 @@ enum GameState {
     STATE_PAUSED,
     STATE_GAME_OVER, 
     STATE_HIGHSCORE_VIEW, 
-    STATE_HIGHSCORE_ENTRY 
+    STATE_HIGHSCORE_ENTRY,
+    STATE_TUTORIAL
 };
 
 class Game {
@@ -56,9 +57,13 @@ protected:
     unsigned long gameMillis() const;
 
     virtual void drawTitleScreen();
-    virtual void drawGameOverScreen();
+    virtual void drawTitleOptions();
     virtual void handleInputTitle();
+    virtual void drawGameOverScreen();
     virtual void handleGameOverState();
+    virtual void drawTutorialScreen();
+    virtual void drawTutorialContent() = 0;
+    virtual void handleTutorialInput();
 
     void changeState(GameState newState);
     void checkPauseButton(); 
@@ -86,6 +91,10 @@ protected:
     void drawBottomBar(const String& text, uint16_t color = TFT_WHITE);
     static const int BAR_HEIGHT = 25;
 
+    // --- Tutorial Helpers ---
+    void drawTutorialHeader(const char* title, int y);
+    void drawTutorialLine(const char* text, int y, uint16_t color = TFT_WHITE);
+
 private:
     Preferences preferences;
     int topScores[3];
@@ -96,6 +105,9 @@ private:
     int currentInitialIndex;
     
     static char lastInitials[3]; 
+
+    // Title menu bookkeeping
+    int titleSelection;
 
     // Pause bookkeeping
     unsigned long pauseStartTime; // millis() when the current pause began

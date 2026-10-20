@@ -36,13 +36,61 @@
   X(STR_PAUSED,             9, "PAUSED",                        "PAUSADO") \
   X(STR_RESUME,             8, "Resume",                        "Retomar") \
   X(STR_QUIT,               8, "Quit",                          "Sair") \
-  X(STR_PLAY,              15, "[A] Play",                      "[A] Jogar") \
-  X(STR_HINT_TITLE,        50, "[SELECT] Highscores    [B] Back", "[SELECT] Recordes    [B] Voltar") \
+  X(STR_OPT_PLAY,          11, "Play",                          "Jogar") \
+  X(STR_OPT_TUTORIAL,      11, "Tutorial",                      "Tutorial") \
+  X(STR_OPT_HIGHSCORES,    11, "Highscores",                    "Recordes") \
+  X(STR_HINT_TITLE,        50, "[A] Select    [B] Back",        "[A] Selecionar    [B] Voltar") \
   X(STR_GAME_OVER,         15, "GAME OVER",                     "FIM DE JOGO") \
   X(STR_SCORE_FMT,         13, "Score: %d",                     "Pontos: %d") \
   X(STR_HIGHSCORES_TITLE,  24, "HIGHSCORES",                    "RECORDES") \
   X(STR_NEW_TOP_SCORE,     24, "NEW TOP SCORE!",                "NOVO RECORDE!") \
   X(STR_HINT_CONFIRM,      50, "[A] Confirm",                   "[A] Confirmar") \
+  /* --- Tutorial Shared --- */ \
+  X(STR_TUTORIAL_TITLE,    15, "TUTORIAL",                      "TUTORIAL") \
+  X(STR_TUT_SEC_CONTROLS,  12, "CONTROLS",                      "CONTROLES") \
+  X(STR_TUT_SEC_OBJECTIVE, 12, "OBJECTIVE",                     "OBJETIVO") \
+  /* --- Crossy Road Tutorial --- */ \
+  X(STR_CR_TUT_C1,         30, "D-Pad : Move / Hop",            "D-Pad : Mover / Pular") \
+  X(STR_CR_TUT_C2,         30, "[A]   : Hop forward",           "[A]   : Pular para frente") \
+  X(STR_CR_TUT_O1,         48, "Cross roads, rivers, and train tracks.", "Atravesse ruas, rios e trilhos de trem.") \
+  X(STR_CR_TUT_O2,         48, "Hop on logs to cross rivers. Don't drown!", "Pule nos troncos no rio. Não se afogue!") \
+  X(STR_CR_TUT_O3,         48, "Watch for fast cars and red train lights.", "Cuidado com carros e sinais de trem.") \
+  X(STR_CR_TUT_O4,         48, "Go as far as you can to score high!", "Avance o mais longe que conseguir!") \
+  /* --- Flappy Bird Tutorial --- */ \
+  X(STR_FB_TUT_C1,         40, "[A] : Flap wings / Gain altitude", "[A] : Bater asas / Ganhar altura") \
+  X(STR_FB_TUT_O1,         48, "Tap [A] to keep the bird in the air.", "Toque [A] para manter o pássaro no ar.") \
+  X(STR_FB_TUT_O2,         48, "Fly safely through gaps between pipes.", "Voe pelos vãos entre os canos verdes.") \
+  X(STR_FB_TUT_O3,         48, "Avoid touching pipes, ceiling, or ground!", "Não toque nos canos, teto ou chão!") \
+  X(STR_FB_TUT_O4,         48, "Each pipe cleared awards 1 point.", "Cada cano superado vale 1 ponto.") \
+  /* --- Frogger Tutorial --- */ \
+  X(STR_FR_TUT_C1,         35, "D-Pad : Hop in 4 directions",   "D-Pad : Pular em 4 direções") \
+  X(STR_FR_TUT_C2,         30, "[A]   : Hop forward",           "[A]   : Pular para frente") \
+  X(STR_FR_TUT_O1,         48, "Dodge highway traffic to reach the river.", "Desvie dos carros até chegar ao rio.") \
+  X(STR_FR_TUT_O2,         48, "Ride logs and turtles to cross safely.", "Suba em troncos e tartarugas no rio.") \
+  X(STR_FR_TUT_O3,         48, "Beware: turtles dive when turning red!", "Atenção: tartarugas vermelhas afundam!") \
+  X(STR_FR_TUT_O4,         48, "Fill all 5 home bays to win the round!", "Preencha os 5 abrigos para pontuar!") \
+  /* --- Genius Tutorial --- */ \
+  X(STR_GN_TUT_C1,         40, "[UP] Green      [RIGHT] Red",   "[UP] Verde      [RIGHT] Vermelho") \
+  X(STR_GN_TUT_C2,         40, "[DOWN] Yellow   [LEFT] Blue",   "[DOWN] Amarelo  [LEFT] Azul") \
+  X(STR_GN_TUT_O1,         48, "Watch and listen to the color pattern.", "Observe e ouça a sequência de cores.") \
+  X(STR_GN_TUT_O2,         48, "Repeat the sequence using the D-Pad.", "Repita a sequência usando o D-Pad.") \
+  X(STR_GN_TUT_O3,         48, "Each round adds a new step to remember.", "Cada rodada adiciona mais uma cor.") \
+  X(STR_GN_TUT_O4,         48, "One wrong press ends your game!", "Um erro encerra a partida!") \
+  /* --- Snake Tutorial --- */ \
+  X(STR_SN_TUT_C1,         40, "D-Pad : Change movement direction", "D-Pad : Mudar direção da cobra") \
+  X(STR_SN_TUT_O1,         48, "Eat red apples to grow and score points.", "Coma maçãs vermelhas para crescer.") \
+  X(STR_SN_TUT_O2,         48, "Each apple increases your body length.", "Cada maçã aumenta o tamanho da cobra.") \
+  X(STR_SN_TUT_O3,         48, "Don't crash into the outer walls!", "Não bata nas paredes da arena!") \
+  X(STR_SN_TUT_O4,         48, "Avoid biting your own growing tail!", "Evite morder o próprio rabo!") \
+  /* --- Tetris Tutorial --- */ \
+  X(STR_TT_TUT_C1,         35, "[LEFT / RIGHT] : Move piece",   "[LEFT / RIGHT] : Mover peça") \
+  X(STR_TT_TUT_C2,         40, "[A / B]        : Rotate (CW / CCW)", "[A / B]        : Girar horário/anti") \
+  X(STR_TT_TUT_C3,         40, "[DOWN] Soft Drop    [UP] Hard Drop", "[DOWN] Descer       [UP] Queda total") \
+  X(STR_TT_TUT_C4,         35, "[SELECT]       : Hold piece",   "[SELECT]       : Guardar peça") \
+  X(STR_TT_TUT_O1,         48, "Fill horizontal lines to clear them.", "Complete linhas horizontais.") \
+  X(STR_TT_TUT_O2,         48, "Clear lines to score and level up.", "Elimine linhas para subir de nível.") \
+  X(STR_TT_TUT_O3,         48, "Speed increases with each level!", "A velocidade aumenta a cada nível!") \
+  X(STR_TT_TUT_O4,         48, "Don't let pieces stack to the top!", "Não deixe as peças baterem no topo!") \
   /* --- Tetris side panels (PANEL_W = 90 px -> 14 chars) --- */ \
   X(STR_TETRIS_HOLD,       14, "HOLD",                          "RESERVA") \
   X(STR_TETRIS_LEVEL,      14, "LEVEL",                         "NÍVEL") \
