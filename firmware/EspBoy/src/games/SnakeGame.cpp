@@ -1,5 +1,5 @@
 #include "SnakeGame.h"
-#include "audio_assets.h"
+#include "../core/audio_assets.h"
 
 SnakeGame::SnakeGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager) 
     : Game(tft_display, sound_manager, input_manager, "Snake") {

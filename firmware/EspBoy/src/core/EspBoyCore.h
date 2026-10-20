@@ -6,8 +6,8 @@
 #include "InputManager.h"
 #include "SoundManager.h"
 #include "BatteryManager.h"
-#include "MenuManager.h"
-#include "Game.h"
+#include "../ui/MenuManager.h"
+#include "../games/Game.h"
 #include "pins.h"
 
 enum CoreMode { MODE_MENU, MODE_GAME };

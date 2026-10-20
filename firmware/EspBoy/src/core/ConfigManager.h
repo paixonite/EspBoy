@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <Preferences.h>
 #include "pins.h"
-#include "Localization.h"
+#include "../localization/Localization.h"
 
 class ConfigManager {
 public:

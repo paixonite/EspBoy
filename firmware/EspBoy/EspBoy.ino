@@ -1,4 +1,4 @@
-#include "EspBoyCore.h"
+#include "src/core/EspBoyCore.h"
 
 EspBoyCore systemCore;
 

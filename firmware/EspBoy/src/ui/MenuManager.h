@@ -2,13 +2,13 @@
 #define MENUMANAGER_H
 
 #include <TFT_eSPI.h>
-#include "SoundManager.h"
-#include "BatteryManager.h"
-#include "ConfigManager.h"
-#include "InputManager.h"
-#include "Localization.h"
+#include "../core/SoundManager.h"
+#include "../core/BatteryManager.h"
+#include "../core/ConfigManager.h"
+#include "../core/InputManager.h"
+#include "../localization/Localization.h"
 #include "TextRenderer.h"
-#include "pins.h"
+#include "../core/pins.h"
 
 // Added new states for Settings Menu
 enum MenuState { 

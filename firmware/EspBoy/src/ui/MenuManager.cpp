@@ -1,5 +1,5 @@
 #include "MenuManager.h"
-#include "audio_assets.h"
+#include "../core/audio_assets.h"
 
 #define MY_ORANGE tft->color565(255, 55, 0)
 #define MY_GREY tft->color565(30, 30, 40)

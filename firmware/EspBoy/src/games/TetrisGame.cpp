@@ -1,6 +1,6 @@
 #include "TetrisGame.h"
-#include "audio_assets.h"
-#include "pins.h"
+#include "../core/audio_assets.h"
+#include "../core/pins.h"
 
 // Custom RGB565 Palette for Crisp Retro Arcade Aesthetics
 static const uint16_t COLOR_BG_NAVY      = 0x0045; // Really dark almost black navy blue (RGB: ~0, 8, 41)

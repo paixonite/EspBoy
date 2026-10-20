@@ -1,6 +1,6 @@
 #include "FroggerGame.h"
-#include "audio_assets.h"
-#include "pins.h"
+#include "../core/audio_assets.h"
+#include "../core/pins.h"
 
 static const uint16_t COLOR_SAFE_BANK     = 0x4208; // Dark slate/purple-grey safe zone
 static const uint16_t COLOR_LOG_BROWN     = 0x8200; // Warm arcade wood brown

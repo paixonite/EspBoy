@@ -1,6 +1,6 @@
 #include "GeniusGame.h"
-#include "audio_assets.h"
-#include "pins.h"
+#include "../core/audio_assets.h"
+#include "../core/pins.h"
 #include <math.h>
 
 // Pad Colors: [0: UP/Green, 1: RIGHT/Red, 2: DOWN/Yellow, 3: LEFT/Blue]

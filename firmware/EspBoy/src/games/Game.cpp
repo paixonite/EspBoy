@@ -1,5 +1,5 @@
 #include "Game.h"
-#include "audio_assets.h"
+#include "../core/audio_assets.h"
 
 // Initialize global memory for last used name
 char Game::lastInitials[3] = {'A', 'A', 'A'};

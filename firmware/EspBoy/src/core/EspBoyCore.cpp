@@ -1,10 +1,10 @@
 #include "EspBoyCore.h"
-#include "CrossyRoadGame.h"
-#include "FlappyBirdGame.h"
-#include "FroggerGame.h"
-#include "GeniusGame.h"
-#include "SnakeGame.h"
-#include "TetrisGame.h"
+#include "../games/CrossyRoadGame.h"
+#include "../games/FlappyBirdGame.h"
+#include "../games/FroggerGame.h"
+#include "../games/GeniusGame.h"
+#include "../games/SnakeGame.h"
+#include "../games/TetrisGame.h"
 
 EspBoyCore::EspBoyCore() 
     : tft(), 

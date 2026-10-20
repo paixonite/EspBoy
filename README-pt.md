@@ -41,37 +41,36 @@ O software do EspBoy foi projetado para ser modular, escalável e responsivo:
 O projeto segue uma organização estrita de responsabilidades:
 
 ```
-EspBoy/
+firmware/EspBoy/
 |
-|-- [ Ponto de Entrada ]
-|-- EspBoy.ino            # Inicialização do sistema e loop principal
-|-- pins.h                # Mapeamento dos pinos de hardware
-|
-|-- [ Sistema Operacional (Gerenciadores) ]
-|-- EspBoyCore.h/.cpp     # Orquestrador global e alternador de modos (Menu vs Jogo)
-|-- InputManager.h/.cpp   # Leitura centralizada de botões, debounce e auto-repeat
-|-- MenuManager.h/.cpp    # Gerencia Splash Screen, Carrossel de Jogos e Configurações
-|-- BatteryManager.h/.cpp # Lógica matemática e ADC para leitura da bateria
-|-- ConfigManager.h/.cpp  # Persistência centralizada de configurações na NVS
-|-- Localization.h/.cpp   # Seleção de idioma e busca de textos (tr()).
-|-- i18n_strings.h        # Tabela única com todos os textos em todos os idiomas.
-|-- TextRenderer.h/.cpp   # Desenho de texto UTF-8 com acentos na fonte pixelada.
-|-- Utf8Text.h/.cpp       # Funções puras de UTF-8 / decomposição de acentos.
-|
-|-- [ Motor de Jogos ]
-|-- Game.h/.cpp           # Classe base abstrata com ciclo de vida (Template Method)
-|
-|-- [ Sistema de Áudio ]
-|-- SoundManager.h/.cpp   # Gerenciador de fila de áudio não-bloqueante
-|-- audio_assets.h        # Biblioteca de frequências e vetores de melodias
-|
-|-- [ Jogos Implementados ]
-|-- CrossyRoadGame.h/.cpp # Lógica isolada do jogo Crossy Road
-|-- FlappyBirdGame.h/.cpp # Lógica isolada do jogo Flappy Bird
-|-- FroggerGame.h/.cpp    # Lógica isolada do jogo Frogger
-|-- GeniusGame.h/.cpp     # Lógica isolada do jogo Genius
-|-- SnakeGame.h/.cpp      # Lógica isolada do jogo Snake
-|-- TetrisGame.h/.cpp     # Lógica isolada do jogo Tetris
+|-- EspBoy.ino                      # Ponto de entrada: inicializa o sistema e roda o loop
+|-- src/
+    |-- core/                       # Gerenciadores de hardware e núcleo do sistema
+    |   |-- EspBoyCore.h/.cpp       # Orquestrador global e alternador de modos (Menu vs Jogo)
+    |   |-- InputManager.h/.cpp     # Leitura centralizada de botões, debounce e auto-repeat
+    |   |-- BatteryManager.h/.cpp   # Lógica matemática e ADC para leitura da bateria
+    |   |-- ConfigManager.h/.cpp    # Persistência centralizada de configurações na NVS
+    |   |-- SoundManager.h/.cpp     # Gerenciador de fila de áudio e melodias não-bloqueante
+    |   |-- pins.h                  # Mapeamento de pinos do ESP32-S3 e display
+    |   |-- audio_assets.h          # Biblioteca de frequências e vetores de melodias
+    |
+    |-- games/                      # Motor de jogos e jogos implementados
+    |   |-- Game.h/.cpp             # Classe base abstrata com ciclo de vida (Template Method)
+    |   |-- CrossyRoadGame.h/.cpp   # Implementação do jogo Crossy Road
+    |   |-- FlappyBirdGame.h/.cpp   # Implementação do jogo Flappy Bird
+    |   |-- FroggerGame.h/.cpp      # Implementação do jogo Frogger
+    |   |-- GeniusGame.h/.cpp       # Implementação do jogo Genius
+    |   |-- SnakeGame.h/.cpp        # Implementação do jogo Snake
+    |   |-- TetrisGame.h/.cpp       # Implementação do jogo Tetris
+    |
+    |-- ui/                         # Interface de usuário e renderização visual
+    |   |-- MenuManager.h/.cpp      # Splash screen, carrossel de jogos, configurações e HUD
+    |   |-- TextRenderer.h/.cpp     # Desenho de texto UTF-8 com acentos na fonte pixelada
+    |   |-- Utf8Text.h/.cpp         # Funções puras de decodificação UTF-8 e decomposição de acentos
+    |
+    |-- localization/               # Internacionalização e traduções
+        |-- Localization.h/.cpp     # Seleção de idioma e busca de textos (tr())
+        |-- i18n_strings.h          # Tabela única com todos os textos em todos os idiomas
 ```
 
 ## 🚀 Como Compilar e Gravar

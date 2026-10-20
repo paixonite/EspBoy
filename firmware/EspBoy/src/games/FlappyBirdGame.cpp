@@ -1,6 +1,6 @@
 #include "FlappyBirdGame.h"
-#include "audio_assets.h"
-#include "pins.h"
+#include "../core/audio_assets.h"
+#include "../core/pins.h"
 
 // Game constants (Tuned)
 const float GRAVITY = 0.28;

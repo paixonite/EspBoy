@@ -40,37 +40,36 @@ The EspBoy software was designed to be modular, scalable, and responsive.
 The project follows an organization that separates firmware responsibilities. 
 
 ```
-EspBoy/
+firmware/EspBoy/
 |
-|-- [ Entry Point ]
-|-- EspBoy.ino            # Only initializes the console's operating system.
-|-- pins.h                # Centralizes the ESP32 hardware mapping.
-|
-|-- [ Operating System (Managers) ]
-|-- EspBoyCore.h/.cpp     # Global state orchestrator.
-|-- InputManager.h/.cpp   # Centralized button debounce, edge detection, and auto-repeat.
-|-- MenuManager.h/.cpp    # Manages Splash Screen, Game Carousel, and Settings.
-|-- BatteryManager.h/.cpp # Math logic and ADC for battery reading.
-|-- ConfigManager.h/.cpp  # Centralized NVS configuration persistence.
-|-- Localization.h/.cpp   # Language selection and string lookup (tr()).
-|-- i18n_strings.h        # Single table with all UI text in every language.
-|-- TextRenderer.h/.cpp   # UTF-8 text drawing with accent marks on the pixel font.
-|-- Utf8Text.h/.cpp       # Pure UTF-8 / accent decomposition helpers.
-|
-|-- [ Game Engine ]
-|-- Game.h/.cpp           # Base abstract class with Template Methods.
-|
-|-- [ Audio System ]
-|-- SoundManager.h/.cpp   # Non-blocking audio queue manager.
-|-- audio_assets.h        # Frequency library and melody arrays.
-|
-|-- [ Implemented Games ]
-|-- CrossyRoadGame.h/.cpp # Isolated Crossy Road logic.
-|-- FlappyBirdGame.h/.cpp # Isolated Flappy Bird logic.
-|-- FroggerGame.h/.cpp    # Isolated Frogger logic.
-|-- GeniusGame.h/.cpp     # Isolated Genius logic.
-|-- SnakeGame.h/.cpp      # Isolated Snake logic.
-|-- TetrisGame.h/.cpp     # Isolated Tetris logic.
+|-- EspBoy.ino                      # Entry point: initializes system and runs loop
+|-- src/
+    |-- core/                       # Core system managers & hardware abstraction
+    |   |-- EspBoyCore.h/.cpp       # Global state orchestrator (Menu vs Game)
+    |   |-- InputManager.h/.cpp     # Button debounce, edge detection, and auto-repeat
+    |   |-- BatteryManager.h/.cpp   # ADC read & piecewise battery percentage calculation
+    |   |-- ConfigManager.h/.cpp    # Centralized NVS configuration persistence
+    |   |-- SoundManager.h/.cpp     # Non-blocking audio queue & melody player
+    |   |-- pins.h                  # Hardware pin mappings for ESP32-S3 & display
+    |   |-- audio_assets.h          # Frequency library and game melody arrays
+    |
+    |-- games/                      # Game engine & playable games
+    |   |-- Game.h/.cpp             # Base abstract class with Template Method lifecycle
+    |   |-- CrossyRoadGame.h/.cpp   # Crossy Road implementation
+    |   |-- FlappyBirdGame.h/.cpp   # Flappy Bird implementation
+    |   |-- FroggerGame.h/.cpp      # Frogger implementation
+    |   |-- GeniusGame.h/.cpp       # Simon/Genius implementation
+    |   |-- SnakeGame.h/.cpp        # Snake implementation
+    |   |-- TetrisGame.h/.cpp       # Tetris implementation
+    |
+    |-- ui/                         # User interface & visual presentation
+    |   |-- MenuManager.h/.cpp      # Splash screen, game carousel, settings, & HUD
+    |   |-- TextRenderer.h/.cpp     # UTF-8 text renderer with accent overlays
+    |   |-- Utf8Text.h/.cpp         # UTF-8 parsing and accent decomposition
+    |
+    |-- localization/               # Internationalization & translations
+        |-- Localization.h/.cpp     # Language selector and string lookup (tr())
+        |-- i18n_strings.h          # Central string table for all supported languages
 ```
 
 ## 🚀 How to Compile and Use

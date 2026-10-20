@@ -1,6 +1,6 @@
 #include "CrossyRoadGame.h"
-#include "audio_assets.h"
-#include "pins.h"
+#include "../core/audio_assets.h"
+#include "../core/pins.h"
 
 // Custom RGB565 colors for crisp minimalist readability
 static const uint16_t COLOR_RIVER_WATER = 0x0011; // Deep dark navy blue for deadly water

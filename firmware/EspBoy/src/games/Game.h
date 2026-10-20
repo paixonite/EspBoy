@@ -3,11 +3,11 @@
 
 #include <TFT_eSPI.h>
 #include <Preferences.h>
-#include "SoundManager.h"
-#include "InputManager.h"
-#include "Localization.h"
-#include "TextRenderer.h"
-#include "pins.h"
+#include "../core/SoundManager.h"
+#include "../core/InputManager.h"
+#include "../localization/Localization.h"
+#include "../ui/TextRenderer.h"
+#include "../core/pins.h"
 
 enum GameState { 
     STATE_TITLE, 
