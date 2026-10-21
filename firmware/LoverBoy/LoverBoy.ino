@@ -1,6 +1,6 @@
-#include "src/core/EspBoyCore.h"
+#include "src/core/LoverBoyCore.h"
 
-EspBoyCore systemCore;
+LoverBoyCore systemCore;
 
 void setup() {
     systemCore.begin();

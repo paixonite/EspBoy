@@ -41,14 +41,14 @@ struct Note {
 
 // =================================================================
 // SECTION 3: MELODIES AND SOUND EFFECTS (SFX)
-// EspBoy sound library, organized by context.
+// LoverBoy sound library, organized by context.
 // =================================================================
 
 // -----------------------------------------------------------------
 // 3.1 System Sounds
 // -----------------------------------------------------------------
 
-// Melody for the Splash Screen ("EspBoy Fanfare")
+// Melody for the Splash Screen ("LoverBoy Fanfare")
 // An ascending A Major arpeggio, sounding "bright" and "positive".
 const Note MELODY_SPLASH[] = {
     {NOTE_A3, 150},

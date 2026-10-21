@@ -1,14 +1,16 @@
-# 🎮 EspBoy ![Status](https://img.shields.io/badge/status-in%20development-yellow) ![Platform](https://img.shields.io/badge/platform-ESP32--S3-blue) ![Framework](https://img.shields.io/badge/framework-Arduino-cyan)
+# 🎮 LoverBoy ![Status](https://img.shields.io/badge/status-in%20development-yellow) ![Platform](https://img.shields.io/badge/platform-ESP32--S3-blue) ![Framework](https://img.shields.io/badge/framework-Arduino-cyan)
+
+> *A passion project.*
 
 [Versão em Português](./README-pt.md)
 
-![EspBoy logo](EspBoy_logo.png)
+![LoverBoy logo](LoverBoy_logo.png)
 
 A portable game console, inspired by the iconic "Game Boy", built from scratch using a LILYGO ESP32-S3, basic electronic components, and lots of programming! This is a personal educational project, originally developed using the materials and maker space at Colégio Técnico da UFMG (Coltec) and constantly evolving during my Computer Science undergraduate studies (DCC/UFMG).
 
 ## 🕹️ About the Project
 
-The goal of EspBoy is to build a robust and modular hardware and software platform, developing practical skills in:
+The goal of LoverBoy is to build a robust and modular hardware and software platform, developing practical skills in:
 
 - **Hardware Development:** Circuit assembly, soldering, and component integration.
 - **Low-Level Programming:** Direct interaction with GPIOs, timers (PWM), and microcontroller peripherals.
@@ -24,14 +26,14 @@ The goal of EspBoy is to build a robust and modular hardware and software platfo
 
 ## ✨ Firmware Features
 
-The EspBoy software was designed to be modular, scalable, and responsive.
+The LoverBoy software was designed to be modular, scalable, and responsive.
 
 - **Included Games:** Currently features the classics Crossy Road, Flappy Bird, Frogger, Genius, Snake, and Tetris, running smoothly at ~60 FPS.
 - **Persistent Highscore System:** The console has built-in Flash memory that saves the Top 3 for each game, including a classic arcade-style 3-initial input screen.
 - **In-Game Tutorials:** Every game features a dedicated tutorial screen accessible from a 3-option title carousel (Play, Tutorial, Highscores), detailing controls and objectives in both English and Brazilian Portuguese.
 - **Dynamic Settings Menu:** A dedicated system UI allows adjusting volume, changing screen brightness, and resetting records.
 - **Multi-language UI:** English (default) and Brazilian Portuguese, selectable in Settings. Every on-screen string lives in one table (`i18n_strings.h`), and accented letters are rendered on the retro pixel font by `TextRenderer`.
-- **Object-Oriented Architecture (OOP):** The system is orchestrated by a Core (`EspBoyCore`) that delegates tasks to specific managers (`InputManager`, `MenuManager`, `BatteryManager`, `ConfigManager`, `SoundManager`). New games inherit from a `Game` superclass that provides the standard state machine and template methods.
+- **Object-Oriented Architecture (OOP):** The system is orchestrated by a Core (`LoverBoyCore`) that delegates tasks to specific managers (`InputManager`, `MenuManager`, `BatteryManager`, `ConfigManager`, `SoundManager`). New games inherit from a `Game` superclass that provides the standard state machine and template methods.
 - **Non-Blocking Audio:** A sound system that plays background melodies and sound effects via a state machine, without freezing the game's physics or logic.
 - **Responsive Controls (`InputManager`):** Centralized button reading with asymmetric zero-latency press detection, continuous-LOW release qualification (preventing double clicks), DAS/ARR auto-repeat, and state-transition consumption.
 
@@ -40,12 +42,12 @@ The EspBoy software was designed to be modular, scalable, and responsive.
 The project follows an organization that separates firmware responsibilities. 
 
 ```
-firmware/EspBoy/
+firmware/LoverBoy/
 |
-|-- EspBoy.ino                      # Entry point: initializes system and runs loop
+|-- LoverBoy.ino                      # Entry point: initializes system and runs loop
 |-- src/
     |-- core/                       # Core system managers & hardware abstraction
-    |   |-- EspBoyCore.h/.cpp       # Global state orchestrator (Menu vs Game)
+    |   |-- LoverBoyCore.h/.cpp       # Global state orchestrator (Menu vs Game)
     |   |-- InputManager.h/.cpp     # Button debounce, edge detection, and auto-repeat
     |   |-- BatteryManager.h/.cpp   # ADC read & piecewise battery percentage calculation
     |   |-- ConfigManager.h/.cpp    # Centralized NVS configuration persistence
@@ -79,12 +81,12 @@ Ideal for standalone Linux environments.
 
 1. **Compile**:
    ```bash
-   arduino-cli compile --fqbn esp32:esp32:lilygo_t_display_s3 firmware/EspBoy
+   arduino-cli compile --fqbn esp32:esp32:lilygo_t_display_s3 firmware/LoverBoy
    ```
 
 2. **Upload**:
    ```bash
-   arduino-cli upload -p /dev/ttyACM0 --fqbn esp32:esp32:lilygo_t_display_s3 firmware/EspBoy
+   arduino-cli upload -p /dev/ttyACM0 --fqbn esp32:esp32:lilygo_t_display_s3 firmware/LoverBoy
    ```
    *(Adjust `-p` with your device port).*
 
@@ -95,7 +97,7 @@ Ideal for Windows users who prefer a graphical interface.
 2. **Libraries:** Install the **TFT_eSPI** library by Bodmer.
 3. **Display Configuration:** In `TFT_eSPI/User_Setup_Select.h`, uncomment `#include <User_Setups/Setup206_LilyGo_T_Display_S3.h>`.
 4. **Compile & Upload:**
-   - Open `firmware/EspBoy/EspBoy.ino`.
+   - Open `firmware/LoverBoy/LoverBoy.ino`.
    - Select the **LilyGo T-Display-S3** board and the corresponding `COMx` port.
    - Click **Upload**.
 
@@ -109,7 +111,7 @@ Ideal for developers working directly inside the WSL (Linux) terminal on Windows
    *Customizable parameters & flags:*
    - `-p, --port <PORT>`: Target serial port on Windows host (default: `COM7`).
    - `-b, --baud <BAUD>`: Upload baud rate (default: `921600`).
-   - `-d, --dir <DIR>`: Custom firmware path (defaults to `firmware/EspBoy`).
+   - `-d, --dir <DIR>`: Custom firmware path (defaults to `firmware/LoverBoy`).
    - `-c, --cli <PATH>`: Custom `arduino-cli` binary in WSL (auto-detected if omitted).
    - `-e, --esptool <PATH>`: Custom `esptool.exe` path on Windows host (auto-detected if omitted).
 

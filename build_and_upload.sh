@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# EspBoy - Build & Upload Script for WSL (Windows Subsystem for Linux)
+# LoverBoy - Build & Upload Script for WSL (Windows Subsystem for Linux)
 # ==============================================================================
 # Compiles the firmware inside WSL using arduino-cli and uploads it to the ESP32-S3
 # via the Windows host's esptool.exe (bridging the WSL2 USB serial isolation).
@@ -14,7 +14,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PORT="COM7"
 BAUD="921600"
 FQBN="esp32:esp32:lilygo_t_display_s3"
-FIRMWARE_DIR="${SCRIPT_DIR}/firmware/EspBoy"
+FIRMWARE_DIR="${SCRIPT_DIR}/firmware/LoverBoy"
 CUSTOM_CLI=""
 CUSTOM_ESPTOOL=""
 
@@ -26,7 +26,7 @@ Options:
   -p, --port <PORT>        Serial COM port on Windows (default: COM7)
   -b, --baud <BAUD>        Upload baud rate (default: 921600)
   -f, --fqbn <FQBN>        Board FQBN (default: esp32:esp32:lilygo_t_display_s3)
-  -d, --dir <DIR>          Path to firmware directory (default: firmware/EspBoy)
+  -d, --dir <DIR>          Path to firmware directory (default: firmware/LoverBoy)
   -c, --cli <PATH>         Path to arduino-cli inside WSL (auto-detected if omitted)
   -e, --esptool <PATH>     Path to Windows esptool.exe (auto-detected if omitted)
   -h, --help               Show this help message and exit
@@ -119,9 +119,10 @@ echo -e "\033[36m[1/2] Compiling firmware in WSL (${FQBN})...\033[0m"
 "$ARDUINO_CLI" compile --fqbn "$FQBN" --export-binaries "$FIRMWARE_DIR"
 
 # 4. Prepare temporary staging directory on Windows host
+SKETCH_NAME="$(basename "$FIRMWARE_DIR")"
 WIN_TEMP=$(cd /mnt/c && powershell.exe -NoProfile -NonInteractive -Command '[System.IO.Path]::GetTempPath()' </dev/null | tr -d '\r')
-WIN_STAGE_DIR="${WIN_TEMP}EspBoy_Build"
-WSL_STAGE_DIR="$(wslpath -u "${WIN_TEMP}")EspBoy_Build"
+WIN_STAGE_DIR="${WIN_TEMP}${SKETCH_NAME}_Build"
+WSL_STAGE_DIR="$(wslpath -u "${WIN_TEMP}")${SKETCH_NAME}_Build"
 
 mkdir -p "$WSL_STAGE_DIR"
 
@@ -140,12 +141,8 @@ echo -e "\033[33m[2/2] Flashing ESP32-S3 over ${PORT} at ${BAUD} baud...\033[0m"
 
 (
     cd /mnt/c && powershell.exe -NoProfile -NonInteractive -Command "
-        & '${ESPTOOL_WIN}' --chip esp32s3 --port ${PORT} --baud ${BAUD} --before default-reset --after hard-reset write-flash -z --flash-mode dio --flash-freq 80m --flash-size 16MB \
-            0x0 '${WIN_STAGE_DIR}\\EspBoy.ino.bootloader.bin' \
-            0x8000 '${WIN_STAGE_DIR}\\EspBoy.ino.partitions.bin' \
-            0xe000 '${WIN_STAGE_DIR}\\boot_app0.bin' \
-            0x10000 '${WIN_STAGE_DIR}\\EspBoy.ino.bin'
+        & '${ESPTOOL_WIN}' --chip esp32s3 --port ${PORT} --baud ${BAUD} --before default_reset --after hard_reset write_flash -z --flash_mode dio --flash_freq 80m --flash_size 16MB 0x0 '${WIN_STAGE_DIR}\\${SKETCH_NAME}.ino.bootloader.bin' 0x8000 '${WIN_STAGE_DIR}\\${SKETCH_NAME}.ino.partitions.bin' 0xe000 '${WIN_STAGE_DIR}\\boot_app0.bin' 0x10000 '${WIN_STAGE_DIR}\\${SKETCH_NAME}.ino.bin'
     " </dev/null
 )
 
-echo -e "\033[32m[SUCCESS] Flash complete! Enjoy your EspBoy!\033[0m"
+echo -e "\033[32m[SUCCESS] Flash complete! Enjoy your ${SKETCH_NAME}!\033[0m"

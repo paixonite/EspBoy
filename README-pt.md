@@ -1,14 +1,16 @@
-# 🎮 EspBoy ![Status](https://img.shields.io/badge/status-in%20development-yellow) ![Platform](https://img.shields.io/badge/platform-ESP32--S3-blue) ![Framework](https://img.shields.io/badge/framework-Arduino-cyan)
+# 🎮 LoverBoy ![Status](https://img.shields.io/badge/status-in%20development-yellow) ![Platform](https://img.shields.io/badge/platform-ESP32--S3-blue) ![Framework](https://img.shields.io/badge/framework-Arduino-cyan)
+
+> *Um projeto de paixão.*
 
 [English version](./README.md)
 
-![EspBoy logo](EspBoy_logo.png)
+![LoverBoy logo](LoverBoy_logo.png)
 
 Um console de videogame portátil inspirado no clássico "Game Boy", construído do zero utilizando um LILYGO ESP32-S3, componentes eletrônicos básicos e muita programação! Este é um projeto educacional e pessoal, originalmente desenvolvido com os recursos e espaço maker do Colégio Técnico da UFMG (Coltec) e em constante evolução durante a minha graduação em Ciência da Computação (DCC/UFMG).
 
 ## 🕹️ Sobre o Projeto
 
-O objetivo do EspBoy é criar uma plataforma modular e robusta de hardware e software, desenvolvendo habilidades práticas em:
+O objetivo do LoverBoy é criar uma plataforma modular e robusta de hardware e software, desenvolvendo habilidades práticas em:
 
 - **Desenvolvimento de Hardware:** Montagem de circuitos, soldagem, roteamento de PCB e integração de componentes.
 - **Programação de Baixo Nível:** Interação direta com GPIOs, temporizadores (PWM) e periféricos do microcontrolador.
@@ -24,7 +26,7 @@ O objetivo do EspBoy é criar uma plataforma modular e robusta de hardware e sof
 
 ## ✨ Recursos do Firmware
 
-O software do EspBoy foi projetado para ser modular, escalável e responsivo:
+O software do LoverBoy foi projetado para ser modular, escalável e responsivo:
 
 - **Jogos Inclusos:** Clássicos **Crossy Road**, **Flappy Bird**, **Frogger**, **Genius**, **Snake** e **Tetris** rodando a ~60 FPS com alta fluidez.
 - **Renderização por Diferença (Delta/Zero-Flicker):** Pipeline gráfico otimizado para barramento SPI/paralelo que calcula apenas o que mudou entre os quadros, apagando e redesenhando estritamente os pixels em movimento para eliminar cintilações.
@@ -41,12 +43,12 @@ O software do EspBoy foi projetado para ser modular, escalável e responsivo:
 O projeto segue uma organização estrita de responsabilidades:
 
 ```
-firmware/EspBoy/
+firmware/LoverBoy/
 |
-|-- EspBoy.ino                      # Ponto de entrada: inicializa o sistema e roda o loop
+|-- LoverBoy.ino                      # Ponto de entrada: inicializa o sistema e roda o loop
 |-- src/
     |-- core/                       # Gerenciadores de hardware e núcleo do sistema
-    |   |-- EspBoyCore.h/.cpp       # Orquestrador global e alternador de modos (Menu vs Jogo)
+    |   |-- LoverBoyCore.h/.cpp       # Orquestrador global e alternador de modos (Menu vs Jogo)
     |   |-- InputManager.h/.cpp     # Leitura centralizada de botões, debounce e auto-repeat
     |   |-- BatteryManager.h/.cpp   # Lógica matemática e ADC para leitura da bateria
     |   |-- ConfigManager.h/.cpp    # Persistência centralizada de configurações na NVS
@@ -80,11 +82,11 @@ Ideal para computadores com Linux nativo.
 
 1. **Compilar**:
    ```bash
-   arduino-cli compile --fqbn esp32:esp32:lilygo_t_display_s3 firmware/EspBoy
+   arduino-cli compile --fqbn esp32:esp32:lilygo_t_display_s3 firmware/LoverBoy
    ```
 2. **Gravar**:
    ```bash
-   arduino-cli upload -p /dev/ttyACM0 --fqbn esp32:esp32:lilygo_t_display_s3 firmware/EspBoy
+   arduino-cli upload -p /dev/ttyACM0 --fqbn esp32:esp32:lilygo_t_display_s3 firmware/LoverBoy
    ```
    *(Ajuste `-p` com a porta serial identificada da sua placa).*
 
@@ -95,7 +97,7 @@ Ideal para desenvolvedores no Windows que preferem ambiente visual com interface
 2. **Bibliotecas**: Instale a biblioteca **TFT_eSPI** de Bodmer.
 3. **Configuração da Tela**: No arquivo `TFT_eSPI/User_Setup_Select.h`, descomente `#include <User_Setups/Setup206_LilyGo_T_Display_S3.h>`.
 4. **Compilar e Gravar**:
-   - Abra `firmware/EspBoy/EspBoy.ino`.
+   - Abra `firmware/LoverBoy/LoverBoy.ino`.
    - Selecione a placa **LilyGo T-Display-S3** e a porta `COMx` correspondente.
    - Clique em **Carregar** (*Upload*).
 
@@ -109,7 +111,7 @@ Ideal para quem desenvolve diretamente de dentro do terminal Linux do WSL no Win
    *Parâmetros e flags customizáveis:*
    - `-p, --port <PORT>`: Porta serial no Windows (padrão: `COM7`).
    - `-b, --baud <BAUD>`: Velocidade de gravação (padrão: `921600`).
-   - `-d, --dir <DIR>`: Caminho para a pasta do firmware (padrão: `firmware/EspBoy`).
+   - `-d, --dir <DIR>`: Caminho para a pasta do firmware (padrão: `firmware/LoverBoy`).
    - `-c, --cli <PATH>`: Caminho do `arduino-cli` no WSL (detectado automaticamente se omitido).
    - `-e, --esptool <PATH>`: Caminho do `esptool.exe` no Windows (detectado automaticamente se omitido).
 

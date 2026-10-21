@@ -1,5 +1,5 @@
-#ifndef ESPBOYCORE_H
-#define ESPBOYCORE_H
+#ifndef LOVERBOYCORE_H
+#define LOVERBOYCORE_H
 
 #include <TFT_eSPI.h>
 #include "ConfigManager.h"
@@ -12,9 +12,9 @@
 
 enum CoreMode { MODE_MENU, MODE_GAME };
 
-class EspBoyCore {
+class LoverBoyCore {
 public:
-    EspBoyCore();
+    LoverBoyCore();
     void begin();
     void update();
 
@@ -39,4 +39,4 @@ private:
     void handlePowerManagement();
 };
 
-#endif // ESPBOYCORE_H
+#endif // LOVERBOYCORE_H

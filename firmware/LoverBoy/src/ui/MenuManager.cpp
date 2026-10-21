@@ -402,8 +402,8 @@ void MenuManager::drawSplashScreen() {
     tft->setTextDatum(MC_DATUM);
     tft->setTextSize(5);
 
-    String title = "EspBoy"; // i18n-ignore (brand name)
-    uint16_t rainbowColors[] = {TFT_RED, MY_ORANGE, TFT_YELLOW, TFT_GREEN, TFT_BLUE, TFT_PURPLE};
+    String title = "LoverBoy"; // i18n-ignore (brand name)
+    uint16_t rainbowColors[] = {TFT_RED, MY_ORANGE, TFT_YELLOW, TFT_GREEN, TFT_CYAN, TFT_BLUE, TFT_MAGENTA, TFT_PINK};
     
     int totalWidth = tft->textWidth(title);
     int cursorX = (tft->width() / 2) - (totalWidth / 2);
@@ -411,7 +411,7 @@ void MenuManager::drawSplashScreen() {
     
     for (int i = 0; i < title.length(); i++) {
         String letter = String(title.charAt(i));
-        tft->setTextColor(rainbowColors[i % 6]);
+        tft->setTextColor(rainbowColors[i % 8]);
         tft->setTextDatum(ML_DATUM);
         tft->drawString(letter, cursorX, cursorY);
         cursorX += tft->textWidth(letter);

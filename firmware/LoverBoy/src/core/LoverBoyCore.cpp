@@ -1,4 +1,4 @@
-#include "EspBoyCore.h"
+#include "LoverBoyCore.h"
 #include "../games/CrossyRoadGame.h"
 #include "../games/FlappyBirdGame.h"
 #include "../games/FroggerGame.h"
@@ -6,7 +6,7 @@
 #include "../games/SnakeGame.h"
 #include "../games/TetrisGame.h"
 
-EspBoyCore::EspBoyCore() 
+LoverBoyCore::LoverBoyCore() 
     : tft(), 
       configManager(),
       inputManager(),
@@ -19,7 +19,7 @@ EspBoyCore::EspBoyCore()
     isDimmed = false;
 }
 
-void EspBoyCore::begin() {
+void LoverBoyCore::begin() {
     loadHardware();
     inputManager.begin();
     configManager.begin();
@@ -29,7 +29,7 @@ void EspBoyCore::begin() {
     lastActivityTime = millis();
 }
 
-void EspBoyCore::update() {
+void LoverBoyCore::update() {
     inputManager.update();
     handlePowerManagement();
     if (isSleeping) {
@@ -63,7 +63,7 @@ void EspBoyCore::update() {
     }
 }
 
-void EspBoyCore::handlePowerManagement() {
+void LoverBoyCore::handlePowerManagement() {
     if (inputManager.anyPhysicalActivity()) {
         lastActivityTime = millis();
 
@@ -119,7 +119,7 @@ void EspBoyCore::handlePowerManagement() {
     }
 }
 
-void EspBoyCore::loadHardware() {
+void LoverBoyCore::loadHardware() {
     Serial.begin(115200);
     tft.init();
     tft.setRotation(1);
@@ -130,7 +130,7 @@ void EspBoyCore::loadHardware() {
     pinMode(TFT_BL_PIN, OUTPUT);
 }
 
-void EspBoyCore::loadGame(int gameIndex) {
+void LoverBoyCore::loadGame(int gameIndex) {
     if (currentGame != nullptr) {
         delete currentGame;
     }
