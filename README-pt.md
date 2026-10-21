@@ -75,25 +75,43 @@ firmware/EspBoy/
 
 ## 🚀 Como Compilar e Gravar
 
-### Opção A: Linha de Comando / Antigravity (Recomendado)
+### Opção 1: Linux Nativo (`arduino-cli`)
+Ideal para computadores com Linux nativo.
 
-1. **Compilar com `arduino-cli`** (WSL / Linux):
+1. **Compilar**:
    ```bash
    arduino-cli compile --fqbn esp32:esp32:lilygo_t_display_s3 firmware/EspBoy
    ```
-2. **Gravação Direta** (PowerShell no Windows):
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File .\build_and_upload.ps1
+2. **Gravar**:
+   ```bash
+   arduino-cli upload -p /dev/ttyACM0 --fqbn esp32:esp32:lilygo_t_display_s3 firmware/EspBoy
    ```
-   *(Opcional: utilize `-Port COMx` para especificar a porta COM desejada).*
+   *(Ajuste `-p` com a porta serial identificada da sua placa).*
 
-### Opção B: Arduino IDE
+### Opção 2: Windows Nativo (Arduino IDE)
+Ideal para desenvolvedores no Windows que preferem ambiente visual com interface gráfica.
 
-1. Instale o suporte às placas **ESP32** no Gerenciador de Placas da Arduino IDE.
-2. Instale a biblioteca **TFT_eSPI** de Bodmer.
-3. No arquivo `TFT_eSPI/User_Setup_Select.h`, descomente `#include <User_Setups/Setup206_LilyGo_T_Display_S3.h>`.
-4. Abra o arquivo `firmware/EspBoy/EspBoy.ino`.
-5. Selecione a placa **LilyGo T-Display-S3** e clique em Carregar.
+1. **Suporte à Placa**: Instale o suporte a placas **ESP32** pelo Gerenciador de Placas da Arduino IDE.
+2. **Bibliotecas**: Instale a biblioteca **TFT_eSPI** de Bodmer.
+3. **Configuração da Tela**: No arquivo `TFT_eSPI/User_Setup_Select.h`, descomente `#include <User_Setups/Setup206_LilyGo_T_Display_S3.h>`.
+4. **Compilar e Gravar**:
+   - Abra `firmware/EspBoy/EspBoy.ino`.
+   - Selecione a placa **LilyGo T-Display-S3** e a porta `COMx` correspondente.
+   - Clique em **Carregar** (*Upload*).
+
+### Opção 3: Terminal WSL (`build_and_upload.sh`)
+Ideal para quem desenvolve diretamente de dentro do terminal Linux do WSL no Windows.
+
+1. **Compilação e Gravação em 1 Comando** (no terminal do WSL):
+   ```bash
+   ./build_and_upload.sh -p COM7
+   ```
+   *Parâmetros e flags customizáveis:*
+   - `-p, --port <PORT>`: Porta serial no Windows (padrão: `COM7`).
+   - `-b, --baud <BAUD>`: Velocidade de gravação (padrão: `921600`).
+   - `-d, --dir <DIR>`: Caminho para a pasta do firmware (padrão: `firmware/EspBoy`).
+   - `-c, --cli <PATH>`: Caminho do `arduino-cli` no WSL (detectado automaticamente se omitido).
+   - `-e, --esptool <PATH>`: Caminho do `esptool.exe` no Windows (detectado automaticamente se omitido).
 
 ## 👤 Autor
 

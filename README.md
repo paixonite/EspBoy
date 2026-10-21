@@ -72,30 +72,46 @@ firmware/EspBoy/
         |-- i18n_strings.h          # Central string table for all supported languages
 ```
 
-## 🚀 How to Compile and Use
+## 🚀 How to Compile and Upload
 
-### Option A: Command Line / Automated Script (Recommended)
+### Option 1: Native Linux (`arduino-cli`)
+Ideal for standalone Linux environments.
 
-1. **One-Touch Build & Flash** (PowerShell on Windows):
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File .\build_and_upload.ps1
-   ```
-   *(Optional: pass `-Port COMx` to specify your COM port).*
-
-2. **Compile Only with `arduino-cli`** (WSL / Linux):
+1. **Compile**:
    ```bash
    arduino-cli compile --fqbn esp32:esp32:lilygo_t_display_s3 firmware/EspBoy
    ```
 
-### Option B: Arduino IDE
+2. **Upload**:
+   ```bash
+   arduino-cli upload -p /dev/ttyACM0 --fqbn esp32:esp32:lilygo_t_display_s3 firmware/EspBoy
+   ```
+   *(Adjust `-p` with your device port).*
+
+### Option 2: Native Windows (Arduino IDE)
+Ideal for Windows users who prefer a graphical interface.
 
 1. **Board Support:** Install **ESP32** board support in the Arduino IDE Boards Manager.
 2. **Libraries:** Install the **TFT_eSPI** library by Bodmer.
 3. **Display Configuration:** In `TFT_eSPI/User_Setup_Select.h`, uncomment `#include <User_Setups/Setup206_LilyGo_T_Display_S3.h>`.
-4. **Compilation & Upload:**
+4. **Compile & Upload:**
    - Open `firmware/EspBoy/EspBoy.ino`.
-   - Select the **LilyGo T-Display-S3** board and the corresponding port.
+   - Select the **LilyGo T-Display-S3** board and the corresponding `COMx` port.
    - Click **Upload**.
+
+### Option 3: WSL Terminal (`build_and_upload.sh`)
+Ideal for developers working directly inside the WSL (Linux) terminal on Windows.
+
+1. **One-Command Build & Flash** (inside WSL terminal):
+   ```bash
+   ./build_and_upload.sh -p COM7
+   ```
+   *Customizable parameters & flags:*
+   - `-p, --port <PORT>`: Target serial port on Windows host (default: `COM7`).
+   - `-b, --baud <BAUD>`: Upload baud rate (default: `921600`).
+   - `-d, --dir <DIR>`: Custom firmware path (defaults to `firmware/EspBoy`).
+   - `-c, --cli <PATH>`: Custom `arduino-cli` binary in WSL (auto-detected if omitted).
+   - `-e, --esptool <PATH>`: Custom `esptool.exe` path on Windows host (auto-detected if omitted).
 
 ## 👤 Author
 
