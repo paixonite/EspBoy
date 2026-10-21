@@ -403,7 +403,25 @@ void MenuManager::drawSplashScreen() {
     tft->setTextSize(5);
 
     String title = "LoverBoy"; // i18n-ignore (brand name)
-    uint16_t rainbowColors[] = {TFT_RED, MY_ORANGE, TFT_YELLOW, TFT_GREEN, TFT_CYAN, TFT_BLUE, TFT_MAGENTA, TFT_PINK};
+    // Logo palette:
+    // L: R3 Pure Red (255, 0, 0)
+    // o: MY_ORANGE (reverted to original)
+    // v: TFT_YELLOW (reverted to original)
+    // e: G3 Pure Green (0, 255, 0)
+    // r: B2 Pure Blue (0, 100, 255)
+    // B: Pure Blue (0, 0, 255)
+    // o: U1 Indigo (100, 20, 190)
+    // y: P2 Deep Rose (230, 30, 100)
+    uint16_t rainbowColors[] = {
+        tft->color565(255,   0,   0), // L: R3
+        MY_ORANGE,                    // o: original MY_ORANGE
+        TFT_YELLOW,                   // v: original TFT_YELLOW
+        tft->color565(  0, 255,   0), // e: G3
+        tft->color565(  0, 100, 255), // r: B2
+        tft->color565(  0,   0, 255), // B: Pure Blue (0, 0, 255)
+        tft->color565(100,  20, 190), // o: U1
+        tft->color565(230,  30, 100)  // y: P2
+    };
     
     int totalWidth = tft->textWidth(title);
     int cursorX = (tft->width() / 2) - (totalWidth / 2);
@@ -418,7 +436,7 @@ void MenuManager::drawSplashScreen() {
     }
 
     tft->setTextDatum(MC_DATUM);
-    tft->setTextColor(TFT_CYAN);
+    tft->setTextColor(TFT_WHITE);
     tft->setTextSize(2);
     TextRenderer::draw(tft, tr(STR_SPLASH_BY), tft->width() / 2, tft->height() / 2 + 30);
 }

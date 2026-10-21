@@ -1,4 +1,7 @@
 #include "FlappyBirdGame.h"
+
+// O3 Pure Orange (RGB: 255, 110, 0 -> 0xFD60)
+static const uint16_t COLOR_BIRD = 0xFD60;
 #include "../core/audio_assets.h"
 #include "../core/pins.h"
 
@@ -159,7 +162,7 @@ void FlappyBirdGame::drawPlaying() {
     }
 
     // Draw player
-    tft->fillRect(PLAYER_X, round(player_y), PLAYER_SIZE, PLAYER_SIZE, TFT_YELLOW);
+    tft->fillRect(PLAYER_X, round(player_y), PLAYER_SIZE, PLAYER_SIZE, COLOR_BIRD);
     drawHUD();
     tft->drawFastHLine(0, tft->height() - 1, tft->width(), TFT_WHITE);
 

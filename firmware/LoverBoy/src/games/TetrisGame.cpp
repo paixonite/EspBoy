@@ -6,7 +6,9 @@
 static const uint16_t COLOR_BG_NAVY      = 0x0045; // Really dark almost black navy blue (RGB: ~0, 8, 41)
 static const uint16_t COLOR_GRID_DOT     = 0x2104; // Subtle dark slate guide dot
 static const uint16_t COLOR_BORDER_OUTER = 0x4A69; // Steel grey outer frame
-static const uint16_t COLOR_L_ORANGE     = 0xFB60; // Title screen orange (RGB: 255, 55, 0)
+// 7 Tetromino Solid Colors: I, O, T, S, Z, J (Inverted L), L
+// L-Piece updated to O2 Deep Orange (RGB: 255, 55, 0 -> 0xFB60)
+static const uint16_t COLOR_L_ORANGE     = 0xFB60; // O2 Deep Orange (RGB: 255, 55, 0)
 
 // 7 Tetromino Solid Colors: I, O, T, S, Z, J (Inverted L), L
 static const uint16_t PIECE_COLORS[7] = {

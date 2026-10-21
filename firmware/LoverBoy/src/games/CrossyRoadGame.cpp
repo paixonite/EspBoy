@@ -3,13 +3,13 @@
 #include "../core/pins.h"
 
 // Custom RGB565 colors for crisp minimalist readability
-static const uint16_t COLOR_RIVER_WATER = 0x0011; // Deep dark navy blue for deadly water
-static const uint16_t COLOR_LOG         = 0x79C0; // Rich dark wood brown (high contrast with yellow player)
+static const uint16_t COLOR_RIVER_WATER = 0x033F; // Water blue (RGB: 0, 100, 255)
+static const uint16_t COLOR_LOG         = 0x4141; // N1 Dark Coffee brown (RGB: 80, 40, 15)
 static const uint16_t COLOR_CAR         = TFT_RED;
 static const uint16_t COLOR_TRUCK       = 0x90DF; // Vibrant purple for buses/trucks
 static const uint16_t COLOR_TRAIN       = TFT_CYAN;
 static const uint16_t COLOR_RAIL_DIM    = 0x1082; // Dim grey for inactive rail signal
-static const uint16_t COLOR_RAIL_LINE   = 0x39E7; // 2px grey line for train passageway (same shade of grey as inactive signal)
+static const uint16_t COLOR_RAIL_LINE   = 0x1103; // E1 Deep Night grey (RGB: 20, 20, 24)
 
 static const float WRAP_SPAN = 400.0f; // 320px screen + 80px off-screen buffer
 
@@ -534,7 +534,7 @@ void CrossyRoadGame::drawLaneFull(int rowIdx) {
     }
 
     if (rowIdx == playerRow) {
-        drawPlayerAt((int)round(playerX), playerRow, TFT_YELLOW);
+        drawPlayerAt((int)round(playerX), playerRow, TFT_WHITE);
     }
 }
 
@@ -666,7 +666,7 @@ void CrossyRoadGame::drawPlaying() {
 
         // Draw player only when position changed (or on initial frame)
         if (pxCurr != pxPrev || playerRow != playerRowPrev || playerHoppedThisFrame) {
-            drawPlayerAt(pxCurr, playerRow, TFT_YELLOW);
+            drawPlayerAt(pxCurr, playerRow, TFT_WHITE);
         }
         playerHoppedThisFrame = false;
     }

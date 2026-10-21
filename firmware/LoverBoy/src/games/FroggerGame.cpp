@@ -3,8 +3,11 @@
 #include "../core/pins.h"
 
 static const uint16_t COLOR_SAFE_BANK     = 0x4208; // Dark slate/purple-grey safe zone
-static const uint16_t COLOR_LOG_BROWN     = 0x8200; // Warm arcade wood brown
+static const uint16_t COLOR_LOG_BROWN     = 0x4141; // N1 Dark Coffee brown (RGB: 80, 40, 15)
 static const uint16_t COLOR_ARCADE_ORANGE = 0xFA00; // Deep vivid arcade orange
+static const uint16_t COLOR_FROG_GREEN    = 0x5F23; // G4 Lime Green (RGB: 90, 230, 30)
+static const uint16_t COLOR_WATER_BLUE    = 0x033F; // Water blue (RGB: 0, 100, 255)
+static const uint16_t COLOR_CROC_GREEN    = 0x0280; // Dark crocodile green (darker than forest green: RGB 0, 80, 0)
 
 // X coordinates for the 5 Lilypad Goal Bays across the 320px width
 // 6 water gaps of 30px + 5 bays of 28px = 180 + 140 = 320px
@@ -19,7 +22,7 @@ int FroggerGame::rowToY(int row) const {
 }
 
 uint16_t FroggerGame::getRowBgColor(int row) const {
-    if (row >= 0 && row <= 5) return TFT_NAVY;
+    if (row >= 0 && row <= 5) return COLOR_WATER_BLUE;
     if (row == 6 || row == 12) return COLOR_SAFE_BANK;
     return TFT_BLACK;
 }
@@ -34,11 +37,11 @@ uint16_t FroggerGame::getObstacleColor(const Lane& lane, const Obstacle& obs) co
         return lane.color;
     }
     if (obs.diveState == TURTLE_SUBMERGED) {
-        return TFT_NAVY;
+        return COLOR_WATER_BLUE;
     }
     if (obs.diveState == TURTLE_WARNING) {
         // Blink between vivid orange and dark green every 180ms to warn before diving
-        return ((gameMillis() / 180) % 2 == 0) ? COLOR_ARCADE_ORANGE : TFT_DARKGREEN;
+        return ((gameMillis() / 180) % 2 == 0) ? COLOR_ARCADE_ORANGE : COLOR_CROC_GREEN;
     }
     return lane.color;
 }
@@ -51,10 +54,10 @@ void FroggerGame::respawnFrog() {
 void FroggerGame::initLanes() {
     // 5 River Lanes (Rows 1..5)
     lanes[0] = {1, true,  false,  0.85f, 54, 3, COLOR_LOG_BROWN, {}};
-    lanes[1] = {2, true,  true,  -0.75f, 36, 3, TFT_DARKGREEN,   {}};
+    lanes[1] = {2, true,  true,  -0.75f, 36, 3, COLOR_CROC_GREEN,{}};
     lanes[2] = {3, true,  false,  1.15f, 72, 2, COLOR_LOG_BROWN, {}};
     lanes[3] = {4, true,  false,  0.65f, 42, 3, COLOR_LOG_BROWN, {}};
-    lanes[4] = {5, true,  true,  -0.90f, 36, 3, TFT_DARKGREEN,   {}};
+    lanes[4] = {5, true,  true,  -0.90f, 36, 3, COLOR_CROC_GREEN,{}};
 
     // 5 Road Lanes (Rows 7..11)
     lanes[5] = {7,  false, false, -0.90f, 44, 2, TFT_WHITE,           {}};
@@ -295,7 +298,7 @@ void FroggerGame::drawSpanClippedAroundFrog(int y, int spanL, int spanR, int fro
 
 void FroggerGame::drawGoalRow() {
     int goalY = HUD_HEIGHT;
-    tft->fillRect(0, goalY, DISPLAY_WIDTH, ROW_HEIGHT, TFT_NAVY);
+    tft->fillRect(0, goalY, DISPLAY_WIDTH, ROW_HEIGHT, COLOR_WATER_BLUE);
 
     for (int b = 0; b < NUM_BAYS; b++) {
         tft->fillRect(BAY_X[b], goalY, BAY_WIDTH, ROW_HEIGHT, TFT_DARKGREEN);
@@ -311,7 +314,7 @@ void FroggerGame::drawStaticBackground() {
     drawGoalRow();
 
     // Rows 1..5: River zone (5 * 12px = 60px)
-    tft->fillRect(0, HUD_HEIGHT + ROW_HEIGHT, DISPLAY_WIDTH, 5 * ROW_HEIGHT, TFT_NAVY);
+    tft->fillRect(0, HUD_HEIGHT + ROW_HEIGHT, DISPLAY_WIDTH, 5 * ROW_HEIGHT, COLOR_WATER_BLUE);
 
     // Row 6: Median safe bank (12px)
     tft->fillRect(0, HUD_HEIGHT + 6 * ROW_HEIGHT, DISPLAY_WIDTH, ROW_HEIGHT, COLOR_SAFE_BANK);
@@ -354,7 +357,7 @@ void FroggerGame::drawPlaying() {
                 int visR = min(DISPLAY_WIDTH, ix + lane.width);
                 uint16_t col = getObstacleColor(lane, obs);
 
-                if (col != TFT_NAVY) {
+                if (col != COLOR_WATER_BLUE) {
                     drawSpanClippedAroundFrog(y, visL, visR, newFrogL, newFrogR, frogOnRow, col);
                 }
                 obs.x_prev = obs.x;
@@ -363,7 +366,7 @@ void FroggerGame::drawPlaying() {
             }
         }
 
-        tft->fillRect(newFrogL, rowToY(player_row), FROG_SIZE, FROG_SIZE, TFT_YELLOW);
+        tft->fillRect(newFrogL, rowToY(player_row), FROG_SIZE, FROG_SIZE, COLOR_FROG_GREEN);
         player_x_prev = player_x;
         player_row_prev = player_row;
         fullRedrawRequired = false;
@@ -433,7 +436,7 @@ void FroggerGame::drawPlaying() {
             if (newR > newL) {
                 if (lane.isTurtle && obs.isDivingGroup && obs.diveState == TURTLE_SUBMERGED) {
                     if (obs.prevDiveState != TURTLE_SUBMERGED) {
-                        drawSpanClippedAroundFrog(y, newL, newR, newFrogL, newFrogR, frogOnRow, TFT_NAVY);
+                        drawSpanClippedAroundFrog(y, newL, newR, newFrogL, newFrogR, frogOnRow, COLOR_WATER_BLUE);
                     }
                 } else {
                     drawSpanClippedAroundFrog(y, newL, newR, newFrogL, newFrogR, frogOnRow, curColor);
@@ -450,7 +453,7 @@ void FroggerGame::drawPlaying() {
     int drawFrogL = max(0, newFrogL);
     int drawFrogR = min(DISPLAY_WIDTH, newFrogR);
     if (drawFrogR > drawFrogL) {
-        tft->fillRect(drawFrogL, rowToY(player_row), drawFrogR - drawFrogL, FROG_SIZE, TFT_YELLOW);
+        tft->fillRect(drawFrogL, rowToY(player_row), drawFrogR - drawFrogL, FROG_SIZE, COLOR_FROG_GREEN);
     }
 
     // 4. Update HUD only when score changes
