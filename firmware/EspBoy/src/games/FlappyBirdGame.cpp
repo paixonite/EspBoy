@@ -27,6 +27,7 @@ void FlappyBirdGame::resetGame() {
     player_vel_y = 0;
     score = 0;
     fullRedrawRequired = true;
+    gameStarted = false;
 
     for (int i = 0; i < 3; i++) {
         pipes[i].x = tft->width() + (i * PIPE_SPACING);
@@ -39,6 +40,9 @@ void FlappyBirdGame::resetGame() {
 
 void FlappyBirdGame::handleInputPlaying() {
     if (input->wasPressed(BTN_ID_A)) {
+        if (!gameStarted) {
+            gameStarted = true;
+        }
         player_vel_y = FLAP_STRENGTH;
         sound->play(MELODY_FLAP, MELODY_FLAP_LENGTH);
     }
@@ -61,6 +65,10 @@ void FlappyBirdGame::drawTutorialContent() {
 }
 
 void FlappyBirdGame::updatePlaying() {
+    if (!gameStarted) {
+        return;
+    }
+
     player_vel_y += GRAVITY;
     player_y += player_vel_y;
 

@@ -60,7 +60,7 @@ void FroggerGame::initLanes() {
     lanes[5] = {7,  false, false, -0.90f, 44, 2, TFT_WHITE,           {}};
     lanes[6] = {8,  false, false,  1.40f, 18, 2, TFT_CYAN,            {}};
     lanes[7] = {9,  false, false, -0.80f, 20, 3, TFT_MAGENTA,         {}};
-    lanes[8] = {10, false, false,  0.60f, 22, 3, COLOR_ARCADE_ORANGE, {}};
+    lanes[8] = {10, false, false,  0.60f, 22, 3, TFT_BLUE,            {}};
     lanes[9] = {11, false, false, -0.75f, 18, 3, TFT_RED,             {}};
 
     for (int l = 0; l < NUM_ACTIVE_LANES; l++) {

@@ -309,7 +309,7 @@ void Game::drawGameOverScreen() {
 }
 
 void Game::handleGameOverState() {
-    if (millis() - stateTimer > 2500) {
+    if (millis() - stateTimer > 1667) { // 2/3 of previous 2500ms duration
         if (newHighscoreRank != -1) {
             currentInitials[0] = lastInitials[0];
             currentInitials[1] = lastInitials[1];

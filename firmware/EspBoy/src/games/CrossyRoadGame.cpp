@@ -8,7 +8,8 @@ static const uint16_t COLOR_LOG         = 0x79C0; // Rich dark wood brown (high 
 static const uint16_t COLOR_CAR         = TFT_RED;
 static const uint16_t COLOR_TRUCK       = 0x90DF; // Vibrant purple for buses/trucks
 static const uint16_t COLOR_TRAIN       = TFT_CYAN;
-static const uint16_t COLOR_RAIL_DIM    = 0x39E7; // Dim grey for inactive rail signal
+static const uint16_t COLOR_RAIL_DIM    = 0x1082; // Dim grey for inactive rail signal
+static const uint16_t COLOR_RAIL_LINE   = 0x39E7; // 2px grey line for train passageway (same shade of grey as inactive signal)
 
 static const float WRAP_SPAN = 400.0f; // 320px screen + 80px off-screen buffer
 
@@ -520,9 +521,8 @@ void CrossyRoadGame::drawLaneFull(int rowIdx) {
         }
     }
     else if (lane.type == LANE_RAIL) {
-        uint16_t lightCol = lane.warningLightOn ? TFT_RED : COLOR_RAIL_DIM;
-        tft->fillRect(2, yTop + 4, 6, 6, lightCol);
-        tft->fillRect(DISPLAY_WIDTH - 8, yTop + 4, 6, 6, lightCol);
+        uint16_t lineCol = lane.warningLightOn ? TFT_RED : COLOR_RAIL_LINE;
+        drawRectExcludingPlayer(0, yTop + 6, DISPLAY_WIDTH, 2, lineCol, rowIdx);
         lane.warningLightPrev = lane.warningLightOn;
 
         if (lane.railState == RAIL_TRAIN) {
@@ -568,9 +568,12 @@ void CrossyRoadGame::drawLaneDelta(int rowIdx) {
         }
     }
     else if (lane.type == LANE_RAIL) {
+        uint16_t lineCol = lane.warningLightOn ? TFT_RED : COLOR_RAIL_LINE;
+
         if (lane.trainNeedsErase) {
             int prevX = (int)round(lane.trainXPrev);
             drawRectExcludingPlayer(prevX, yEnt, TRAIN_WIDTH, ENTITY_H, TFT_BLACK, rowIdx);
+            drawRectExcludingPlayer(prevX, yTop + 6, TRAIN_WIDTH, 2, lineCol, rowIdx);
             lane.trainNeedsErase = false;
             lane.warningLightPrev = !lane.warningLightOn;
         }
@@ -580,18 +583,32 @@ void CrossyRoadGame::drawLaneDelta(int rowIdx) {
             int currX = (int)round(lane.trainX);
             if (currX > prevX) {
                 drawRectExcludingPlayer(prevX, yEnt, currX - prevX, ENTITY_H, TFT_BLACK, rowIdx);
+                drawRectExcludingPlayer(prevX, yTop + 6, currX - prevX, 2, lineCol, rowIdx);
             } else if (currX < prevX) {
                 drawRectExcludingPlayer(currX + TRAIN_WIDTH, yEnt, prevX - currX, ENTITY_H, TFT_BLACK, rowIdx);
+                drawRectExcludingPlayer(currX + TRAIN_WIDTH, yTop + 6, prevX - currX, 2, lineCol, rowIdx);
             }
             drawRectExcludingPlayer(currX, yEnt, TRAIN_WIDTH, ENTITY_H, COLOR_TRAIN, rowIdx);
             lane.trainXPrev = lane.trainX;
         }
 
-        if (lane.warningLightOn != lane.warningLightPrev || lane.railState == RAIL_TRAIN || playerHoppedThisFrame) {
-            uint16_t lightCol = lane.warningLightOn ? TFT_RED : COLOR_RAIL_DIM;
-            tft->fillRect(2, yTop + 4, 6, 6, lightCol);
-            tft->fillRect(DISPLAY_WIDTH - 8, yTop + 4, 6, 6, lightCol);
+        if (lane.warningLightOn != lane.warningLightPrev || playerHoppedThisFrame) {
             lane.warningLightPrev = lane.warningLightOn;
+
+            // When warning light toggles (blinking red / returning to grey) or player hopped, redraw the passageway line across
+            if (lane.railState == RAIL_TRAIN) {
+                int currX = (int)round(lane.trainX);
+                int trainLeft = max(0, currX);
+                int trainRight = min(DISPLAY_WIDTH, currX + TRAIN_WIDTH);
+                if (trainLeft > 0) {
+                    drawRectExcludingPlayer(0, yTop + 6, trainLeft, 2, lineCol, rowIdx);
+                }
+                if (trainRight < DISPLAY_WIDTH) {
+                    drawRectExcludingPlayer(trainRight, yTop + 6, DISPLAY_WIDTH - trainRight, 2, lineCol, rowIdx);
+                }
+            } else {
+                drawRectExcludingPlayer(0, yTop + 6, DISPLAY_WIDTH, 2, lineCol, rowIdx);
+            }
         }
     }
 }
@@ -613,6 +630,10 @@ void CrossyRoadGame::drawPlaying() {
         if (playerHoppedThisFrame && (pxCurr != pxPrev || playerRow != playerRowPrev)) {
             uint16_t oldBg = getLaneBgColor(lanes[playerRowPrev].type);
             drawRectExcludingPlayer(pxPrev, laneTopY(playerRowPrev) + 2, PLAYER_W, PLAYER_H, oldBg, playerRowPrev);
+            if (lanes[playerRowPrev].type == LANE_RAIL) {
+                uint16_t prevLineCol = lanes[playerRowPrev].warningLightOn ? TFT_RED : COLOR_RAIL_LINE;
+                drawRectExcludingPlayer(pxPrev, laneTopY(playerRowPrev) + 6, PLAYER_W, 2, prevLineCol, playerRowPrev);
+            }
         } else if (pxCurr != pxPrev && lanes[playerRow].type == LANE_RIVER) {
             // Player is drifting on a River log: only erase trailing pixels that hang over water
             // (any trailing pixels on the log itself will be painted COLOR_LOG by drawLaneDelta!)

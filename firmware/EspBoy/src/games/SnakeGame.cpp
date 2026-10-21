@@ -161,9 +161,10 @@ void SnakeGame::drawGrid() {
 }
 
 void SnakeGame::drawScoreHUD() {
-    tft->fillRect(0, 0, tft->width(), Y_OFFSET, TFT_BLACK);
-    tft->setTextColor(TFT_YELLOW, TFT_BLACK);
-    tft->setTextSize(1);
-    tft->setTextDatum(MC_DATUM);
-    TextRenderer::draw(tft, I18n::fmt(STR_SCORE_FMT, score), tft->width() / 2, Y_OFFSET / 2);
+    tft->fillRect(0, 0, tft->width(), Y_OFFSET - 1, TFT_BLACK);
+    tft->drawFastHLine(0, Y_OFFSET - 1, tft->width(), TFT_WHITE);
+    tft->setTextDatum(TC_DATUM);
+    tft->setTextColor(TFT_WHITE);
+    tft->setTextSize(2);
+    tft->drawString(String(score), tft->width() / 2, 2);
 }

@@ -33,6 +33,7 @@ private:
     float player_vel_y;
     Pipe pipes[3];
     bool fullRedrawRequired;
+    bool gameStarted;
 };
 
 #endif // FLAPPYBIRDGAME_H
