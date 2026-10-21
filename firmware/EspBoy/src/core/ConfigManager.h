@@ -30,6 +30,7 @@ public:
     // --- Auto-Sleep Timeout ---
     int getSleepTimeoutIndex() const;
     void setSleepTimeoutIndex(int idx);
+    void toggleSleepTimeout();
     unsigned long getSleepTimeoutMs() const;
 
     // --- Language ---
@@ -44,6 +45,7 @@ private:
     int _lastNonZeroVolume;
     int _brightness;
     int _sleepTimeoutIndex;
+    int _lastNonZeroSleepTimeoutIndex;
     Language _language;
 
     static const unsigned long SLEEP_TIMEOUTS_MS[SLEEP_OPTION_COUNT];

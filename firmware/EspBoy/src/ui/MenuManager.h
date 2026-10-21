@@ -61,6 +61,7 @@ private:
     // --- Drawing Functions ---
     void drawSplashScreen();
     void drawMenu();
+    void drawCarouselContent();
     void updateBatteryDisplay();
     void drawSettings();
     void drawConfirmReset();

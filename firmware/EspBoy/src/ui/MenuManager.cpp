@@ -91,17 +91,13 @@ int MenuManager::handleSelectInput() {
         selectedGameIndex--;
         if (selectedGameIndex < 0) selectedGameIndex = GAME_COUNT - 1;
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-        tft->fillScreen(MY_GREY);
-        delay(40);
-        drawMenu();
+        drawCarouselContent();
     }
     else if (input->isRepeated(BTN_ID_RIGHT, 250, 150)) {
         selectedGameIndex++;
         if (selectedGameIndex >= GAME_COUNT) selectedGameIndex = 0;
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-        tft->fillScreen(MY_GREY);
-        delay(40);
-        drawMenu();
+        drawCarouselContent();
     }
 
     if (input->wasPressed(BTN_ID_A)) {
@@ -199,9 +195,9 @@ void MenuManager::handleSettingsInput() {
                 sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             }
             drawSettings();
-        } else if (selectedSettingIndex == SETTING_AUTO_SLEEP) { // Cycle preset
+        } else if (selectedSettingIndex == SETTING_AUTO_SLEEP) { // Alternate to OFF / last active preset
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
-            config->setSleepTimeoutIndex(config->getSleepTimeoutIndex() + 1);
+            config->toggleSleepTimeout();
             drawSettings();
         } else if (selectedSettingIndex == SETTING_HIGHSCORES) { // Reset Highscores
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
@@ -352,26 +348,31 @@ void MenuManager::drawConfirmReset() {
 void MenuManager::drawMenu() {
     tft->fillScreen(TFT_BLACK);
     drawTopBar(tr(STR_CHOOSE_GAME_TITLE), TFT_YELLOW);
-    
+    drawCarouselContent();
+    drawBottomBar(tr(STR_HINT_MENU), TFT_WHITE);
+}
+
+void MenuManager::drawCarouselContent() {
+    // Clear only the carousel region between top and bottom bars (no full-screen flicker)
+    tft->fillRect(0, BAR_HEIGHT, tft->width(), tft->height() - (2 * BAR_HEIGHT), TFT_BLACK);
+
     int gameY = (tft->height() / 2) - 2;
-    
+
     // Fixed navigation arrows on display sides
     tft->setTextSize(3);
     tft->setTextColor(TFT_WHITE);
-    
+
     tft->setTextDatum(ML_DATUM);
     tft->drawString("<", 16, gameY);
-    
+
     tft->setTextDatum(MR_DATUM);
     tft->drawString(">", tft->width() - 16, gameY);
-    
+
     // Centered game name (size 3)
     tft->setTextDatum(MC_DATUM);
     tft->drawString(gameNames[selectedGameIndex], tft->width() / 2, gameY);
-    
-    drawCarouselIndicators();
 
-    drawBottomBar(tr(STR_HINT_MENU), TFT_WHITE);
+    drawCarouselIndicators();
 }
 
 void MenuManager::drawCarouselIndicators() {

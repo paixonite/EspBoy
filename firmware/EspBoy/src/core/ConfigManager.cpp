@@ -13,6 +13,7 @@ ConfigManager::ConfigManager()
       _lastNonZeroVolume(80),
       _brightness(100),
       _sleepTimeoutIndex(2),
+      _lastNonZeroSleepTimeoutIndex(2),
       _language(LANG_EN) {
 }
 
@@ -35,6 +36,7 @@ void ConfigManager::begin() {
     if (_sleepTimeoutIndex < 0 || _sleepTimeoutIndex >= SLEEP_OPTION_COUNT) {
         _sleepTimeoutIndex = 2;
     }
+    _lastNonZeroSleepTimeoutIndex = (_sleepTimeoutIndex > 0) ? _sleepTimeoutIndex : 2;
 
     _language = (storedLanguage >= 0 && storedLanguage < LANG_COUNT) ? (Language)storedLanguage : LANG_EN;
     I18n::setLanguage(_language);
@@ -119,11 +121,22 @@ void ConfigManager::setSleepTimeoutIndex(int idx) {
     if (idx < 0) idx = SLEEP_OPTION_COUNT - 1;
     if (idx >= SLEEP_OPTION_COUNT) idx = 0;
     _sleepTimeoutIndex = idx;
+    if (_sleepTimeoutIndex > 0) {
+        _lastNonZeroSleepTimeoutIndex = _sleepTimeoutIndex;
+    }
 
     Preferences prefs;
     prefs.begin("system_cfg", false);
     prefs.putInt("sleep_idx", _sleepTimeoutIndex);
     prefs.end();
+}
+
+void ConfigManager::toggleSleepTimeout() {
+    if (_sleepTimeoutIndex > 0) {
+        setSleepTimeoutIndex(0);
+    } else {
+        setSleepTimeoutIndex(_lastNonZeroSleepTimeoutIndex > 0 ? _lastNonZeroSleepTimeoutIndex : 2);
+    }
 }
 
 unsigned long ConfigManager::getSleepTimeoutMs() const {
