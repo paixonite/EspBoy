@@ -28,8 +28,8 @@ uint16_t FroggerGame::getRowBgColor(int row) const {
 }
 
 float FroggerGame::getSpeedMultiplier() const {
-    float mult = 1.0f + (score * 0.06f);
-    return (mult > 2.2f) ? 2.2f : mult;
+    float mult = 1.0f + (score * 0.18f);
+    return (mult > 2.3f) ? 2.3f : mult;
 }
 
 uint16_t FroggerGame::getObstacleColor(const Lane& lane, const Obstacle& obs) const {
