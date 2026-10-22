@@ -28,7 +28,7 @@ The goal of LoverBoy is to build a robust and modular hardware and software plat
 
 The LoverBoy software was designed to be modular, scalable, and responsive.
 
-- **Included Games:** Currently features the classics Crossy Road, Flappy Bird, Frogger, Genius, Snake, and Tetris, running smoothly at ~60 FPS.
+- **Included Games:** Currently features the classics Crossy, Flappy Bird, Frogger, Genius, Snake, and Tetris, running smoothly at ~60 FPS.
 - **Persistent Highscore System:** The console has built-in Flash memory that saves the Top 3 for each game, including a classic arcade-style 3-initial input screen.
 - **In-Game Tutorials:** Every game features a dedicated tutorial screen accessible from a 3-option title carousel (Play, Tutorial, Highscores), detailing controls and objectives in both English and Brazilian Portuguese.
 - **Dynamic Settings Menu:** A dedicated system UI allows adjusting volume, changing screen brightness, and resetting records.
@@ -57,7 +57,7 @@ firmware/LoverBoy/
     |
     |-- games/                      # Game engine & playable games
     |   |-- Game.h/.cpp             # Base abstract class with Template Method lifecycle
-    |   |-- CrossyRoadGame.h/.cpp   # Crossy Road implementation
+    |   |-- CrossyGame.h/.cpp       # Crossy implementation
     |   |-- FlappyBirdGame.h/.cpp   # Flappy Bird implementation
     |   |-- FroggerGame.h/.cpp      # Frogger implementation
     |   |-- GeniusGame.h/.cpp       # Simon/Genius implementation

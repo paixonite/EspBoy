@@ -49,7 +49,7 @@
   X(STR_TUTORIAL_TITLE,    15, "TUTORIAL",                      "TUTORIAL") \
   X(STR_TUT_SEC_CONTROLS,  12, "CONTROLS",                      "CONTROLES") \
   X(STR_TUT_SEC_OBJECTIVE, 12, "OBJECTIVE",                     "OBJETIVO") \
-  /* --- Crossy Road Tutorial --- */ \
+  /* --- Crossy Tutorial --- */ \
   X(STR_CR_TUT_C1,         30, "D-Pad : Move / Hop",            "D-Pad : Mover / Pular") \
   X(STR_CR_TUT_C2,         30, "[A]   : Hop forward",           "[A]   : Pular para frente") \
   X(STR_CR_TUT_O1,         48, "Cross roads, rivers, and train tracks.", "Atravesse ruas, rios e trilhos de trem.") \

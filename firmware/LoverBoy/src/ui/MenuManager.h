@@ -42,7 +42,7 @@ private:
     int selectedGameIndex;
     static const int GAME_COUNT = 6;
     // Games are listed in alphabetical order
-    const char* gameNames[GAME_COUNT] = {"Crossy Road", "Flappy Bird", "Frogger", "Genius", "Snake", "Tetris"};
+    const char* gameNames[GAME_COUNT] = {"Crossy", "Flappy Bird", "Frogger", "Genius", "Snake", "Tetris"};
 
     // --- Settings Logic ---
     int selectedSettingIndex;

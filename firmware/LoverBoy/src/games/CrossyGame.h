@@ -1,5 +1,5 @@
-#ifndef CROSSYROADGAME_H
-#define CROSSYROADGAME_H
+#ifndef CROSSYGAME_H
+#define CROSSYGAME_H
 
 #include "Game.h"
 
@@ -16,9 +16,9 @@ enum RailState {
     RAIL_TRAIN
 };
 
-class CrossyRoadGame : public Game {
+class CrossyGame : public Game {
 public:
-    CrossyRoadGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager);
+    CrossyGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager);
 
 protected:
     void resetGame() override;
@@ -100,4 +100,4 @@ private:
     void drawPlayerAt(int x, int row, uint16_t color);
 };
 
-#endif // CROSSYROADGAME_H
+#endif // CROSSYGAME_H

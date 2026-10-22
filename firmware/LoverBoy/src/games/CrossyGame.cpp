@@ -1,4 +1,4 @@
-#include "CrossyRoadGame.h"
+#include "CrossyGame.h"
 #include "../core/audio_assets.h"
 #include "../core/pins.h"
 
@@ -13,18 +13,18 @@ static const uint16_t COLOR_RAIL_LINE   = 0x1103; // E1 Deep Night grey (RGB: 20
 
 static const float WRAP_SPAN = 400.0f; // 320px screen + 80px off-screen buffer
 
-CrossyRoadGame::CrossyRoadGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager)
-    : Game(tft_display, sound_manager, input_manager, "Crossy Road") {
+CrossyGame::CrossyGame(TFT_eSPI* tft_display, SoundManager* sound_manager, InputManager* input_manager)
+    : Game(tft_display, sound_manager, input_manager, "Crossy") {
     defaultScores[0] = 45;
     defaultScores[1] = 25;
     defaultScores[2] = 12;
 }
 
-uint16_t CrossyRoadGame::getLaneBgColor(LaneType type) const {
+uint16_t CrossyGame::getLaneBgColor(LaneType type) const {
     return (type == LANE_RIVER) ? COLOR_RIVER_WATER : TFT_BLACK;
 }
 
-void CrossyRoadGame::resetGame() {
+void CrossyGame::resetGame() {
     score = 0;
     prevScore = -1;
     currentWorldRow = 0;
@@ -53,7 +53,7 @@ void CrossyRoadGame::resetGame() {
     lanes[7].trees[10] = false;
 }
 
-void CrossyRoadGame::generateLane(int rowIdx, int worldDist, const Lane* adjacentLane) {
+void CrossyGame::generateLane(int rowIdx, int worldDist, const Lane* adjacentLane) {
     Lane& lane = lanes[rowIdx];
     int effDist = constrain(worldDist, 0, 60);
 
@@ -215,7 +215,7 @@ void CrossyRoadGame::generateLane(int rowIdx, int worldDist, const Lane* adjacen
     }
 }
 
-void CrossyRoadGame::shiftWorldDown() {
+void CrossyGame::shiftWorldDown() {
     for (int r = NUM_LANES - 1; r >= 1; r--) {
         lanes[r] = lanes[r - 1];
     }
@@ -223,12 +223,12 @@ void CrossyRoadGame::shiftWorldDown() {
     generateLane(0, topWorldDist, &lanes[1]);
 }
 
-void CrossyRoadGame::onResume() {
+void CrossyGame::onResume() {
     // Repaint HUD and all 10 lanes (with the player) over the pause popup
     fullRedrawRequired = true;
 }
 
-void CrossyRoadGame::drawTutorialContent() {
+void CrossyGame::drawTutorialContent() {
     drawTutorialHeader(tr(STR_TUT_SEC_CONTROLS), 37);
     drawTutorialLine(tr(STR_CR_TUT_C1), 49);
     drawTutorialLine(tr(STR_CR_TUT_C2), 61);
@@ -240,7 +240,7 @@ void CrossyRoadGame::drawTutorialContent() {
     drawTutorialLine(tr(STR_CR_TUT_O4), 125);
 }
 
-void CrossyRoadGame::handleInputPlaying() {
+void CrossyGame::handleInputPlaying() {
     int dRow = 0;
     int dCol = 0;
 
@@ -321,7 +321,7 @@ void CrossyRoadGame::handleInputPlaying() {
     }
 }
 
-void CrossyRoadGame::updatePlaying() {
+void CrossyGame::updatePlaying() {
     unsigned long now = gameMillis();
 
     for (int r = 0; r < NUM_LANES; r++) {
@@ -380,7 +380,7 @@ void CrossyRoadGame::updatePlaying() {
     checkCollisions();
 }
 
-void CrossyRoadGame::checkCollisions() {
+void CrossyGame::checkCollisions() {
     const Lane& curLane = lanes[playerRow];
     int pLeft  = (int)round(playerX);
     int pRight = pLeft + PLAYER_W;
@@ -436,7 +436,7 @@ void CrossyRoadGame::checkCollisions() {
 // ZERO-FLICKER DIFFERENTIAL RENDERER
 // =================================================================
 
-void CrossyRoadGame::drawClippedRect(int x, int y, int w, int h, uint16_t color) {
+void CrossyGame::drawClippedRect(int x, int y, int w, int h, uint16_t color) {
     if (w <= 0 || h <= 0) return;
     int x0 = max(0, x);
     int x1 = min(DISPLAY_WIDTH, x + w);
@@ -445,7 +445,7 @@ void CrossyRoadGame::drawClippedRect(int x, int y, int w, int h, uint16_t color)
     }
 }
 
-void CrossyRoadGame::drawRectExcludingPlayer(int x, int y, int w, int h, uint16_t color, int rowIdx) {
+void CrossyGame::drawRectExcludingPlayer(int x, int y, int w, int h, uint16_t color, int rowIdx) {
     if (w <= 0 || h <= 0) return;
     int x0 = max(0, x);
     int x1 = min(DISPLAY_WIDTH, x + w);
@@ -473,11 +473,11 @@ void CrossyRoadGame::drawRectExcludingPlayer(int x, int y, int w, int h, uint16_
     }
 }
 
-void CrossyRoadGame::drawPlayerAt(int x, int row, uint16_t color) {
+void CrossyGame::drawPlayerAt(int x, int row, uint16_t color) {
     drawClippedRect(x, laneTopY(row) + 2, PLAYER_W, PLAYER_H, color);
 }
 
-void CrossyRoadGame::drawHUD() {
+void CrossyGame::drawHUD() {
     if (!fullRedrawRequired && score == prevScore) return;
 
     tft->fillRect(0, 0, DISPLAY_WIDTH, HUD_HEIGHT - 1, TFT_BLACK);
@@ -491,7 +491,7 @@ void CrossyRoadGame::drawHUD() {
     prevScore = score;
 }
 
-void CrossyRoadGame::drawLaneFull(int rowIdx) {
+void CrossyGame::drawLaneFull(int rowIdx) {
     Lane& lane = lanes[rowIdx];
     int yTop = laneTopY(rowIdx);
     int yEnt = yTop + 2;
@@ -538,7 +538,7 @@ void CrossyRoadGame::drawLaneFull(int rowIdx) {
     }
 }
 
-void CrossyRoadGame::drawLaneDelta(int rowIdx) {
+void CrossyGame::drawLaneDelta(int rowIdx) {
     Lane& lane = lanes[rowIdx];
     int yTop = laneTopY(rowIdx);
     int yEnt = yTop + 2;
@@ -613,7 +613,7 @@ void CrossyRoadGame::drawLaneDelta(int rowIdx) {
     }
 }
 
-void CrossyRoadGame::drawPlaying() {
+void CrossyGame::drawPlaying() {
     drawHUD();
 
     if (fullRedrawRequired || cameraShiftedThisFrame) {

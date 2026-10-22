@@ -97,7 +97,7 @@ const int MELODY_HIT_LENGTH = sizeof(MELODY_HIT) / sizeof(Note);
 
 
 // -----------------------------------------------------------------
-// 3.2 Crossy Road Game Sounds
+// 3.2 Crossy Game Sounds
 // -----------------------------------------------------------------
 
 // Crisp, deep tactile blip for directional hops (left/right/back or non-scoring forward).

@@ -28,7 +28,7 @@ O objetivo do LoverBoy é criar uma plataforma modular e robusta de hardware e s
 
 O software do LoverBoy foi projetado para ser modular, escalável e responsivo:
 
-- **Jogos Inclusos:** Clássicos **Crossy Road**, **Flappy Bird**, **Frogger**, **Genius**, **Snake** e **Tetris** rodando a ~60 FPS com alta fluidez.
+- **Jogos Inclusos:** Clássicos **Crossy**, **Flappy Bird**, **Frogger**, **Genius**, **Snake** e **Tetris** rodando a ~60 FPS com alta fluidez.
 - **Renderização por Diferença (Delta/Zero-Flicker):** Pipeline gráfico otimizado para barramento SPI/paralelo que calcula apenas o que mudou entre os quadros, apagando e redesenhando estritamente os pixels em movimento para eliminar cintilações.
 - **Sistema de Recordes Persistente:** Memória Flash integrada (Preferences/NVS) que salva o Top 3 de cada jogo, incluindo tela clássica estilo arcade para inserir 3 iniciais.
 - **Tutoriais Integrados:** Todos os jogos contam com uma tela dedicada de tutorial acessível a partir do menu inicial em carrossel vertical de 3 opções (Jogar, Tutorial, Recordes), explicando controles e objetivos em inglês e português.
@@ -58,7 +58,7 @@ firmware/LoverBoy/
     |
     |-- games/                      # Motor de jogos e jogos implementados
     |   |-- Game.h/.cpp             # Classe base abstrata com ciclo de vida (Template Method)
-    |   |-- CrossyRoadGame.h/.cpp   # Implementação do jogo Crossy Road
+    |   |-- CrossyGame.h/.cpp       # Implementação do jogo Crossy
     |   |-- FlappyBirdGame.h/.cpp   # Implementação do jogo Flappy Bird
     |   |-- FroggerGame.h/.cpp      # Implementação do jogo Frogger
     |   |-- GeniusGame.h/.cpp       # Implementação do jogo Genius
