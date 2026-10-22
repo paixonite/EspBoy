@@ -35,6 +35,7 @@ private:
     
     MenuState currentState;
     unsigned long splashStartTime;
+    int splashCurrentOffset[8];
     unsigned long lastBatteryUpdate;
 
     // --- Game Carousel Logic ---
@@ -59,7 +60,8 @@ private:
     static const int SETTING_COUNT = SETTING_ITEM_COUNT;
 
     // --- Drawing Functions ---
-    void drawSplashScreen();
+    void drawSplashScreen(bool animateLogo = false);
+    void updateSplashAnimation();
     void drawMenu();
     void drawCarouselContent();
     void updateBatteryDisplay();

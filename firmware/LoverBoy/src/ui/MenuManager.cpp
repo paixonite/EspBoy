@@ -23,7 +23,7 @@ MenuManager::MenuManager(TFT_eSPI* tft_display, SoundManager* sound_manager, Bat
 
 void MenuManager::begin() {
     currentState = MENU_STATE_SPLASH;
-    drawSplashScreen();
+    drawSplashScreen(true);
     splashStartTime = millis();
     sound->play(MELODY_SPLASH, MELODY_SPLASH_LENGTH);
 }
@@ -37,6 +37,7 @@ void MenuManager::returnToMenu() {
 int MenuManager::update() {
     switch (currentState) {
         case MENU_STATE_SPLASH:
+            updateSplashAnimation();
             if (millis() - splashStartTime > SPLASH_DURATION_MS) {
                 currentState = MENU_STATE_SELECT;
                 input->consumeAll();
@@ -208,7 +209,7 @@ void MenuManager::handleSettingsInput() {
             sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
             currentState = MENU_STATE_CREDITS;
             input->consumeAll();
-            drawSplashScreen();
+            drawSplashScreen(false);
         }
     }
 }
@@ -397,7 +398,7 @@ void MenuManager::drawCarouselIndicators() {
     }
 }
 
-void MenuManager::drawSplashScreen() {
+void MenuManager::drawSplashScreen(bool animateLogo) {
     tft->fillScreen(TFT_BLACK);
     tft->setTextDatum(MC_DATUM);
     tft->setTextSize(5);
@@ -428,6 +429,7 @@ void MenuManager::drawSplashScreen() {
     int cursorY = tft->height() / 2 - 10;
     
     for (int i = 0; i < title.length(); i++) {
+        splashCurrentOffset[i] = 0;
         String letter = String(title.charAt(i));
         tft->setTextColor(rainbowColors[i % 8]);
         tft->setTextDatum(ML_DATUM);
@@ -439,6 +441,65 @@ void MenuManager::drawSplashScreen() {
     tft->setTextColor(TFT_WHITE);
     tft->setTextSize(2);
     TextRenderer::draw(tft, tr(STR_SPLASH_BY), tft->width() / 2, tft->height() / 2 + 30);
+}
+
+void MenuManager::updateSplashAnimation() {
+    String title = "LoverBoy"; // i18n-ignore (brand name)
+    uint16_t rainbowColors[] = {
+        tft->color565(255,   0,   0), // L: R3
+        MY_ORANGE,                    // o: original MY_ORANGE
+        TFT_YELLOW,                   // v: original TFT_YELLOW
+        tft->color565(  0, 255,   0), // e: G3
+        tft->color565(  0, 100, 255), // r: B2
+        tft->color565(  0,   0, 255), // B: Pure Blue (0, 0, 255)
+        tft->color565(100,  20, 190), // o: U1
+        tft->color565(230,  30, 100)  // y: P2
+    };
+
+    unsigned long elapsed = millis() - splashStartTime;
+
+    // 4 notes play at:
+    // Note 0 (Lo): 0 ms -> duration 150ms
+    // Note 1 (ve): 180 ms -> duration 150ms
+    // Note 2 (rB): 360 ms -> duration 150ms
+    // Note 3 (oy): 540 ms -> duration 600ms
+    const unsigned long noteStarts[4] = {0, 180, 360, 540};
+    const unsigned long jumpDuration = 180;
+    const int maxJumpHeight = 9;
+
+    tft->setTextSize(5);
+    int totalWidth = tft->textWidth(title);
+    int startCursorX = (tft->width() / 2) - (totalWidth / 2);
+    int baseY = tft->height() / 2 - 10;
+
+    int currentCursorX = startCursorX;
+    for (int i = 0; i < title.length(); i++) {
+        String letter = String(title.charAt(i));
+        int letterW = tft->textWidth(letter);
+        int pairIdx = i / 2;
+
+        int targetOffset = 0;
+        if (elapsed >= noteStarts[pairIdx] && elapsed < noteStarts[pairIdx] + jumpDuration) {
+            unsigned long jumpElapsed = elapsed - noteStarts[pairIdx];
+            // Sine wave arc: jumps up to maxJumpHeight and lands smoothly
+            float phase = (float)jumpElapsed / (float)jumpDuration; // 0.0 to 1.0
+            targetOffset = (int)(sin(phase * 3.14159265f) * maxJumpHeight);
+        }
+
+        if (targetOffset != splashCurrentOffset[i]) {
+            // Letter bounding box at font size 5 is roughly letterW x 40
+            int clearH = 46; // cover jump range and font bounds
+            int clearY = baseY - maxJumpHeight - 2;
+            tft->fillRect(currentCursorX, clearY, letterW, clearH, TFT_BLACK);
+
+            splashCurrentOffset[i] = targetOffset;
+            tft->setTextColor(rainbowColors[i % 8]);
+            tft->setTextDatum(ML_DATUM);
+            tft->drawString(letter, currentCursorX, baseY - splashCurrentOffset[i]);
+        }
+
+        currentCursorX += letterW;
+    }
 }
 
 void MenuManager::updateBatteryDisplay() {
