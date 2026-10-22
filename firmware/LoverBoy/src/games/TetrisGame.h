@@ -41,9 +41,9 @@ private:
     // Timing Constants (ms)
     static const unsigned long DAS_DELAY_MS      = 165;
     static const unsigned long ARR_RATE_MS       = 48;
-    static const unsigned long SOFT_DROP_RATE_MS = 45;
-    static const unsigned long LOCK_DELAY_MS     = 450;
-    static const int           MAX_LOCK_RESETS   = 8;
+    static const unsigned long SOFT_DROP_RATE_MS = 25;
+    static const unsigned long LOCK_DELAY_MS     = 500; // Tetris Guideline standard (0.5s)
+    static const int           MAX_LOCK_RESETS   = 15;  // Tetris Guideline 15-move reset limit
     static const unsigned long LINE_CLEAR_MS     = 160;
 
     // Board & Differential Display Buffers

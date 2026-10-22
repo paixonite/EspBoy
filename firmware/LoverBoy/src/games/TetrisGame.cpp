@@ -281,10 +281,13 @@ int TetrisGame::computeGhostY() const {
 }
 
 unsigned long TetrisGame::getGravityInterval() const {
+    // Official Tetris Guideline gravity curve:
+    // seconds = (0.8 - ((level - 1) * 0.007)) ^ (level - 1)
+    // Converted to milliseconds per cell drop (levels 1 to 15+):
     static const unsigned long LEVEL_SPEEDS[15] = {
-        750, 650, 560, 480, 410,
-        350, 295, 245, 200, 165,
-        135, 110,  90,  75,  60
+        1000, 793, 618, 473, 355,
+         262, 190, 135,  94,  64,
+          43,  28,  18,  11,   7
     };
     int idx = constrain(level - 1, 0, 14);
     return LEVEL_SPEEDS[idx];
@@ -453,7 +456,9 @@ void TetrisGame::updatePlaying() {
         lockTimerActive = false;
 
         if (isSoftDropping) {
-            if (now - lastSoftDropTime >= SOFT_DROP_RATE_MS) {
+            unsigned long dropRate = min(SOFT_DROP_RATE_MS, getGravityInterval() / 2);
+            if (dropRate < 10) dropRate = 10;
+            if (now - lastSoftDropTime >= dropRate) {
                 lastSoftDropTime = now;
                 lastGravityTime  = now;
                 tryMove(0, 1);
