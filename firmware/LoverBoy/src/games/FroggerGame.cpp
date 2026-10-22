@@ -6,7 +6,7 @@ static const uint16_t COLOR_SAFE_BANK     = 0x4208; // Dark slate/purple-grey sa
 static const uint16_t COLOR_LOG_BROWN     = 0x4141; // N1 Dark Coffee brown (RGB: 80, 40, 15)
 static const uint16_t COLOR_ARCADE_ORANGE = 0xFA00; // Deep vivid arcade orange
 static const uint16_t COLOR_FROG_GREEN    = 0x5F23; // G4 Lime Green (RGB: 90, 230, 30)
-static const uint16_t COLOR_WATER_BLUE    = 0x033F; // Water blue (RGB: 0, 100, 255)
+static const uint16_t COLOR_WATER_BLUE    = 0x019B; // B1 Deep Royal blue (RGB: 0, 50, 220)
 static const uint16_t COLOR_CROC_GREEN    = 0x0280; // Dark crocodile green (darker than forest green: RGB 0, 80, 0)
 
 // X coordinates for the 5 Lilypad Goal Bays across the 320px width

@@ -3,7 +3,7 @@
 #include "../core/pins.h"
 
 // Custom RGB565 colors for crisp minimalist readability
-static const uint16_t COLOR_RIVER_WATER = 0x033F; // Water blue (RGB: 0, 100, 255)
+static const uint16_t COLOR_RIVER_WATER = 0x019B; // B1 Deep Royal blue (RGB: 0, 50, 220)
 static const uint16_t COLOR_LOG         = 0x4141; // N1 Dark Coffee brown (RGB: 80, 40, 15)
 static const uint16_t COLOR_CAR         = TFT_RED;
 static const uint16_t COLOR_TRUCK       = 0x90DF; // Vibrant purple for buses/trucks
