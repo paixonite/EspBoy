@@ -431,7 +431,7 @@ void MenuManager::drawSplashScreen(bool animateLogo) {
     for (int i = 0; i < title.length(); i++) {
         splashCurrentOffset[i] = 0;
         String letter = String(title.charAt(i));
-        tft->setTextColor(rainbowColors[i % 8]);
+        tft->setTextColor(rainbowColors[i % 8], TFT_BLACK);
         tft->setTextDatum(ML_DATUM);
         tft->drawString(letter, cursorX, cursorY);
         cursorX += tft->textWidth(letter);
@@ -487,13 +487,15 @@ void MenuManager::updateSplashAnimation() {
         }
 
         if (targetOffset != splashCurrentOffset[i]) {
-            // Letter bounding box at font size 5 is roughly letterW x 40
-            int clearH = 46; // cover jump range and font bounds
-            int clearY = baseY - maxJumpHeight - 2;
+            // Font size 5 uses 8*5 = 40px height; centered with ML_DATUM gives baseY - 20 to baseY + 20.
+            // With maxJumpHeight (10px), letter can reach baseY - 30.
+            // Clear with generous vertical padding to fully erase prior positions.
+            int clearH = 40 + maxJumpHeight + 6;
+            int clearY = (baseY - 20) - maxJumpHeight - 3;
             tft->fillRect(currentCursorX, clearY, letterW, clearH, TFT_BLACK);
 
             splashCurrentOffset[i] = targetOffset;
-            tft->setTextColor(rainbowColors[i % 8]);
+            tft->setTextColor(rainbowColors[i % 8], TFT_BLACK);
             tft->setTextDatum(ML_DATUM);
             tft->drawString(letter, currentCursorX, baseY - splashCurrentOffset[i]);
         }
