@@ -16,7 +16,8 @@ enum GameState {
     STATE_GAME_OVER, 
     STATE_HIGHSCORE_VIEW, 
     STATE_HIGHSCORE_ENTRY,
-    STATE_TUTORIAL
+    STATE_TUTORIAL,
+    STATE_HIGHSCORE_CONFIRM_RESET
 };
 
 class Game {
@@ -78,13 +79,16 @@ protected:
     void endGame(); 
     void loadHighscores();
     void saveHighscores();
+    void resetHighscores();
     
     void drawHighscoreViewScreen();
     void drawHighscoreEntryScreen();
+    void drawConfirmReset();
     void drawInitials(); 
     
     void handleHighscoreViewInput();
     void handleHighscoreEntryInput();
+    void handleConfirmResetInput();
 
     // --- UI Helpers ---
     void drawTopBar(const String& title, uint16_t color = TFT_YELLOW);

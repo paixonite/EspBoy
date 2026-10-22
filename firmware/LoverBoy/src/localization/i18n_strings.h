@@ -45,6 +45,7 @@
   X(STR_HIGHSCORES_TITLE,  24, "HIGHSCORES",                    "RECORDES") \
   X(STR_NEW_TOP_SCORE,     24, "NEW TOP SCORE!",                "NOVO RECORDE!") \
   X(STR_HINT_CONFIRM,      50, "[A] Confirm",                   "[A] Confirmar") \
+  X(STR_HINT_HIGHSCORES,   50, "[SELECT] Reset    [B] Back",        "[SELECT] Zerar    [B] Voltar") \
   /* --- Tutorial Shared --- */ \
   X(STR_TUTORIAL_TITLE,    15, "TUTORIAL",                      "TUTORIAL") \
   X(STR_TUT_SEC_CONTROLS,  12, "CONTROLS",                      "CONTROLES") \

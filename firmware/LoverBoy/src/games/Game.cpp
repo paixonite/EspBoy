@@ -69,6 +69,10 @@ void Game::loop() {
             handleHighscoreViewInput();
             break;
 
+        case STATE_HIGHSCORE_CONFIRM_RESET:
+            handleConfirmResetInput();
+            break;
+
         case STATE_TUTORIAL:
             handleTutorialInput();
             break;
@@ -114,6 +118,7 @@ void Game::changeState(GameState newState) {
     else if (newState == STATE_HIGHSCORE_VIEW) drawHighscoreViewScreen();
     else if (newState == STATE_HIGHSCORE_ENTRY) drawHighscoreEntryScreen();
     else if (newState == STATE_TUTORIAL) drawTutorialScreen();
+    else if (newState == STATE_HIGHSCORE_CONFIRM_RESET) drawConfirmReset();
 }
 
 unsigned long Game::gameMillis() const {
@@ -364,6 +369,20 @@ void Game::saveHighscores() {
     preferences.end();
 }
 
+void Game::resetHighscores() {
+    String ns = gameName;
+    ns.replace(" ", ""); 
+
+    preferences.begin(ns.c_str(), false); 
+    preferences.clear();
+    preferences.end();
+
+    for (int i = 0; i < 3; i++) {
+        topScores[i] = defaultScores[i];
+        topNames[i] = defaultNames[i];
+    }
+}
+
 // =================================================================
 // VIEW SCREEN (TOP SCORES)
 // =================================================================
@@ -386,13 +405,43 @@ void Game::drawHighscoreViewScreen() {
         tft->drawString(String(topScores[i]), tft->width() - 40, y);
     }
 
-    drawBottomBar(tr(STR_HINT_BACK), TFT_WHITE);
+    drawBottomBar(tr(STR_HINT_HIGHSCORES), TFT_WHITE);
+}
+
+void Game::drawConfirmReset() {
+    tft->fillRect(tft->width() / 2 - 110, tft->height() / 2 - 45, 220, 90, TFT_BLACK);
+    tft->drawRect(tft->width() / 2 - 110, tft->height() / 2 - 45, 220, 90, TFT_RED);
+    
+    tft->setTextColor(TFT_RED);
+    tft->setTextSize(2);
+    tft->setTextDatum(MC_DATUM);
+    TextRenderer::draw(tft, tr(STR_RESET_TITLE), tft->width() / 2, tft->height() / 2 - 15);
+    
+    tft->setTextColor(TFT_WHITE);
+    tft->setTextSize(1);
+    TextRenderer::draw(tft, tr(STR_HINT_YES_NO), tft->width() / 2, tft->height() / 2 + 15);
 }
 
 void Game::handleHighscoreViewInput() {
-    if (input->wasPressed(BTN_ID_B)) {
+    if (input->wasPressed(BTN_ID_SELECT)) {
+        sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+        changeState(STATE_HIGHSCORE_CONFIRM_RESET);
+    }
+    else if (input->wasPressed(BTN_ID_B)) {
         sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
         changeState(STATE_TITLE);
+    }
+}
+
+void Game::handleConfirmResetInput() {
+    if (input->wasPressed(BTN_ID_A)) {
+        resetHighscores();
+        sound->play(MELODY_SCORE, MELODY_SCORE_LENGTH);
+        changeState(STATE_HIGHSCORE_VIEW);
+    }
+    else if (input->wasPressed(BTN_ID_B)) {
+        sound->play(MELODY_MENU_NAVIGATE, MELODY_MENU_NAVIGATE_LENGTH);
+        changeState(STATE_HIGHSCORE_VIEW);
     }
 }
 
